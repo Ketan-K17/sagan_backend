@@ -1,0 +1,24 @@
+{
+    "Results": [
+        {
+            "content": "(clocked at lower frequencies) and more power hungry than commercial embedded technology. \nTo demonstrate the gap between rad-hard and commercial technology, Figure 1 compares the \ncomputational density (CD), a metric that measures the theoretical steady-state performance of the \ncomputational units of a processor for a stream of independent integer (Int8, Int16, Int32) and \nfloating-point (SPFP-Single Precision Floating Point, DPFP-Double Precision Floating Point)",
+            "images": []
+        },
+        {
+            "content": "Likewise, the power efficiency of rad-hard processors, which can be estimated from the \ncomputational density per watt (CD/W) metric shown in Figure 2, is nearly two orders of \nmagnitude smaller than that of commercial embedded processors [21]. Aside from the \ncomputational density and power efficiency of the processing units, memory size and bandwidth \nare also key considerations for AI, allowing the processor to efficiently store and stream model",
+            "images": []
+        },
+        {
+            "content": "units available is united by a peculiar characteristic: the average performance of \nCOTS processors is considerably higher than the average rad-hard solution found \nin spacecraft. However, despite the average performances, interesting solutions \nfrom the rad-hard domain are also appearing, and this makes the separation between \nCOTS and rad-hard processors somewhat smaller when interpreted from a \nperformance point of view [57]. Even if from a cost perspective the comparison",
+            "images": []
+        },
+        {
+            "content": "processor, the BAE RAD5545 (still awaiting QML qualification as of July 2023), exhibits a \ncomputational density that is nearly two orders of magnitude smaller than that of the commercial \nXilinx Zynq 7020, a popular embedded system-on-chip (SoC) architecture released in 2011 that \ncombines a dual ARM Cortex-A9 core and an FPGA fabric, and the commercial Core i7-4610Y, \na 4th-generation Intel hyperthreaded dual-core processor launched in 2013 that was designed for \nmobile and tablet markets.",
+            "images": []
+        },
+        {
+            "content": "Date: 07/23 \nRevision: v4 \n \n \n \nAs Published in \u201cPrecision Medicine for Long and Safe Permanence of Humans in Space\u201d \n7 \nCurrent AI Technology in Space \n \n \n \nFigure 2: Comparison of Computational Density Per Watt of State-of-the-art Rad-Hard Processors (BAE RAD750, \nCAES Gaisler GR740, and BAE RAD5545) and Commercial Embedded Processors (Xilinx Zynq 7020 and Intel \nCore i7-4610Y) [21] \nLikewise, the power efficiency of rad-hard processors, which can be estimated from the",
+            "images": []
+        }
+    ]
+}

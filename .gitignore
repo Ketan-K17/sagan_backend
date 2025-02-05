@@ -1,0 +1,162 @@
+mgmt_writeup_template
+mgmt_db
+mgmt_template_db
+template_db
+.env
+What_to_finish_on_9th_nov
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# dotenv
+.env
+.env.*
+
+# virtualenv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Poetry
+poetry.lock
+
+# VS Code
+.vscode/
+
+# Ignore specific files in the output_pdf directory
+sagan_workflow/spaider_agent_temp/output_pdf/output.aux
+sagan_workflow/spaider_agent_temp/output_pdf/output.fdb_latexmk
+sagan_workflow/spaider_agent_temp/output_pdf/output.fls
+sagan_workflow/spaider_agent_temp/output_pdf/output.out
+sagan_workflow/spaider_agent_temp/output_pdf/output.synctex.gz
+sagan_workflow/spaider_agent_temp/output_pdf/output.toc
+sagan_workflow/spaider_agent_temp/output_pdf/
+
+sagan_multimodal/data/*
+sagan_multimodal/fnr_knowledgebase/*
+
+sagan_multimodal/sagan_workflow/spaider_agent_temp/output_pdf/
+
+sagan_multimodal/sagan_workflow/spaider_agent_temp/output_pdf/nodewise_output/
+
+sagan_multimodal/sagan_workflow/spaider_agent_temp/retrieved_images/
+
+sagan_multimodal/sagan_workflow/spaider_agent_temp/output_pdf/output.docx
+
+node_modules/
+
+sagan_multimodal/sagan_workflow_refiner/spaider_agent_temp/formatter_response.txt
+
+
+sagan_multimodal/ingest_data/extracted_images/*

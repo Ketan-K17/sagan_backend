@@ -1,0 +1,70 @@
+[tool.poetry]
+version = "0.1.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"  # Using the more flexible version constraint
+
+# Core dependencies
+langchain = "*"
+langchain-huggingface = "*"
+langchain-community = "^0.3.3"  # Using specific version from ingest-data
+langchain-core = "^0.3.16"
+langchain-openai = "*"
+langchain-groq = "*"
+langchain-chroma = "^0.1.4"
+
+# Graph and checkpoint dependencies
+langgraph = "^0.2.39"  # Using specific version from ingest-data
+langgraph-checkpoint-sqlite = "*"
+
+# Document processing
+unstructured = "^0.16.2"
+docx2txt = "^0.8"
+fitz = "^0.0.1.dev2"
+
+# API and web
+fastapi = "^0.115.5"
+python-multipart = "^0.0.17"
+pyngrok = "^7.2.1"
+websockets = "^14.1"
+requests = {extras = ["security"], version = "^2.32.3"}
+
+# Database and search
+chromadb = "^0.5.15"
+duckduckgo-search = "^6.3.4"
+
+# Utilities
+python-dotenv = "*"
+typing-extensions = "*"
+black = "*"
+ipython = "*"
+nest-asyncio = "^1.6.0"
+beautifulsoup4 = "^4.12.3"
+einops = "^0.8.0"
+sentence-transformers = "^3.3.1"
+certifi = "^2024.8.30"
+pyopenssl = "^24.3.0"
+importlib = "^1.0.4"
+colorama = "^0.4.6"
+chardet = "^5.2.0"
+matplotlib = "^3.9.2"
+pypandoc = "^1.15"
+smolagents = "^1.7.0"
+python-docx = "^1.1.2"
+
+[tool.poetry.group.dev.dependencies]
+python-certifi-win32 = "^1.6.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+authors = [
+    { name = "Ketan Kunkalikar", email = "ketankunkalikar33@gmail.com" },
+]
+description = "Sagan Proposal Generator with multiple workflows"
+dynamic = ["version", "dependencies", "readme", "authors", "description"]
+name = "sagan_multimodal"
+requires-python = ">=3.11"

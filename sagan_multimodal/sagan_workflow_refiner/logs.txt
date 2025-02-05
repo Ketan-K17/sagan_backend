@@ -1,0 +1,55 @@
+#### og section text
+
+# 3: Expected Outcomes / Impact
+
+
+
+## Industry and Policy Implications
+The FNR places significant emphasis on the impact of research outputs on science, industry, policy making, and society at large. To maximize the potential impact, FNR-funded research results are expected to be disseminated through high-quality, Open Access publications, in line with the FNR Policy on Open Access. This includes the encouragement of preprints in open access repositories. Applicants are required to list the value and impact of all research outputs, including publications, data, software, and training of young scientists. The FNR also supports the dissemination of research to the general public and media, emphasizing the need for impact-generating activities from the project's inception. Furthermore, the FNR is committed to the principles of the European Charter for Researchers, ensuring that projects align with European standards and practices. Public-private partnerships are encouraged, with a significant portion of research time spent in collaboration with industry partners. The FNR provides funding support for project-related publications through its Open Access Fund, ensuring that research outputs are accessible and impactful across various sectors.
+
+
+## Scientific and Societal Impact
+The FNR emphasizes the importance of evaluating research outputs beyond traditional research articles, considering a diverse range of contributions such as data, reagents, software, mentoring, intellectual property, and societal outreach. Applicants are encouraged to focus on the content and quality of their scientific outputs rather than relying on journal-based metrics like Journal Impact Factors. The FNR, as a signatory of the DORA declaration, supports the dissemination of research through Open Access publications to maximize impact on science, industry, policy making, and society. It is crucial to account for legitimate delays in research activities due to personal factors and to ensure diversity and inclusion in all research-related activities. The FNR also highlights the importance of planning for the impact of research from the project's inception and encourages the training and career development of young scientists, particularly in AFR bilateral projects. Researchers should be aware of unconscious bias and strive to foster diversity, especially in recruitment processes.
+
+###### modified_section_text taken directly from the state
+## Scientific and Societal Impact
+
+The University of Luxembourg is at the forefront of research activities in the space and aerospace industry, significantly contributing to scientific advancements and societal benefits. The university's Research Unit in Engineering Science (RUES) is dedicated to addressing socio-economic challenges through advanced research in civil, mechanical, and electrical engineering, as well as geophysics. This commitment positions the university as a leader in education and research within the Greater Region and globally.
+
+The university's Interdisciplinary Centre for Security, Reliability and Trust (SnT) conducts cutting-edge research in information and communication technology (ICT), with a strong focus on space-related projects. These include satellite communications, space resources, and space vehicles, aligning with the strategic priorities of the university to create socio-economic impact.
+
+In collaboration with the Luxembourg Space Agency, the University of Luxembourg launched a two-year Interdisciplinary Space Master program in 2019. This initiative aims to develop the necessary skills and expertise required by the growing space ecosystem, fostering talent for the space industry.
+
+## Industry and Policy Implications
+
+The University of Luxembourg emphasizes the importance of evaluating research outputs beyond traditional metrics, focusing on diverse contributions such as data, software, and societal outreach. The university supports the dissemination of research through Open Access publications, maximizing impact on science, industry, policy making, and society.
+
+Public-private partnerships are encouraged, with significant research time spent in collaboration with industry partners. The university's involvement in the national space program (LuxIMPULSE) and contributions to the European Space Agency programs facilitate access to the space market in Europe, supporting groundbreaking technological developments.
+
+The university is committed to diversity and inclusion in all research-related activities, ensuring that projects align with European standards and practices. It also highlights the importance of planning for the impact of research from the project's inception and encourages the training and career development of young scientists, particularly in space-related fields.
+
+
+
+
+
+###### modified section text picked from draft.media
+
+# 3: Expected Outcomes / Impact
+## Scientific and Societal Impact
+
+The University of Luxembourg is at the forefront of research activities in the space and aerospace industry, significantly contributing to scientific advancements and societal benefits. The university's Research Unit in Engineering Science (RUES) is dedicated to addressing socio-economic challenges through advanced research in civil, mechanical, and electrical engineering, as well as geophysics. This commitment positions the university as a leader in education and research within the Greater Region and globally.
+
+The university's Interdisciplinary Centre for Security, Reliability and Trust (SnT) conducts cutting-edge research in information and communication technology (ICT), with a strong focus on space-related projects. These include satellite communications, space resources, and space vehicles, aligning with the strategic priorities of the university to create socio-economic impact.
+
+In collaboration with the Luxembourg Space Agency, the University of Luxembourg launched a two-year Interdisciplinary Space Master program in 2019. This initiative aims to develop the necessary skills and expertise required by the growing space ecosystem, fostering talent for the space industry.
+
+## Industry and Policy Implications
+
+The University of Luxembourg emphasizes the importance of evaluating research outputs beyond traditional metrics, focusing on diverse contributions such as data, software, and societal outreach. The university supports the dissemination of research through Open Access publications, maximizing impact on science, industry, policy making, and society.
+
+Public-private partnerships are encouraged, with significant research time spent in collaboration with industry partners. The university's involvement in the national space program (LuxIMPULSE) and contributions to the European Space Agency programs facilitate access to the space market in Europe, supporting groundbreaking technological developments.
+
+The university is committed to diversity and inclusion in all research-related activities, ensuring that projects align with European standards and practices. It also highlights the importance of planning for the impact of research from the project's inception and encourages the training and career development of young scientists, particularly in space-related fields.
+
+
+
