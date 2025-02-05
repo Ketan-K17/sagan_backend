@@ -9,6 +9,9 @@ SAGAN_ROOT = Path(__file__).parent # i.e. sagan_multimodal
 FIRST_WORKFLOW_ROOT = SAGAN_ROOT / "sagan_workflow" / "spaider_agent_temp"
 SECOND_WORKFLOW_ROOT = SAGAN_ROOT / "sagan_workflow_refiner" / "spaider_agent_temp"
 
+# template file path
+TEMPLATE_FILE_PATH = SAGAN_ROOT / "fnr_template" / "template.docx"
+
 # Database paths
 VECTOR_DB_PATHS = {
     'astro_db': SAGAN_ROOT / "ingest_data" / "astroaidb",
