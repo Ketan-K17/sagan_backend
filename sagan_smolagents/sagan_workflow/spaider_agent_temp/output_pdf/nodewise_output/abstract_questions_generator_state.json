@@ -1,24 +1,24 @@
 {
   "metadata": {
     "node_name": "abstract_questions_generator",
-    "timestamp": "2025-02-10 01:26:36.599603"
+    "timestamp": "2025-02-09 22:19:07.344787"
   },
   "state": {
     "messages": [],
-    "user_prompt": "Write a comprehensive research proposal focused on the development of autonomous AI agents for spacecraft operations in GNC and AOCS operations and also remote sensing. The proposal should outline a vision for AI-driven agents capable of not only facilitating real-time communication with spacecraft systems but also autonomously managing and controlling spacecraft functions. Emphasize how these agents will reduce human involvement in mission-critical tasks, minimize human error, and enhance overall mission efficiency and safety. Include detailed objectives, expected technical innovations, challenges to address (such as AI reliability, decision-making under uncertainty, and system integration), and potential impacts on the space exploration industry.",
-    "project_title": "Autonomous AI Agents for Spacecraft Operations",
-    "project_description": "A research proposal focused on developing autonomous AI agents for spacecraft operations to enhance real-time communication, autonomous management, and control of spacecraft functions in GNC and AOCS operations as well as remote sensing. The agents will reduce human involvement in mission-critical tasks, minimize errors, and enhance mission efficiency and safety of spacecraft operation by utilizing AI agents. Some key aspects of the project include (1) Developing AI agents to facilitate real-time communication with spacecraft systems, (2) Implementing AI-driven autonomous management and control of spacecraft functions, (3) Improving decision-making under uncertainty and handling reliability challenges, (4) System integration and preventing potential conflicts between human operators and AI agents, (5) Visualizing the integration and deployment strategies of AI agents with the existing mission operations environments, and (6) Creating a migration process for human operators who will collaborate with the AI agents and establishing proper human-AI cooperation protocols. Successful completion will positively impact space exploration by (1) reducing errors and reliance on human decision-making, (2) enhancing safety, (3) improving the response time and adjusting to the newly arising mission tasks and lessening overall human configuration and integration burdens.",
+    "user_prompt": "Our research project aims to determine precise orbital trajectories of asteroids in our solar system. We're developing advanced computational methods and algorithms to improve asteroid tracking and prediction. Our sophisticated system processes astronomical observations from various sources to calculate accurate orbital parameters, accounting for subtle forces like solar radiation pressure and the Yarkovsky effect. Key challenges include developing robust statistical methods, implementing advanced orbit determination algorithms, and creating a comprehensive database. We're combining classical orbital mechanics with modern computational techniques, including machine learning. The project will deliver practical tools for the astronomical community and has significant implications for planetary defense and solar system dynamics understanding.",
+    "project_title": "Precise Asteroid Trajectory Analysis",
+    "project_description": "A research project aimed at determining accurate orbital trajectories of asteroids in the solar system. Developing advanced computational methods and algorithms to improve asteroid tracking and prediction, processing astronomical observations from various sources to calculate precise orbital parameters. Accounts for subtle forces such as solar radiation pressure and the Yarkovsky effect. Involves robust statistical methods, advanced orbit determination algorithms, and creation of a comprehensive database. Combines classical orbital mechanics with modern computational techniques, including machine learning. Delivers practical tools for the astronomical community and enhances understanding of planetary defense and solar system dynamics.",
     "abstract_questions": [
-      "What specific spacecraft operations will the autonomous AI agents be designed to manage and control, and how will this impact the overall efficiency of the mission?",
-      "Can you elaborate on the type of real-time communication that the AI agents will facilitate with spacecraft systems, and what protocols will be used to ensure seamless communication?",
-      "How will the AI agents handle decision-making under uncertainty, and what strategies will be employed to mitigate potential reliability challenges?",
-      "What measures will be taken to ensure a smooth system integration and prevent potential conflicts between human operators and AI agents?",
-      "What kind of visualization tools and strategies will be used to illustrate the integration and deployment of AI agents within the existing mission operations environment?",
-      "How will the migration process for human operators who will collaborate with the AI agents be managed, and what protocols will be established to ensure effective human-AI cooperation?",
-      "What kind of testing and validation will be conducted to ensure that the AI agents can operate safely and efficiently in a variety of mission scenarios?",
-      "How will the success of the project be measured, and what metrics will be used to evaluate the impact on space exploration?",
-      "What kind of human-AI interface will be designed to facilitate collaboration and minimize potential errors or conflicts?",
-      "How will the AI agents be trained, validated, and updated with new mission requirements or changing environmental conditions?"
+      "Could you describe the specific goals of this project in terms of improving asteroid trajectory analysis?",
+      "What are the key sources and types of astronomical observations that will be utilized in this project?",
+      "How will the project account for factors such as solar radiation pressure and the Yarkovsky effect in its computations?",
+      "What existing orbital mechanics and computational techniques will be combined in this project?",
+      "Could you provide more details on the role of machine learning in enhancing orbit determination and prediction?",
+      "What are the expected benefits and practical applications of the tools and database to be developed during this project?",
+      "How will the project ensure the accuracy and reliability of the computed orbital parameters?",
+      "What are some of the potential challenges that the project may face, and how are these being addressed?",
+      "Who is the target audience or end-users of the tools and database developed in this project?",
+      "How does this project contribute to our understanding of planetary defense and solar system dynamics?"
     ]
   }
 }

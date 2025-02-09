@@ -66,13 +66,14 @@ from smolagents import ToolCallingAgent, HfApiModel
 # select model
 # model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
-model_id = "meta-llama/Meta-Llama-3.1-70B-Instruct"
+model_id = "Qwen/Qwen2.5-Coder-32B-Instruct"
+# model_id = "meta-llama/Meta-Llama-3.1-70B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 # model_id = "NousResearch/Hermes-3-Llama-3.1-8B"
 model = HfApiModel(model_id=model_id)   
 
-MODEL = "gpt-4o"
-llm = BuildChatOpenAI(model=MODEL, temperature=0)
+# MODEL = "gpt-4o"
+# llm = BuildChatOpenAI(model=MODEL, temperature=0)
 
 def prompt_parser(state: State) -> State:
     """
@@ -123,7 +124,7 @@ def abstract_questions_generator(state: State) -> State:
     project_title = state.get("project_title", "")
     project_description = state.get("project_description", "")
     
-    empty_prompt = """"""
+    empty_prompt = """ """
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
@@ -159,6 +160,8 @@ def abstract_questions_generator(state: State) -> State:
         state["messages"].append(SystemMessage(content=f"Error: {e}"))
         state["abstract_questions"] = None
         return state
+    
+
 
 def abstract_answers_generator(state: State) -> State:
     """
