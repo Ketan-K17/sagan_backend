@@ -1,5 +1,10 @@
 [tool.poetry]
+name = "sagan_multimodal"
 version = "0.1.0"
+description = "Sagan Proposal Generator with multiple workflows"
+authors = [
+    "Ketan Kunkalikar <ketankunkalikar33@gmail.com>"
+]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -21,7 +26,7 @@ langgraph-checkpoint-sqlite = "*"
 # Document processing
 unstructured = "^0.16.2"
 docx2txt = "^0.8"
-fitz = "^0.0.1.dev2"
+PyMuPDF = "^1.24.0"
 
 # API and web
 fastapi = "^0.115.5"
@@ -52,6 +57,7 @@ matplotlib = "^3.9.2"
 pypandoc = "^1.15"
 smolagents = "^1.7.0"
 python-docx = "^1.1.2"
+frontend = "^0.0.3"
 
 [tool.poetry.group.dev.dependencies]
 python-certifi-win32 = "^1.6.1"
@@ -59,12 +65,3 @@ python-certifi-win32 = "^1.6.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[project]
-authors = [
-    { name = "Ketan Kunkalikar", email = "ketankunkalikar33@gmail.com" },
-]
-description = "Sagan Proposal Generator with multiple workflows"
-dynamic = ["version", "dependencies", "readme", "authors", "description"]
-name = "sagan_multimodal"
-requires-python = ">=3.11"
