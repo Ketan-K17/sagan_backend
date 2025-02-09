@@ -1,0 +1,891 @@
+
+Processing section: Introduction
+
+Querying for question: 
+What is the current state of autonomous AI agents in spacecraft operations, and how does it motivate the need for this research project?
+Query results: {'Results': [{'content': 'cuses on spacecraft autonomous operations, providing an overview of \nthe most promising concepts applied to human and machine collabo\xad\nration in space operations. Section 4 provides a critical examination of \nthe many AI techniques proposed for space system applications and \nsection 5 discusses how these techniques can be applied in practice to \nvarious DSS architectures. The required evolution of spaceflight systems \ninfrastructure is discussed in section 5, which highlights the most', 'images': []}, {'content': 'intervention \nand \nenabling \nmore \nambitious \nexploration missions. \n \nAUTONOMOUS SPACECRAFT \n \nThe development of autonomous spacecraft has \nbeen greatly facilitated by AI technologies. \nTraditionally, spacecraft operations have relied on \nground control systems for navigation and decision-\nmaking. \nHowever, \nAI-enabled \nautonomous \nspacecraft can make independent decisions in real-\ntime, adapting to unforeseen circumstances and \noptimizing mission objectives. By reducing the', 'images': []}, {'content': 'demonstrated its potential, with autonomous robots \nbeing deployed for tasks such as planetary \nexploration and repair missions. Additionally, AI \nplays a crucial role in autonomous spacecraft, \nenabling them to make independent decisions and \nnavigate through space with minimal human \nintervention. \nFurthermore, AI techniques have been extensively \nstudied and applied in the field of satellite \noperations. Researchers have developed AI-based \nsystems that enable efficient monitoring, control,', 'images': []}, {'content': 'optimize trajectories, perform course corrections, \nand handle unforeseen situations. Autonomous \nspacecraft equipped with AI capabilities can adapt \nto changing conditions, make real-time decisions, \nand operate with minimal human intervention. This \nincreased autonomy enhances mission efficiency, \nreduces \ncommunication \ndelays, \nand \nenables \nspacecraft to explore distant destinations or perform \ncomplex moves with greater precision. \nThe advancements in AI in the field of space have', 'images': []}, {'content': 'autonomous spacecraft. These advancements have \nenhanced the efficiency, accuracy, and autonomy of \nspace missions, contributing to scientific discoveries \nand opening new avenues for exploration. \nIn satellite operations, AI has enabled more efficient \nmonitoring, control, and maintenance of satellites in \norbit. Advanced algorithms and machine learning \ntechniques have been employed to analyse telemetry \ndata, predict anomalies, and optimize satellite \nperformance. AI systems continuously monitor', 'images': []}]}
+Added answer entry with content length: 489
+Number of images: 0
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 498
+Number of images: 0
+Added answer entry with content length: 491
+Number of images: 0
+Added answer entry with content length: 503
+Number of images: 0
+
+Querying for question: 
+How does the proposed research differ from existing approaches to AI in Guidance, Navigation, and Control (GNC) and Attitude and Orbit Control Systems (AOCS)?
+Query results: {'Results': [{'content': 'will be presented in Section 1.1, Section 1.2 and Section 1.3 respectively.\n1.1\nResearch objectives\nIn the previously presented context, this thesis’ work humbly wants to study\npotential advancements in the Guidance, Navigation & Control (GNC) design\nto move steps forward in the definition of spacecraft’s guidance and control\ntechniques characterized by an increased level of autonomy. In particular, the\nfollowing high-level question is posed.', 'images': []}, {'content': 'While an exhaustive review of onboard AI examples is beyond the scope of this chapter, we will \nhighlight major domains where onboard AI research is bourgeoning, including remote sensing and \nautonomous guidance, navigation, and control (GNC). For remote-sensing applications, methods \nfor onboard data triage are becoming exceptionally critical to maximize the science return of \nremote-sensing instruments, as limited satellite downlink bandwidth becomes saturated by ever-', 'images': []}, {'content': 'iii.Vehicle GNC \niv.Autonomous Landing \nv.Robotic Exploration \nReconfigurable platforms/on-board telemetry analysis, \nFDIR \ni.Adapt platforms to change in requirements or new standards \nii.Autonomous failure prognostic and detection \niii.Autonomous Safe mode management. \niv.AI-based FDIR \nSatellite guidance applications \ni.Autonomous AOCS management for constellations \nii.Autonomous collision avoidance \niii.Autonomous navigation \niv.Autonomous pointing and/or acquisition (AOCS-in-the-loop)', 'images': []}, {'content': 'iii.Autonomous navigation \niv.Autonomous pointing and/or acquisition (AOCS-in-the-loop) \nv.Payload-in-the-loop visual-based navigation \nvi.SDR/Beamforming/Adaptive Coding and Modulation \nvii.Smart FDIR/failure prediction/smart HKTM \nNew missions that are candidates for the use of AI \ni.Reconfigurable science (several missions with the same Hardware/Instrument) \nii.Servicing/Non-cooperative approach and rendezvous \niii.Debris detection and removal', 'images': []}, {'content': 'inspired by an already established or newly proposed mission concept. This narrow\nscope allows our survey to be concise while remaining relevant for the interested\npractitioner.\nMany times, results obtained by one AI technology for a speciﬁc task appear\nstunning, but perform rather poorly when transferred to a different task, which often\nhappens when its strength and weaknesses are not thoroughly understood. However,\ndue to the pioneering works of many researchers combined with the results of large', 'images': []}]}
+Added answer entry with content length: 446
+Number of images: 0
+Added answer entry with content length: 475
+Number of images: 0
+Added answer entry with content length: 494
+Number of images: 0
+Added answer entry with content length: 450
+Number of images: 0
+Added answer entry with content length: 503
+Number of images: 0
+
+Querying for question: 
+What are the key challenges and opportunities that this project aims to address in the field of autonomous spacecraft operations?
+Query results: {'Results': [{'content': 'In the remainder of this paper, we discuss the tools and\nworkﬂows that will be used to effectively operate spacecraft\nin these scenarios.\n3. OPERATIONS WORKFLOW\nIn this section, we describe current JPL operations workﬂow\nfor missions in a class comparable to the concept of opera-\ntions under considerations, and highlight areas and roles that\nwill change with the advent of more autonomous missions.\nFigure 3 provides a detailed representation of the new work-', 'images': []}, {'content': 'date autonomous technology has been deployed in a limited \nfashion to meet specific mission objectives which in most cases \ncould not be otherwise met.  In most instances, autonomy \ntechnology has met with success in its limited mission role.  \nFully autonomous spacecraft control has been demonstrated in a \nlimited capacity and appears to hold promise for reducing \nmission cost, increasing scientific returns and allowing the \noperation of more complex multi-vehicle missions.  What', 'images': []}, {'content': 'conducted in 2002 regarding the launch of a UAV from a UGV.  \nAdditional work regarding landing and refueling of a Allied \nAerospace 29” iStar UAV  has been conducted and technology \nfrom Carnegie Mellon, the Jet Propulsion Laboratory and \nGeodetics, Inc. is being used to facilitate autonomous landing. \n[32] \n \n \n4. AUTONOMOUS SPACE EXPLORATION \n \nA spacecraft encounters a somewhat unique problem as it \nmoves further and further from earth.  The increasing distance', 'images': []}, {'content': 'situations, guaranteeing mission success while minimizing any possible risks.\nSubsequently in the constant evolution of on-orbit servicing, the focus on\nspacecraft guidance and control autonomy emerges as a fundamental aspect\nwhich strongly drives the success and efficiency of missions, in order to make\nthe way to a new era of space exploration and applications where spacecrafts\ncan navigate and operate with unprecedented precision and adaptability.', 'images': []}, {'content': 'and no line-of-sight periods will occur depending on the specific mission. \nTaking into account the emerging needs of new nanosatellites missions, the \napplication presented in this case study aims at supporting the development of more \nautonomous spacecraft, able to decide and execute tasks independently from ground \ncontrol and from mothership authority. The presented algorithm forms the \nfoundation for event-based autonomous operations. This case study presents an', 'images': []}]}
+Added answer entry with content length: 461
+Number of images: 0
+Added answer entry with content length: 485
+Number of images: 0
+Added answer entry with content length: 469
+Number of images: 0
+Added answer entry with content length: 453
+Number of images: 0
+Added answer entry with content length: 471
+Number of images: 0
+
+Querying for question: 
+How does the project align with broader trends and advancements in the space exploration industry?
+Query results: {'Results': [{'content': "areas of sensing, navigation, control, and autonomy, with examples from past and future missions [20]. \nMehfuz, F. (2018, October): Historically, man's eternal quest to venture into the unknown has benefited humanity. Space exploration \nanswers some of the essential questions in connection with our belonging to the universe and furthers technology, leading to new \nindustries created thereby. Future missions will require advanced systems, robust, and economical, among which will be autonomous", 'images': []}, {'content': 'constructed. It will have state-of-the-art data processing and analysis techniques and will watch the universe in infrared light \nto arrive at new information about star, galaxy, and planetary system formation. \nThese missions and projects also have somewhat different applications of AI and robotics in space exploration and, thus, clearly show \nthe ongoing development and potential of revolutionizing our understanding of the Universe. This continued development holds with it', 'images': []}, {'content': 'is especially true in space where spacecraft operate at \nspeeds and distances orders of magnitude greater than \nterrestrial counterparts. The force that prepares for this \nrevolution and reaps its potential will have a significant \nadvantage over the force that does not. \n \nPROLIFERATING ACCESS TO SPACE \n \nThe rapid growth of the commercial space sector provides \nthe United States both new potential partners and \nopportunities to leverage commercial investment to', 'images': []}, {'content': 'Rovers, Satellite Constellations, Intelligent Habitats, In-situ Resource Utilization, Deep Space Missions. \n1. Introduction \nIntroduction Background Information and Significance Conquest of outer space has been the single biggest impetus for human \ninnovation and scientific enterprise since the launch of the space age [1]. From the first manned missions to the moon to some of the \nmost complex telescopes and robotic probes, the exploration of space has gone on to throw important light on the universe and', 'images': []}, {'content': 'to the reader. We decided to give importance to work published in the last few years,\navoiding the historical perspective of older and well-established fundamental works.\nAdditionally, we decided to avoid publications which are strongly speculative in\nnature: while visionary ideas are interesting to follow, an important requirement for\nthis survey was a well-motivated applicability for a space-related challenge, ideally\ninspired by an already established or newly proposed mission concept. This narrow', 'images': []}]}
+Added answer entry with content length: 496
+Number of images: 0
+Added answer entry with content length: 479
+Number of images: 0
+Added answer entry with content length: 467
+Number of images: 0
+Added answer entry with content length: 509
+Number of images: 0
+Added answer entry with content length: 505
+Number of images: 0
+
+Querying for question: 
+What are the potential long-term impacts of this research on the future of space missions and exploration?
+Query results: {'Results': [{'content': 'spacecraft design is a vast effort, branching out into many fields of science and \nengineering. The proposed research obtains several important results towards the \ndesign of space missions that provide higher utility to the stakeholders, by being \nmore optimized and not bound to the stagnancy of conservative mission design \napproaches. These improvements are obtained through innovations in three aspects \nof the mission design: \n• exploring the alternative concepts thoroughly and more efficiently', 'images': []}, {'content': "areas of sensing, navigation, control, and autonomy, with examples from past and future missions [20]. \nMehfuz, F. (2018, October): Historically, man's eternal quest to venture into the unknown has benefited humanity. Space exploration \nanswers some of the essential questions in connection with our belonging to the universe and furthers technology, leading to new \nindustries created thereby. Future missions will require advanced systems, robust, and economical, among which will be autonomous", 'images': []}, {'content': 'Emphasize their role in such tasks as navigation, data analysis, and environmental interaction [3]. \n\uf0b7 \nFuture Prospects: The topics in the future prospects of AI and robotics that can further revolutionize space exploration should \nbe explored, such as intelligent habitats and in-situ resource utilization. \n\uf0b7 \nScientific Discovery and Operational Efficiency Impact Assessment: Consider how AI and robotics can really enhance the \nscientific output and operational effectiveness of space missions. \n\uf0b7', 'images': []}, {'content': 'space missions. The results highlight the immense \npotential \nof \nAI \nin \nfurther \nadvancing \nour \nunderstanding of the universe and facilitating future \nspace exploration initiatives. \n \nDISCUSSION \n \nThe findings of this research highlight the \ntransformative role of artificial intelligence (AI) in \nthe field of space exploration. The discussion section \nfocuses on the implications of AI applications in \nsatellite operations, data analysis, robotics, and', 'images': []}, {'content': 'Rovers, Satellite Constellations, Intelligent Habitats, In-situ Resource Utilization, Deep Space Missions. \n1. Introduction \nIntroduction Background Information and Significance Conquest of outer space has been the single biggest impetus for human \ninnovation and scientific enterprise since the launch of the space age [1]. From the first manned missions to the moon to some of the \nmost complex telescopes and robotic probes, the exploration of space has gone on to throw important light on the universe and', 'images': []}]}
+Added answer entry with content length: 501
+Number of images: 0
+Added answer entry with content length: 496
+Number of images: 0
+Added answer entry with content length: 502
+Number of images: 0
+Added answer entry with content length: 460
+Number of images: 0
+Added answer entry with content length: 509
+Number of images: 0
+Completed answers for section: Introduction
+Number of answers: 25
+
+Processing section: Originality of the Research Project
+
+Querying for question: 
+What innovative aspects of the proposed AI agents make this research project unique and distinguish it from previous work?
+Query results: {'Results': [{'content': 'inspired by an already established or newly proposed mission concept. This narrow\nscope allows our survey to be concise while remaining relevant for the interested\npractitioner.\nMany times, results obtained by one AI technology for a speciﬁc task appear\nstunning, but perform rather poorly when transferred to a different task, which often\nhappens when its strength and weaknesses are not thoroughly understood. However,\ndue to the pioneering works of many researchers combined with the results of large', 'images': []}, {'content': 'Huge successes in the various fields of AI have contributed to the affirmation of \nthis branch of CS. Despite these successes, in the latest years, a particular research \neffort has taken back momentum and is now expanding: the strive towards the \n“whole agent”. Furthermore, previously isolated fields of AI have now been joined \ntogether, comparing and sharing each other’s results: it is a fact that sensory systems \n(vision, sonar and speech recognition) cannot deliver reliable information about the', 'images': []}, {'content': 'enhance it. Furthermore, AI may examine previous work to make sure \neverything is completed correctly. Furthermore, including collaborative \nrobots (“cobots”) into the production process decreases the requirement \nfor human workers in clean rooms. It improves the consistency of pro\xad\nduction processes that are prone to errors. AI, unlike humans, does not \nrequire rest or sleep in order to digest large amounts of data quickly. The \nbasic objective of the techniques utilised can also be used to classify AI,', 'images': []}, {'content': 'More exotic research directions (that, on the other side, share similar intents with \ninitial efforts in AI research) are considering the emulation of the human-level \nintelligence, or more in general the development of an Artificial General \nIntelligence, that would implement an universal algorithm for learning and acting \nin any environment. \nFinally, in recent years, an important paradigm shift has begun to appear: thanks to', 'images': []}, {'content': 'reason, the research community has devoted much effort to designing and developing new\nAI techniques in many strategic ﬁelds such as cybersecurity, e-Health, military applications,\nand smart cities.\nThe importance of AI is witnessed by the numerous survey papers describing recent\nadvances in AI in almost all ﬁelds. However, we have found that in recent years, AI has\nbeen strongly exploited in an important ﬁeld that is not covered by any speciﬁc survey:', 'images': []}]}
+Added answer entry with content length: 503
+Number of images: 0
+Added answer entry with content length: 504
+Number of images: 0
+Added answer entry with content length: 509
+Number of images: 0
+Added answer entry with content length: 431
+Number of images: 0
+Added answer entry with content length: 456
+Number of images: 0
+
+Querying for question: 
+How does the project leverage recent advancements in AI, machine learning, and data processing to achieve its goals?
+Query results: {'Results': [{'content': '“artificial general intelligence,” in which sophisticated AI approaches \nare developed to reason and solve problems in the same way that \nhumans can. Despite the introduction of new approaches to address \nthem, AI still faces a number of practical obstacles. The labelling of the \ntraining data required for supervised learning frequently necessitates a \nsignificant amount of human labour. Data sets that are large and thor\xad\nough enough to train a model are likewise challenging to come by. The', 'images': []}, {'content': 'mission goals in cybersecurity and satellite health monitoring. Despite \nthe progress made, some difficult difficulties remain, requiring scientific \nbreakthroughs. To date, the majority of progress has been accomplished \nin what is known as “narrow AI,” which involves developing ML algo\xad\nrithms to fulfil specific and well-defined functions, such as natural lan\xad\nguage processing. More difficult problems are left to be dealt with by \n“artificial general intelligence,” in which sophisticated AI approaches', 'images': []}, {'content': 'enhance it. Furthermore, AI may examine previous work to make sure \neverything is completed correctly. Furthermore, including collaborative \nrobots (“cobots”) into the production process decreases the requirement \nfor human workers in clean rooms. It improves the consistency of pro\xad\nduction processes that are prone to errors. AI, unlike humans, does not \nrequire rest or sleep in order to digest large amounts of data quickly. The \nbasic objective of the techniques utilised can also be used to classify AI,', 'images': []}, {'content': 'challenges and unlocking new opportunities. By \nleveraging AI techniques, scientists and engineers \ncan enhance data analysis, enable autonomous \nsystems, improve navigation, and achieve greater \nefficiency in space missions. \n \nMethodology: \nTo conduct this research initially, an extensive \nliterature search was performed using reputable \nscientific databases, including IEEE Xplore, ACM \nDigital Library, and Google Scholar. The search \nkeywords included "artificial intelligence," "AI,"', 'images': []}, {'content': '2\nDario Izzo, Marcus M¨artens, and Binfeng Pan\nfrom Machine Learning (ML) have gained increasing attention from scientists over\nthe past few decades and are now transforming whole economies as a result.\nThe space sector is catching up to these developments, as more and more works\nare published that incorporate concepts related to AI, like natural language process-\ning, knowledge representation, automated reasoning, computer vision, robotics, etc.', 'images': []}]}
+Added answer entry with content length: 495
+Number of images: 0
+Added answer entry with content length: 508
+Number of images: 0
+Added answer entry with content length: 509
+Number of images: 0
+Added answer entry with content length: 491
+Number of images: 0
+Added answer entry with content length: 450
+Number of images: 0
+
+Querying for question: 
+What novel methodologies or techniques are being introduced in the project to enhance the autonomy of spacecraft operations?
+Query results: {'Results': [{'content': 'cuses on spacecraft autonomous operations, providing an overview of \nthe most promising concepts applied to human and machine collabo\xad\nration in space operations. Section 4 provides a critical examination of \nthe many AI techniques proposed for space system applications and \nsection 5 discusses how these techniques can be applied in practice to \nvarious DSS architectures. The required evolution of spaceflight systems \ninfrastructure is discussed in section 5, which highlights the most', 'images': []}, {'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n22\nthe adoption of on-board autonomy for both mission planning and \nexecution [279]. Nowadays, most satellite operators/owners prefer \non-board control due to the limitation in bandwidth and the ability to \nperform autonomous operations [105–108]. These on-board control \nsystems are able to process mission and link segment data such as EO \ndata [271], space weather data, etc. without human intervention and', 'images': []}, {'content': 'date autonomous technology has been deployed in a limited \nfashion to meet specific mission objectives which in most cases \ncould not be otherwise met.  In most instances, autonomy \ntechnology has met with success in its limited mission role.  \nFully autonomous spacecraft control has been demonstrated in a \nlimited capacity and appears to hold promise for reducing \nmission cost, increasing scientific returns and allowing the \noperation of more complex multi-vehicle missions.  What', 'images': []}, {'content': 'In the remainder of this paper, we discuss the tools and\nworkﬂows that will be used to effectively operate spacecraft\nin these scenarios.\n3. OPERATIONS WORKFLOW\nIn this section, we describe current JPL operations workﬂow\nfor missions in a class comparable to the concept of opera-\ntions under considerations, and highlight areas and roles that\nwill change with the advent of more autonomous missions.\nFigure 3 provides a detailed representation of the new work-', 'images': []}, {'content': 'Chapter 4 \nChapter 4 is the first of the two major chapters of this thesis, and introduces the \nconcept of Mission Autonomy. The Chapter discusses about the need of improving \nMission Autonomy on modern spacecraft, presents key terminology used \nthroughout the thesis and discusses about past practices and current standards of \nautonomous operations on spacecraft. Finally, it presents the various issues that are \ncurrently driving the development on Mission Autonomy: control and operation', 'images': []}]}
+Added answer entry with content length: 489
+Number of images: 0
+Added answer entry with content length: 458
+Number of images: 0
+Added answer entry with content length: 485
+Number of images: 0
+Added answer entry with content length: 461
+Number of images: 0
+Added answer entry with content length: 492
+Number of images: 0
+
+Querying for question: 
+How does the project address the gap between current AI capabilities and the demands of real-time spacecraft operations?
+Query results: {'Results': [{'content': 'optimize trajectories, perform course corrections, \nand handle unforeseen situations. Autonomous \nspacecraft equipped with AI capabilities can adapt \nto changing conditions, make real-time decisions, \nand operate with minimal human intervention. This \nincreased autonomy enhances mission efficiency, \nreduces \ncommunication \ndelays, \nand \nenables \nspacecraft to explore distant destinations or perform \ncomplex moves with greater precision. \nThe advancements in AI in the field of space have', 'images': []}, {'content': 'algorithms perform on-board data processing so that the iDSS can \nreconfigure rapidly [290,291]. \n6. Current and future applications \nThe following subsections examine relevant use cases of AI in space \noperations. These examples illustrate the significant potential of AI to \nenhance a variety of real-world space operations. From autonomous \nsatellite control to on-board data processing, AI has proved to be a \npotent tool for improving the efficiency, dependability and safety of', 'images': []}, {'content': 'system and data being exchanged; (2) consistency and resilience against \nadversarial threats; and (3) interpretability of the autonomous decisions. \nBased on our review, it is evident that to safely integrate AI into all \naspects of space operations, further research is needed in several areas. \nFirst of all, AI-based functionalities are needed for: (1) Mission Planning \nand Scheduling (MPS); (2) on-board data collection and processing; (3) \nreconfigurable networking for optimized data exchange with other', 'images': []}, {'content': 'time, adapting to unforeseen circumstances and \noptimizing mission objectives. By reducing the \ncommunication delay with Earth and minimizing \nhuman involvement, autonomous spacecraft can \noperate more efficiently and explore distant regions \nof space with increased autonomy. This capability \nopens up new possibilities for long-duration \nmissions, interplanetary travel, and the exploration \nof celestial bodies that are difficult to access. \nDespite the numerous advantages offered by AI in', 'images': []}, {'content': 'require sophisticated analysis and interpretation. AI \ncan help in automating data processing, identifying \npatterns, and extracting meaningful insights. \nHowever, developing AI algorithms that can handle \nthe complexity and uncertainty of space data is a \nsignificant challenge. \nIn remote space missions, real-time communication \nwith Earth can be limited, leading to delays in \ndecision-making. AI can enable spacecraft and \nrobots to operate autonomously, making decisions', 'images': []}]}
+Added answer entry with content length: 491
+Number of images: 0
+Added answer entry with content length: 483
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+Added answer entry with content length: 493
+Number of images: 0
+Added answer entry with content length: 476
+Number of images: 0
+
+Querying for question: 
+What specific contributions does the project make to the field of autonomous spacecraft systems, and how will these contributions be validated?
+Query results: {'Results': [{'content': '[66] A. Jonsson, R. Morris, L. Pedersen, Autonomy in Space Exploration: Current \nCapabilities and Future Challenges, 2007. \n[67] N.J. Nilsson, "Shakey the Robot", AI Center, in: SRI International, vol. 323, \nRavenswood Ave., Menlo Park, CA 94025, 1984, p. 333. \n[68] E. Vassev, M. Hinchey, Engineering requirements for autonomy features, in: \nM. Wirsing, M. H¨olzl, N. Koch, P. Mayer (Eds.), Software Engineering for \nCollective Autonomic Systems: the ASCENS Approach, Springer International', 'images': []}, {'content': 'G. Aaseng, E. Barszcz, H. Valdez, and H. Moses. Scaling up Model-based Diagnostic and Fault\nEffects Reasoning for Spacecraft. InProceedings of the AIAA Conference on Space\nOperations, 2015.\nG. Aaseng, and J. Frank. Transitioning Autonomous Systems Technology Research to a Flight\nSoftware Environment. In Proceedings of the AIAA Conference on Space Operations, 2016.\nR. Cornelius and J. Frank. International Space Station Payload Autonomous Operations Past,', 'images': []}, {'content': 'which was space construction and exploration. [6, 17] \n \n \n3. GROUND BASED TESTING & SUPPORTING \nSYSTEMS \n \nAutonomous spaceflight starts on the ground.  For each craft \nthat is sent into space to explore, numerous concepts must be \nproposed, developed and tested on Earth to ensure a successful \nmission.  Projects and experimental and concept craft such as \nCarnegie Mellon University’s Ambler program, the Self-Mobile \nSpace Manipulator project, the Tessellator robot, Dante I, Dante', 'images': []}, {'content': 'conducted in 2002 regarding the launch of a UAV from a UGV.  \nAdditional work regarding landing and refueling of a Allied \nAerospace 29” iStar UAV  has been conducted and technology \nfrom Carnegie Mellon, the Jet Propulsion Laboratory and \nGeodetics, Inc. is being used to facilitate autonomous landing. \n[32] \n \n \n4. AUTONOMOUS SPACE EXPLORATION \n \nA spacecraft encounters a somewhat unique problem as it \nmoves further and further from earth.  The increasing distance', 'images': []}, {'content': 'and \nSpace \nMission \nTechnology \nAdvancement (PRISMA) spacecraft before February, 2010.  \nPRISMA will be highly autonomous and demonstrate (from a \nguidance, navigation and control perspective) autonomous \nformation flying, homing and rendezvous, and proximity \noperations.  The craft will also test several types of sensor \ntechnology. [14, 45] \n \nA group of researchers at CalTech, the University of Arizona \nand the US Geologic Survey argue that more autonomy is', 'images': []}]}
+Added answer entry with content length: 491
+Number of images: 0
+Added answer entry with content length: 457
+Number of images: 0
+Added answer entry with content length: 486
+Number of images: 0
+Added answer entry with content length: 469
+Number of images: 0
+Added answer entry with content length: 465
+Number of images: 0
+Completed answers for section: Originality of the Research Project
+Number of answers: 25
+
+Processing section: Hypothesis, Research Objectives and Envisaged Methodology
+
+Querying for question: 
+What is the central hypothesis of the project, and how will it be tested and validated?
+Query results: {'Results': [{'content': 'changes into the main plan.\nThen the team collectively\nreviews these preliminary “low ﬁdelity” outputs, implements\niterations as needed and approves advancing to the “high\nﬁdelity” evaluation of possible outcomes and autonomy out-\nput.\nSuch high ﬁdelity evaluation is called here outcome\nprediction phase.\nAt the outcome prediction phase, simulations produce a more\nrealistic and comprehensive view of the new plan’s impact\nto the projected mission progress and performance. Itera-', 'images': []}, {'content': 'can be determined by performance of the model and/or a schedule.\nAfter development, the artifacts are tested to ensure proper function and performance. Next a ﬁnal review is conducted\nbefore the packaged automated model pipeline is released for delivery to the target environment.\nThe major steps in the Develop phase are largely the same across the three environments and the diﬀerences at\nworkﬂow level have been discussed in the previous sections. The main diﬀerences are the types of artifacts built during', 'images': []}, {'content': 'to the projected mission progress and performance. Itera-\ntions continue, as the team decides to make minor tweaks\nor drop problematic goals entirely.\nThe team can inspect\nindividual cases or “clusters” of related cases to understand\noutcomes that might happen onboard and investigate prob-\nlematic plans that approach undesired limits. Explanation of\nthese problematic cases (either by manually inspecting logs,\nstate history, timelines and traces or by using an automated', 'images': []}, {'content': 'of the workﬂow. Additionally, high-quality datasets for these environments can be diﬃcult to come by and relying on\naugmentation or simulations potentially introduces unknown vulnerabilities. Questions, such as "How will the model\nrespond to novel inputs?" or "Under what conditions do we expect the outputs of the model to be valid?" need to be\naddressed. The performance of an AI/ML system will naturally degrade over time whether due to data drift, changes in', 'images': []}, {'content': 'approach and finding out which are the most important points to investigate\nmore in-depth. As shown in Fig. 6.1, the proposed workflow differentiates\nbetween two kinds of scenario definitions, characterized by two different levels\nof complexity. These levels can be shaped both by the definition of the model\nand by that of the reward function. The model depends on many factors and\naspects, but, among all, is mainly described by the network architecture and', 'images': []}]}
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+Added answer entry with content length: 473
+Number of images: 0
+Added answer entry with content length: 462
+Number of images: 0
+Added answer entry with content length: 459
+Number of images: 0
+
+Querying for question: 
+What are the primary research objectives, and how do they support the overall goal of enhancing spacecraft operations?
+Query results: {'Results': [{'content': 'Appl. Sci. 2022, 12, 5106\n4 of 21\nTherefore, all efforts lead to two common goals: (i) to push toward space exploration\nand scientiﬁc discoveries; (ii) to improve life on Earth. Human beings play an essential\nrole in all this, such as specialists who work on the objectives of space missions, astronauts\nwho experience challenging conditions in space, and ordinary citizens involved in the\nachievement of these challenges, particularly those of improving life on Earth.', 'images': []}, {'content': 'spacecraft design is a vast effort, branching out into many fields of science and \nengineering. The proposed research obtains several important results towards the \ndesign of space missions that provide higher utility to the stakeholders, by being \nmore optimized and not bound to the stagnancy of conservative mission design \napproaches. These improvements are obtained through innovations in three aspects \nof the mission design: \n• exploring the alternative concepts thoroughly and more efficiently', 'images': []}, {'content': 'addition, new worlds, new science, and new phenomena to observe are appearing \non the horizon. The new scientific goals and objectives often require multiple \ncoordinating spacecraft to make simultaneous observations, or to detect events \nwithout ground intervention. This increase in the demands for new spacecraft has \nled to intense research and development efforts for the software applications and \nprocesses that are used during a space mission, both on ground, in the Mission', 'images': []}, {'content': 'supporting the safety of orbiting spacecraft and debris mitigation [7].\nWith an exponentially growing number of space-related practical ser-\nvices and research interests, a new focus has been appropriately made\non the defense and protection of spacecraft to ensure the continued\nﬂow of information (Cukurtepe and Akgun [13], Jah [20], Brown, Cot-\nton, et al. [7], Contant-Jorgenson, Lála, Schrogl, et al. [11]). A few', 'images': []}, {'content': '1.1 Thesis Objectives \n3 \n \nThanks to the faster development cycles of COTS components and weaker \nquality- and reliability-oriented approaches, small satellites are often employing \nhigh computational capabilities within low power consumption and small form \nfactors. This enables advanced and computationally-intensive autonomy \napproaches to be run onboard, compared to larger missions. \n1.1 Thesis Objectives \nThe objective of the research presented in this thesis is the following:', 'images': []}]}
+Added answer entry with content length: 469
+Number of images: 0
+Added answer entry with content length: 501
+Number of images: 0
+Added answer entry with content length: 482
+Number of images: 0
+Added answer entry with content length: 417
+Number of images: 0
+Added answer entry with content length: 486
+Number of images: 0
+
+Querying for question: 
+What specific methodologies will be employed to develop and test the AI agents, and how will these methodologies ensure the reliability and robustness of the system?
+Query results: {'Results': [{'content': 'a model will perform on an FPGA based on how it performed on a GPU or CPU. In any of the environments under\nconsideration, as the level of risk grows so to should the level of trust needed to deploy, which requires rigorous and\nthorough testing of resource consumption, system/environment interactions, and security vulnerabilities.\nEach of the components or artifacts in an AI/ML system should be tested under conditions as similar as possible to', 'images': []}, {'content': 'making capabilities, goal generation, real-time scheduling, repairing and \noptimization [38]. \nFault Detection, Isolation and Recovery – Fault Detection systems have been \ndeveloped using several categories of AI algorithms, ranging from model-based \napplications (which can be considered on the border of AI), to Fuzzy Logics and \nNeural Networks [48]. \nGame playing – The art of gaming has always been a field where AI research', 'images': []}, {'content': 'of the workﬂow. Additionally, high-quality datasets for these environments can be diﬃcult to come by and relying on\naugmentation or simulations potentially introduces unknown vulnerabilities. Questions, such as "How will the model\nrespond to novel inputs?" or "Under what conditions do we expect the outputs of the model to be valid?" need to be\naddressed. The performance of an AI/ML system will naturally degrade over time whether due to data drift, changes in', 'images': []}, {'content': 'go in and outputs come out and there is little insight into how the model is making its determination. The seemingly\nnon-deterministic nature of AI/ML systems may cause some end users to be hesitant to trust AI/ML systems. AI/ML\nsystems will also need to meet more standard software metrics for reliability and security as they suﬀer many of the\nsame vulnerabilities that standard software systems do. There needs to be procedures in place to mitigate radiation', 'images': []}, {'content': 'every environment the AI/ML system will be deployed in.\nBeyond just meeting goals for performance and resource constraints there are other risk factors an AI/ML system\nmust be tested against before deployment. Part of certifying an AI/ML system should include developing proﬁles of the\ntraining and testing data to detect anomalous data and bias, which ideally took place during the prepare and model steps', 'images': []}]}
+Added answer entry with content length: 447
+Number of images: 0
+Added answer entry with content length: 429
+Number of images: 0
+Added answer entry with content length: 462
+Number of images: 0
+Added answer entry with content length: 461
+Number of images: 0
+Added answer entry with content length: 406
+Number of images: 0
+
+Querying for question: 
+How will the project integrate AI agents with existing spacecraft systems, and what challenges are expected in this process?
+Query results: {'Results': [{'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n21\nrevolutionised by AI. By incorporating AI into spacecraft, scientists can \ncollect more data, make better judgements and conduct space explora\xad\ntion in a safer manner [264,265]. \n5. Space infrastructure evolution \nThe benefits offered by AI algorithms will be fully achieved upon \nintegration in all space mission operational segments (Fig. 24): space, \ncontrol, user, link segments and inter-vehicle communications. \n5.1. Space and control segments', 'images': []}, {'content': 'system and data being exchanged; (2) consistency and resilience against \nadversarial threats; and (3) interpretability of the autonomous decisions. \nBased on our review, it is evident that to safely integrate AI into all \naspects of space operations, further research is needed in several areas. \nFirst of all, AI-based functionalities are needed for: (1) Mission Planning \nand Scheduling (MPS); (2) on-board data collection and processing; (3) \nreconfigurable networking for optimized data exchange with other', 'images': []}, {'content': 'to deploy AI onboard spacecraft.  \nFrom a modeling standpoint, the space domain must address many of the same challenges as the \ncommercial embedded domain for mobile and Internet of Things (IoT) deployment. Commonly \nused supervised AI models, especially those with deep architectures, depend upon vast amounts \nof labeled training data to extract rich, meaningful features and accurately predict the output. \nHowever, for novel instrument sensors or missions to unexplored environments, there is often a', 'images': []}, {'content': 'Across the science and defense space sectors, researchers and spacecraft designers are actively \nexploring the use of artificial intelligence (AI) and machine learning (ML) onboard spacecraft for \napplications requiring low-latency predictions and/or data products to enable next-generation \nmission concepts. However, there are many modeling and computational challenges in attempting \nto deploy AI onboard spacecraft.', 'images': []}, {'content': 'cuses on spacecraft autonomous operations, providing an overview of \nthe most promising concepts applied to human and machine collabo\xad\nration in space operations. Section 4 provides a critical examination of \nthe many AI techniques proposed for space system applications and \nsection 5 discusses how these techniques can be applied in practice to \nvarious DSS architectures. The required evolution of spaceflight systems \ninfrastructure is discussed in section 5, which highlights the most', 'images': []}]}
+Added answer entry with content length: 501
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+Added answer entry with content length: 505
+Number of images: 0
+Added answer entry with content length: 419
+Number of images: 0
+Added answer entry with content length: 489
+Number of images: 0
+
+Querying for question: 
+What are the expected outcomes of the research, and how will they be measured and evaluated?
+Query results: {'Results': [{'content': 'as the metrics and variability speciﬁcations. Figure 9 shows\nthe predicted outcomes (for the target tasknet) on the left-\nhand side, ordered from most likely to least likely, aiding the\noperator in more easily deciphering the expected behavior of\nthe constructed plans. The green and red arrows inform the\nimpact of an added goal (in this case, observing Plume X)\non the outcome distribution. For example, the percentage of\ncases in which Observation A and B will be both performed', 'images': []}, {'content': 'changes into the main plan.\nThen the team collectively\nreviews these preliminary “low ﬁdelity” outputs, implements\niterations as needed and approves advancing to the “high\nﬁdelity” evaluation of possible outcomes and autonomy out-\nput.\nSuch high ﬁdelity evaluation is called here outcome\nprediction phase.\nAt the outcome prediction phase, simulations produce a more\nrealistic and comprehensive view of the new plan’s impact\nto the projected mission progress and performance. Itera-', 'images': []}, {'content': 'can be determined by performance of the model and/or a schedule.\nAfter development, the artifacts are tested to ensure proper function and performance. Next a ﬁnal review is conducted\nbefore the packaged automated model pipeline is released for delivery to the target environment.\nThe major steps in the Develop phase are largely the same across the three environments and the diﬀerences at\nworkﬂow level have been discussed in the previous sections. The main diﬀerences are the types of artifacts built during', 'images': []}, {'content': 'of the workﬂow. Additionally, high-quality datasets for these environments can be diﬃcult to come by and relying on\naugmentation or simulations potentially introduces unknown vulnerabilities. Questions, such as "How will the model\nrespond to novel inputs?" or "Under what conditions do we expect the outputs of the model to be valid?" need to be\naddressed. The performance of an AI/ML system will naturally degrade over time whether due to data drift, changes in', 'images': []}, {'content': 'metric speciﬁcation, showing the number of plumes metric\nas an example. Progress and impact is also shown for each\ncampaign, based on the inputs given in the Mission Planning\ntool.\nMetrics are key inputs to evaluate both current and\npredicted spacecraft performance.\nNote that most of the\nmetrics (if not all of them) are usually captured and speciﬁed\nearly in the mission, or at the strategic planning level.\nFigure 6. Metric Deﬁnition: allows scientists, engineers,', 'images': []}]}
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+Added answer entry with content length: 462
+Number of images: 0
+Added answer entry with content length: 467
+Number of images: 0
+Completed answers for section: Hypothesis, Research Objectives and Envisaged Methodology
+Number of answers: 25
+
+Processing section: Expected Outcomes / Impact
+
+Querying for question: 
+What are the anticipated improvements in mission efficiency and safety that the AI agents will bring to spacecraft operations?
+Query results: {'Results': [{'content': 'optimize trajectories, perform course corrections, \nand handle unforeseen situations. Autonomous \nspacecraft equipped with AI capabilities can adapt \nto changing conditions, make real-time decisions, \nand operate with minimal human intervention. This \nincreased autonomy enhances mission efficiency, \nreduces \ncommunication \ndelays, \nand \nenables \nspacecraft to explore distant destinations or perform \ncomplex moves with greater precision. \nThe advancements in AI in the field of space have', 'images': []}, {'content': 'telemetry data, predicting equipment failures, and \nsuggesting maintenance procedures. By leveraging \nAI, space agencies can improve the efficiency and \nlifespan of space missions, reducing costs and \nincreasing mission success rates. \nThe proliferation of space debris poses a significant \nrisk to space missions. AI can be utilized to develop \nalgorithms for monitoring and tracking space debris, \npredicting collision risks, and planning collision \navoidance maneuvers.', 'images': []}, {'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n21\nrevolutionised by AI. By incorporating AI into spacecraft, scientists can \ncollect more data, make better judgements and conduct space explora\xad\ntion in a safer manner [264,265]. \n5. Space infrastructure evolution \nThe benefits offered by AI algorithms will be fully achieved upon \nintegration in all space mission operational segments (Fig. 24): space, \ncontrol, user, link segments and inter-vehicle communications. \n5.1. Space and control segments', 'images': []}, {'content': 'from the present rigid and inflexible safety assurance process to a more \nresponsive and probabilistic approach would take time and developing a \nroadmap to make this process practicable will be one of the key mile\xad\nstones to advance in this direction [279]. Although several experts are \nconcerned about the vulnerability or failure of AI algorithms on-board \nspacecraft, research has shown that they are critical for attaining \nmission goals in cybersecurity and satellite health monitoring. Despite', 'images': []}, {'content': 'time, adapting to unforeseen circumstances and \noptimizing mission objectives. By reducing the \ncommunication delay with Earth and minimizing \nhuman involvement, autonomous spacecraft can \noperate more efficiently and explore distant regions \nof space with increased autonomy. This capability \nopens up new possibilities for long-duration \nmissions, interplanetary travel, and the exploration \nof celestial bodies that are difficult to access. \nDespite the numerous advantages offered by AI in', 'images': []}]}
+Added answer entry with content length: 491
+Number of images: 0
+Added answer entry with content length: 472
+Number of images: 0
+Added answer entry with content length: 501
+Number of images: 0
+Added answer entry with content length: 501
+Number of images: 0
+Added answer entry with content length: 493
+Number of images: 0
+
+Querying for question: 
+How will the project contribute to reducing human involvement and minimizing human error in mission-critical tasks?
+Query results: {'Results': [{'content': 'processes that are used during a space mission, both on ground, in the Mission \nControl centre, and on-board, integrated into the Flight Software. \nOne of the key drivers for enhancing the capabilities of spacecraft for remote \nand complex missions has also been the fact that human exploration missions have \nreceived a setback, due to increased security standards in the design directions [40]. \nIt is currently not advised to consider human exploration in certain kinds of mission,', 'images': []}, {'content': 'the state of the machine itself. \n4.3 Autonomy versus Costs of Missions \nAnother direct effect of implementing more sophisticated mission operations \nmanagement software (either on-board or on ground) can be highlighted analysing \nthe costs of the mission, both in the total amount directly impacting the budget, and \non the repartition of the costs in the various activities. All the main space agencies \nhave allocated significant efforts in reducing the human-supervised operations in', 'images': []}, {'content': 'optimize human performance in space or provide helpful information on the health of\nastronauts. On the mission object level, we come to the challenges linked to reducing the\nthreat to spacecraft from natural and human-made space debris and developing capabilities\nto detect and mitigate the risk of these objects as possible catastrophic threats to Earth.\nFor this reason, it is necessary to seek solutions that are able to improve the accuracy', 'images': []}, {'content': 'time, adapting to unforeseen circumstances and \noptimizing mission objectives. By reducing the \ncommunication delay with Earth and minimizing \nhuman involvement, autonomous spacecraft can \noperate more efficiently and explore distant regions \nof space with increased autonomy. This capability \nopens up new possibilities for long-duration \nmissions, interplanetary travel, and the exploration \nof celestial bodies that are difficult to access. \nDespite the numerous advantages offered by AI in', 'images': []}, {'content': 'Traditional mission design involves carefully planned Ground Segment resource \nallocation, that allows the mission to be controlled and managed smoothly. This is \nnot always the case: one key example being the category of university CubeSats, \nespecially educational, low-budget projects. In this case, often times the required \nGround Control Centre is not available, has poor performances, or there are not \nenough operators to guarantee a high percentage of presence during satellite passes.', 'images': []}]}
+Added answer entry with content length: 484
+Number of images: 0
+Added answer entry with content length: 487
+Number of images: 0
+Added answer entry with content length: 444
+Number of images: 0
+Added answer entry with content length: 493
+Number of images: 0
+Added answer entry with content length: 494
+Number of images: 0
+
+Querying for question: 
+What are the expected advancements in AI algorithms for decision-making under uncertainty, and how will these advancements be validated?
+Query results: {'Results': [{'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n28\nwith limited data, such biases are expected to become increasingly se\xad\nvere [326,334–336]. Table 12 lists the some of the foreseeable techno\xad\nlogical challenges associated to different application areas. \nAs of now, AI in space is limited to offline data processing and has not \nbeen adopted “on the edge” within the spacecraft [264]. When looking \nparticularly at the most promising AI algorithms for spaceborne appli\xad', 'images': []}, {'content': 'Artificial Intelligence algorithms, is the best candidate to perform the automation \nof a certain type of operations. Instead, the research is meant to be considered as a \nfeasibility study for developing AI-based solutions to real operations problems. \nAdditional studies and comparisons will have to follow in order to assess whether \nthe proposed algorithms are in fact the best options to solve the problem addressed', 'images': []}, {'content': 'require sophisticated analysis and interpretation. AI \ncan help in automating data processing, identifying \npatterns, and extracting meaningful insights. \nHowever, developing AI algorithms that can handle \nthe complexity and uncertainty of space data is a \nsignificant challenge. \nIn remote space missions, real-time communication \nwith Earth can be limited, leading to delays in \ndecision-making. AI can enable spacecraft and \nrobots to operate autonomously, making decisions', 'images': []}, {'content': 'Reinforcement Learning powering many developments in all areas as per their nov-\nelty and increasing attractiveness. Work on the validation of AI based system is also\nexpected to appear to provide methods for increasing the trust in trained models\n(like DNNs), which are often regarded with skepticism when seen as a black box.\nReferences\n[1] Girimonte D, Izzo D. Artiﬁcial intelligence for space applications. In Intelli-\ngent Computing Everywhere, Springer2007, 235–253.', 'images': []}, {'content': 'characteristics of the most dominant algorithms developed so far, even if not yet \nadapted for space applications. Chapter 5 defines Artificial Intelligence as a \nconcept, and defines the State of the Art for this technology, from three different \nperspectives: by Algorithm (discussing the various algorithms that populate the \ndomain of Artificial Intelligence), by application (presenting particular cases in \nwhich Artificial Intelligence plays a relevant role), and by open-source products', 'images': []}]}
+Added answer entry with content length: 471
+Number of images: 0
+Added answer entry with content length: 420
+Number of images: 0
+Added answer entry with content length: 476
+Number of images: 0
+Added answer entry with content length: 472
+Number of images: 0
+Added answer entry with content length: 494
+Number of images: 0
+
+Querying for question: 
+How will the project impact the space exploration industry in terms of mission planning, extended mission durations, and cost reduction?
+Query results: {'Results': [{'content': "areas of sensing, navigation, control, and autonomy, with examples from past and future missions [20]. \nMehfuz, F. (2018, October): Historically, man's eternal quest to venture into the unknown has benefited humanity. Space exploration \nanswers some of the essential questions in connection with our belonging to the universe and furthers technology, leading to new \nindustries created thereby. Future missions will require advanced systems, robust, and economical, among which will be autonomous", 'images': []}, {'content': 'commercial partners thrive through high-risk initial \nventures to validate high-potential new technologies. \nSpace Force will use strategic investments to cultivate a \nstrong, diverse and competitive American space industrial \nbase. Civil and commercial developments that pave the \nway for exploration and commercialization beyond near-\nEarth orbit will both generate technology that benefits the \nUSSF and require an order of magnitude expansion of our \nability to sense, communicate and act to protect and', 'images': []}, {'content': 'is especially true in space where spacecraft operate at \nspeeds and distances orders of magnitude greater than \nterrestrial counterparts. The force that prepares for this \nrevolution and reaps its potential will have a significant \nadvantage over the force that does not. \n \nPROLIFERATING ACCESS TO SPACE \n \nThe rapid growth of the commercial space sector provides \nthe United States both new potential partners and \nopportunities to leverage commercial investment to', 'images': []}, {'content': 'the ground control. For example, IBM, in partnership with the German space agency DLR\nand Airbus, created CIMON, the Crew Interactive Mobile Companion [26]. CIMON is an\nAI robot that is able to converse with astronauts at the International Space Station and\nanswer astronauts’ questions.\n3.2. Space Exploration\nThe impact of AI on deﬁning and improving the future of space exploration is relevant.\nMany AI applications exist, from planetary navigation to robot exploration and deep', 'images': []}, {'content': 'Rovers, Satellite Constellations, Intelligent Habitats, In-situ Resource Utilization, Deep Space Missions. \n1. Introduction \nIntroduction Background Information and Significance Conquest of outer space has been the single biggest impetus for human \ninnovation and scientific enterprise since the launch of the space age [1]. From the first manned missions to the moon to some of the \nmost complex telescopes and robotic probes, the exploration of space has gone on to throw important light on the universe and', 'images': []}]}
+Added answer entry with content length: 496
+Number of images: 0
+Added answer entry with content length: 507
+Number of images: 0
+Added answer entry with content length: 467
+Number of images: 0
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 509
+Number of images: 0
+
+Querying for question: 
+What are the potential long-term benefits and broader implications of the project's success for future space missions and scientific discoveries?
+Query results: {'Results': [{'content': "areas of sensing, navigation, control, and autonomy, with examples from past and future missions [20]. \nMehfuz, F. (2018, October): Historically, man's eternal quest to venture into the unknown has benefited humanity. Space exploration \nanswers some of the essential questions in connection with our belonging to the universe and furthers technology, leading to new \nindustries created thereby. Future missions will require advanced systems, robust, and economical, among which will be autonomous", 'images': []}, {'content': 'Rovers, Satellite Constellations, Intelligent Habitats, In-situ Resource Utilization, Deep Space Missions. \n1. Introduction \nIntroduction Background Information and Significance Conquest of outer space has been the single biggest impetus for human \ninnovation and scientific enterprise since the launch of the space age [1]. From the first manned missions to the moon to some of the \nmost complex telescopes and robotic probes, the exploration of space has gone on to throw important light on the universe and', 'images': []}, {'content': 'can be predicted. Some of these are already in the development and \ndemonstration stages. For example, autonomous on-board data pro\xad\ncessing, on-orbit satellite servicing/repairing, analysis and decision- \nmaking for remote sensing for both defence and civil applications, as \nwell as future human space habitation, which could include both space \ntourism and deep space colonisation, are all plausible scenarios [66, \n71–73]. \nFig. 15 shows an evolutionary roadmap of space system capabilities', 'images': []}, {'content': 'is especially true in space where spacecraft operate at \nspeeds and distances orders of magnitude greater than \nterrestrial counterparts. The force that prepares for this \nrevolution and reaps its potential will have a significant \nadvantage over the force that does not. \n \nPROLIFERATING ACCESS TO SPACE \n \nThe rapid growth of the commercial space sector provides \nthe United States both new potential partners and \nopportunities to leverage commercial investment to', 'images': []}, {'content': 'Emphasize their role in such tasks as navigation, data analysis, and environmental interaction [3]. \n\uf0b7 \nFuture Prospects: The topics in the future prospects of AI and robotics that can further revolutionize space exploration should \nbe explored, such as intelligent habitats and in-situ resource utilization. \n\uf0b7 \nScientific Discovery and Operational Efficiency Impact Assessment: Consider how AI and robotics can really enhance the \nscientific output and operational effectiveness of space missions. \n\uf0b7', 'images': []}]}
+Added answer entry with content length: 496
+Number of images: 0
+Added answer entry with content length: 509
+Number of images: 0
+Added answer entry with content length: 494
+Number of images: 0
+Added answer entry with content length: 467
+Number of images: 0
+Added answer entry with content length: 502
+Number of images: 0
+Completed answers for section: Expected Outcomes / Impact
+Number of answers: 25
+
+Processing section: Explanations on the management of ethical issues and data protection
+
+Querying for question: 
+What ethical considerations are relevant to the development and deployment of autonomous AI agents in spacecraft operations?
+Query results: {'Results': [{'content': 'the smaller file sizes required for programming, which is becoming \ncompatible with the uplink bandwidth of small satellites [264]. \n8.2. Ethical and legal challenges \nThe use of AI in space systems raises a number of ethical and legal \nquestions. Some researchers have identified the need for AI ethicists to \nhelp navigate where advances in this technology could lead [328]. This \nis more exciting because AI and space technologies offer a wide range of', 'images': []}, {'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n30\n1. Ethical purpose: AI development, deployment and use should respect \nfundamental rights and applicable regulations as well as core prin\xad\nciples and values to ensure “ethical purpose";  \n2. Technical robustness: AI should be technically robust and reliable \nsince its use can cause unintentional harm, even in the presence of \ngood intentions [344]. \nAI systems use large amounts of data, causing increasing concerns as', 'images': []}, {'content': 'Despite the numerous advantages offered by AI in \nspace exploration, there are challenges that need to \nbe addressed. One significant concern is the \nreliability and robustness of AI systems operating in \nthe harsh conditions of space. Ensuring the \nresilience of AI algorithms to radiation, extreme \ntemperatures, and other space-specific challenges is \ncrucial for the success of future missions. \nAdditionally, ethical considerations surrounding AI \ndecision-making in space, such as the potential for', 'images': []}, {'content': 'and development approaches is required. Going forward, explainability \nand certification of AI based systems will be critical, particularly in outer \nspace operations where there is a need to simultaneously address safety, \nsecurity and legal requirements (e.g., liability for the damages these \nsystems may cause). As a result, there is a need to understand the \nassociated technical, ethical and legal challenges that come with these \nevolving systems.', 'images': []}, {'content': 'highlighting the open technological, ethical and legal challenges, as well \nas the ongoing efforts to overcome these challenges and to facilitate the \nuptake of AI technology in next-generation satellite systems. \n2. Spaceflight systems \nThousands of active satellites are currently orbiting Earth and, in \nrecent years [7], there has been an exponential growth of RSO [8], \nespecially in the LEO environment [9]. Each satellite’s size, orbital \nparameters and configuration depend on its intended purpose. The', 'images': []}]}
+Added answer entry with content length: 455
+Number of images: 0
+Added answer entry with content length: 472
+Number of images: 0
+Added answer entry with content length: 504
+Number of images: 0
+Added answer entry with content length: 454
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+
+Querying for question: 
+How will the project address concerns related to data privacy and security, particularly in the context of real-time communication and data processing?
+Query results: {'Results': [{'content': 'standards. \n4 \nMany living beings could die or \ncould be restricted for life; the \nenvironment could be damaged \npermanently. Loss of \ninformation which endangers \nthe existence of the \norganization. Long-term \nunavailability of critical data or \nservices without which the \norganization cannot function. \nThe ML application is \ndeveloped and documented \nwith great care. Safety & \nSecurity is ensured with \nprocesses and techniques that \ngo beyond traditional best \npractices and industry', 'images': []}, {'content': 'Data Security\n• Access management\n• Sensitive info labeling\n• User/group access rules\nData Version Control\n• Original source\n• Commit history with \ncomments\nData Standardization\n• Labeling standards\n• Column naming standards\n• Data type and unit standards\nData Security\n• Access management\n• Sensitive info labeling\n• User/group access rules\nData \nSource\nDB\nDB\nQuery\nObject\nGraph\nFig. 1\nFunctional diagram of the Prepare step of the AI/ML workﬂow.', 'images': []}, {'content': 'There are times when robots are used to collect and process sensitive information, starting from personal data used in healthcare to \nproprietary information used in industrial settings. All such information should be protected from unauthorized access and cyber attacks \n[15]. Ensure safe communication channels between the robots and the cloud in order to protect against breaches of data or tampering.', 'images': []}, {'content': 'have to be included in the cybersecurity development cycle and applied \nearly in the life cycle of the iDSS system. Small commercial satellite \nowners and operators are frequently responsible for inter-vehicle \ncybersecurity, while the majority of the remaining infrastructure is \ncontracted to certain other suppliers and providers [275]. \n7.2. Satellite resilience \nThe aerospace industry of an increasingly multi-polar world will \nhave to negotiate a future that is getting more and more crowded with', 'images': []}, {'content': 'as state of the art. \n3 \nLiving beings could die or be \nrestricted for life; the \nenvironment could be damaged. \nManipulation of data with \nsevere financial consequences \nand loss of control of the system \nto malicious attackers. \nThe ML application is \ndeveloped and documented \nwith great care. Safety & \nSecurity is ensured with \nprocesses and techniques that \ngo beyond traditional best \npractices and industry \nstandards. \n4 \nMany living beings could die or \ncould be restricted for life; the', 'images': []}]}
+Added answer entry with content length: 489
+Number of images: 0
+Added answer entry with content length: 447
+Number of images: 0
+Added answer entry with content length: 404
+Number of images: 0
+Added answer entry with content length: 503
+Number of images: 0
+Added answer entry with content length: 497
+Number of images: 0
+
+Querying for question: 
+What measures will be taken to ensure the ethical use of AI in mission-critical scenarios, and how will these measures be communicated to stakeholders?
+Query results: {'Results': [{'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n30\n1. Ethical purpose: AI development, deployment and use should respect \nfundamental rights and applicable regulations as well as core prin\xad\nciples and values to ensure “ethical purpose";  \n2. Technical robustness: AI should be technically robust and reliable \nsince its use can cause unintentional harm, even in the presence of \ngood intentions [344]. \nAI systems use large amounts of data, causing increasing concerns as', 'images': []}, {'content': 'potentially threating our civilisation and even human survival [343]. A \nreport on robotics and AI published by the British House of Commons \nhighlighted specific ethical and legal issues, including transparent \ndecision-making, minimising bias, accountability and privacy [325]. \nThe first draft of the “Ethics Guidelines for Trustworthy AI” was pub\xad\nlished by the European Commission’s High-Level Expert Group on \nArtificial Intelligence (‘AI HLEG’) [344]. According to the guidelines,', 'images': []}, {'content': 'good intentions [344]. \nAI systems use large amounts of data, causing increasing concerns as \nmore data is collected and used. Such high volumes and the level of \ndependence on such data will keep privacy at the forefront as one of the \nmost significant legal issues to be addressed in the future. For instance, \nsetting ethical parameters within which AI systems operate is para\xad\nmount in tackling bias, considering the application of AI to data \ngenerated in space and prospective on-board AI space sector', 'images': []}, {'content': 'infrastructure is discussed in section 5, which highlights the most \npromising applications of AI in the different system segments and the \nneed for a co-evolution of DSS space and ground segments. Section 6 \ndiscusses current and likely future applications of AI in near-Earth space \nmissions and section 7 addresses safety and security aspects associated \nto the adoption of AI in DSS. Section 8 concludes the critical review \nhighlighting the open technological, ethical and legal challenges, as well', 'images': []}, {'content': 'from the present rigid and inflexible safety assurance process to a more \nresponsive and probabilistic approach would take time and developing a \nroadmap to make this process practicable will be one of the key mile\xad\nstones to advance in this direction [279]. Although several experts are \nconcerned about the vulnerability or failure of AI algorithms on-board \nspacecraft, research has shown that they are critical for attaining \nmission goals in cybersecurity and satellite health monitoring. Despite', 'images': []}]}
+Added answer entry with content length: 472
+Number of images: 0
+Added answer entry with content length: 487
+Number of images: 0
+Added answer entry with content length: 507
+Number of images: 0
+Added answer entry with content length: 503
+Number of images: 0
+Added answer entry with content length: 501
+Number of images: 0
+
+Querying for question: 
+How will the project ensure transparency and accountability in the decision-making processes of AI agents?
+Query results: {'Results': [{'content': 'potentially threating our civilisation and even human survival [343]. A \nreport on robotics and AI published by the British House of Commons \nhighlighted specific ethical and legal issues, including transparent \ndecision-making, minimising bias, accountability and privacy [325]. \nThe first draft of the “Ethics Guidelines for Trustworthy AI” was pub\xad\nlished by the European Commission’s High-Level Expert Group on \nArtificial Intelligence (‘AI HLEG’) [344]. According to the guidelines,', 'images': []}, {'content': 'enhance it. Furthermore, AI may examine previous work to make sure \neverything is completed correctly. Furthermore, including collaborative \nrobots (“cobots”) into the production process decreases the requirement \nfor human workers in clean rooms. It improves the consistency of pro\xad\nduction processes that are prone to errors. AI, unlike humans, does not \nrequire rest or sleep in order to digest large amounts of data quickly. The \nbasic objective of the techniques utilised can also be used to classify AI,', 'images': []}, {'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n31\nconsequences of AI applications in the space sector and identify practical \nways to ensure that AI-based decision-making systems are transparent, \nfair and accountable by design. Explainability and interpretability will \nbe critical aspects of this endeavour and shall be explored in relation to \nthe duality of human-autonomy interactions (i.e., integrity monitoring \nand augmentation of both human and autonomous agents). Once the', 'images': []}, {'content': 'good intentions [344]. \nAI systems use large amounts of data, causing increasing concerns as \nmore data is collected and used. Such high volumes and the level of \ndependence on such data will keep privacy at the forefront as one of the \nmost significant legal issues to be addressed in the future. For instance, \nsetting ethical parameters within which AI systems operate is para\xad\nmount in tackling bias, considering the application of AI to data \ngenerated in space and prospective on-board AI space sector', 'images': []}, {'content': 'by AI algorithms. Indeed, these operations involve many repetitive procedures requiring\nhigh precision and accuracy and should be performed in clean rooms to avoid biological\ncontamination. In addition, the use of collaborative robots, cobots, can provide more reliable\nmanufacturing steps that can be prone to human errors. Consequently, the exploitation of\nAI can signiﬁcantly speed up production processes and minimize contact with humans,', 'images': []}]}
+Added answer entry with content length: 487
+Number of images: 0
+Added answer entry with content length: 509
+Number of images: 0
+Added answer entry with content length: 484
+Number of images: 0
+Added answer entry with content length: 507
+Number of images: 0
+Added answer entry with content length: 442
+Number of images: 0
+
+Querying for question: 
+What steps will be taken to prevent bias and ensure fairness in the AI algorithms and their outcomes?
+Query results: {'Results': [{'content': 'every environment the AI/ML system will be deployed in.\nBeyond just meeting goals for performance and resource constraints there are other risk factors an AI/ML system\nmust be tested against before deployment. Part of certifying an AI/ML system should include developing proﬁles of the\ntraining and testing data to detect anomalous data and bias, which ideally took place during the prepare and model steps', 'images': []}, {'content': 'proaches for making ML models learn despite the paucity of high-quality \nlabelled data using transfer learning, active learning, DL and unsuper\xad\nvised learning [333]. Because several of these AI methods are based on \ntraining datasets, bias is a very significant issue. The correctness of AI \ndecision-making capacity is determined by how well data was trained \nutilising real and unbiased facts. When data used for training is laced \nwith racial, gender, community, or ethnic biases, unethical and unfair', 'images': []}, {'content': 'of the workﬂow. Additionally, high-quality datasets for these environments can be diﬃcult to come by and relying on\naugmentation or simulations potentially introduces unknown vulnerabilities. Questions, such as "How will the model\nrespond to novel inputs?" or "Under what conditions do we expect the outputs of the model to be valid?" need to be\naddressed. The performance of an AI/ML system will naturally degrade over time whether due to data drift, changes in', 'images': []}, {'content': 'from the present rigid and inflexible safety assurance process to a more \nresponsive and probabilistic approach would take time and developing a \nroadmap to make this process practicable will be one of the key mile\xad\nstones to advance in this direction [279]. Although several experts are \nconcerned about the vulnerability or failure of AI algorithms on-board \nspacecraft, research has shown that they are critical for attaining \nmission goals in cybersecurity and satellite health monitoring. Despite', 'images': []}, {'content': 'policy to track, assess, prioritise, and control the signal flow incoming and outcoming. \nSecondly, the use of AI can introduce program bias into decision making processes. It means the approach from the \nrisks of AI data need to be understood through the behaviour of the system. For example, the AI-based decision-\nmaking tools can become target and attacked by cyber means and unintended consequences of these can be the', 'images': []}]}
+Added answer entry with content length: 406
+Number of images: 0
+Added answer entry with content length: 505
+Number of images: 0
+Added answer entry with content length: 462
+Number of images: 0
+Added answer entry with content length: 501
+Number of images: 0
+Added answer entry with content length: 423
+Number of images: 0
+Completed answers for section: Explanations on the management of ethical issues and data protection
+Number of answers: 25
+
+Processing section: Comment on resubmission (if applicable)
+
+Querying for question: 
+What changes have been made to the project proposal based on feedback from previous submissions?
+Query results: {'Results': [{'content': 'changes into the main plan.\nThen the team collectively\nreviews these preliminary “low ﬁdelity” outputs, implements\niterations as needed and approves advancing to the “high\nﬁdelity” evaluation of possible outcomes and autonomy out-\nput.\nSuch high ﬁdelity evaluation is called here outcome\nprediction phase.\nAt the outcome prediction phase, simulations produce a more\nrealistic and comprehensive view of the new plan’s impact\nto the projected mission progress and performance. Itera-', 'images': []}, {'content': 'tists, engineers and operators go through the process of intent\ncapture, starting by revisiting the goals for the next ﬂyby(s)\nbased on the downlink data and analysis.\nScientists and\nengineers then have the opportunity to make changes to the\ngoals/plan while getting instant feedback on the viability of\ntheir changes and on their impact on overall mission progress\nand performance. The viability and impact analysis here is\nbased on an initial, low ﬁdelity evaluation of possible onboard', 'images': []}, {'content': 'across those meetings, though we also encouraged them to\nbreak into reﬂective discussions about the process and tools\nalong the way. We also collected feedback in the form of\nsurvey responses in a journal they used for each day. We\nhad implemented the tools as click-through prototypes only,\nand user study facilitator needed to “drive” the tools at the the\noperator’s request. This dynamic evoked dialogue about what\ninformation they needed to see and why.\n14', 'images': []}, {'content': 'to the projected mission progress and performance. Itera-\ntions continue, as the team decides to make minor tweaks\nor drop problematic goals entirely.\nThe team can inspect\nindividual cases or “clusters” of related cases to understand\noutcomes that might happen onboard and investigate prob-\nlematic plans that approach undesired limits. Explanation of\nthese problematic cases (either by manually inspecting logs,\nstate history, timelines and traces or by using an automated', 'images': []}, {'content': 'based on an initial, low ﬁdelity evaluation of possible onboard\nautonomy output, e.g., based on the most likely, nominal\nscience and engineering scenario.\nScientists can overload the plan with new observations/goals\nat this stage, and instead of culling the plan to stay within\nresource constraints, science negotiations rank science goals\nby priority, with low priority goals unlikely to be executed\nonboard. The autonomy engineer oversees the merging of\nchanges into the main plan.\nThen the team collectively', 'images': []}]}
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 488
+Number of images: 0
+Added answer entry with content length: 460
+Number of images: 0
+Added answer entry with content length: 473
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+
+Querying for question: 
+How does the revised proposal address the concerns and suggestions raised in previous reviews?
+Query results: {'Results': [{'content': 'changes into the main plan.\nThen the team collectively\nreviews these preliminary “low ﬁdelity” outputs, implements\niterations as needed and approves advancing to the “high\nﬁdelity” evaluation of possible outcomes and autonomy out-\nput.\nSuch high ﬁdelity evaluation is called here outcome\nprediction phase.\nAt the outcome prediction phase, simulations produce a more\nrealistic and comprehensive view of the new plan’s impact\nto the projected mission progress and performance. Itera-', 'images': []}, {'content': 'across those meetings, though we also encouraged them to\nbreak into reﬂective discussions about the process and tools\nalong the way. We also collected feedback in the form of\nsurvey responses in a journal they used for each day. We\nhad implemented the tools as click-through prototypes only,\nand user study facilitator needed to “drive” the tools at the the\noperator’s request. This dynamic evoked dialogue about what\ninformation they needed to see and why.\n14', 'images': []}, {'content': 'the impact gap in green). Furthermore, the operators are also\npresented with a few recommendations on how improve the\nplan to avoid conﬂicts and aid in campaign success. These\nrecommendations are essential in ﬁtting in with the iterative\nworkﬂow of plan development.\nDownlink analysis\nSubsystem Downlink Analysis Tool—The subsystem downlink\nanalysis tool (shown in Figure 11) allows operators to review\nFigure 10. Mission Impact tool: shows an overview of the', 'images': []}, {'content': 'intent, and updates that align evolving requirements.  We \nvalue clear verbal and written communication oriented to \ninform decisions and implement actions. \nWe also value design approaches to critical thinking, and \ndata-driven problem solving. Over the next year, the \nDirector of Staff will publish guidance that establishes a \nstandard \nfor \nhow \nspace \nprofessionals \napproach \nstructured data-driven decision-making. Like MTOs, a \nstandardized process is not intended to constrain thinking', 'images': []}, {'content': 'point and identiﬁed departures required by autonomy. The\nrevised workﬂow and the supporting framework includes a\nset of key design principles and progression from uplink to\ndownlink.\nIn most missions (including for example Europa Clipper,\nPerseverance Rover), planning occurs on several different\ntime horizons, where the cycle time itself is dependent on the\nmission. Although the terms for these planning cycles are not\nconsistent across missions, we will refer to a longer cycle as', 'images': []}]}
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 460
+Number of images: 0
+Added answer entry with content length: 459
+Number of images: 0
+Added answer entry with content length: 495
+Number of images: 0
+Added answer entry with content length: 484
+Number of images: 0
+
+Querying for question: 
+What additional data or evidence has been included to strengthen the case for the project's significance and feasibility?
+Query results: {'Results': [{'content': 'The output of the factor graph is a maximum-likelihood\nestimate of the state variables considered, and the marginal\ndistribution of each variable. In future work, this data will be\ndisplayed in the Subsystem Downlink Analysis Tool (Figure\n11), providing operators with key insight into unmeasured\nvariables and, critically, with the likelihood of each consid-\nered hypothesis - helping operators assess the state of the\nspacecraft and understand why autonomy made its decisions.\n6. USER STUDY\nStudy Design', 'images': []}, {'content': 'supporting the safety of orbiting spacecraft and debris mitigation [7].\nWith an exponentially growing number of space-related practical ser-\nvices and research interests, a new focus has been appropriately made\non the defense and protection of spacecraft to ensure the continued\nﬂow of information (Cukurtepe and Akgun [13], Jah [20], Brown, Cot-\nton, et al. [7], Contant-Jorgenson, Lála, Schrogl, et al. [11]). A few', 'images': []}, {'content': 'to the projected mission progress and performance. Itera-\ntions continue, as the team decides to make minor tweaks\nor drop problematic goals entirely.\nThe team can inspect\nindividual cases or “clusters” of related cases to understand\noutcomes that might happen onboard and investigate prob-\nlematic plans that approach undesired limits. Explanation of\nthese problematic cases (either by manually inspecting logs,\nstate history, timelines and traces or by using an automated', 'images': []}, {'content': 'event of interest (namely, the expected frequency of plume\nobservations), and telemetry data collected across multiple\nobservation opportunities, to assess the relative likelihood of\nmultiple hypotheses, ranging from the absence of plumes to\npossible faults (e.g., the detection algorithm’s threshold is too\nhigh, or the sensor gain is improperly set).\nModeling—Models of the spacecraft, of its environment, and\nof the on-board autonomy are needed to perform inference.', 'images': []}, {'content': 'where the spacecraft delivered all the desired science across\nplumes of interest hid in the later high ﬁdelity outcomes. As\none scientist described, “...starting with the premise that we\ncannot do all 3 [observations], spending a month of arguing\nabout which way to go for the plan, to ﬁnd out there is a\nchance to do all 3 that could have led to a lot of arguments\nand drama for nothing.” As a takeaway, this observation\nopens a space for earlier views to include more Monte Carlo', 'images': []}]}
+Added answer entry with content length: 505
+Number of images: 0
+Added answer entry with content length: 417
+Number of images: 0
+Added answer entry with content length: 473
+Number of images: 0
+Added answer entry with content length: 469
+Number of images: 0
+Added answer entry with content length: 481
+Number of images: 0
+
+Querying for question: 
+How does the resubmission demonstrate a deeper understanding of the research topic and its potential impacts?
+Query results: {'Results': [{'content': 'Chapter 2.\nBackground & State-of-the-Art\nto take an action that affects the state itself, in order to achieve the single or\nmultiple goals, it is meant to accomplish.\nRL differs from all others learning methods since its formulation requires\na trade-off between exploration and exploitation, a choice that represents\none of the most challenging features of the methodology. This dichotomy is\nstraightforward to understand: indeed, it is easy to agree on the fact that, to', 'images': []}, {'content': 'Adapt-\nability\nThe pre-trained model may not\nadapt optimally to the specifics of\nthe target task.\nData Efficiency\nIt often requires fewer samples to\nadapt to the target task due to prior\nknowledge.\nRisk of Negative\nTransfer\nIn some cases, transferring knowl-\nedge may harm the performance of\nthe target task if the source task is\ntoo dissimilar.\nTable 4.11: Advantages and disadvantages of transfer learning and fine-tuning techniques for deep reinforcement learning.\n99', 'images': []}, {'content': 'and Sec. VII concludes this paper.\nII.\nDeep Reinforcement Learning\nThe goal of deep reinforcement learning is to discover a policy, πθ,\nrepresented by a feedforward neural network and whose subscript\ndenotes it has trainable weights θ that maps states, x ∈X, to actions,\na ∈A that, when executed, maximize the expected rewards received\nover one episode. (In reinforcement learning, one simulation is called\none episode.) The action is obtained by feeding the state to the policy,\nas follows:\na \x01 πθ\x03x\x04\n(1)', 'images': []}, {'content': 'ough enough to train a model are likewise challenging to come by. The \n“explainability” difficulty arises from the intricacy of deep learning \ntechniques’ “black box” nature, although some success was achieved \nwith post-hoc explanation methods revealing what factors contribute to \na judgement or prediction and in what manner. Another obstacle is \ndeveloping generalized learning strategies, as AI methods continue to \nhave difficulty transmitting their experiences from one set to the next. A', 'images': []}, {'content': 'approximately 100 GB/day of science data in its high data rate mode, but only 4% of this data can \nbe transmitted to the ground on average [5]. AI models can be used to classify objects in an image \nor identify regions of interest, allowing the spacecraft to autonomously prioritize what data to \ndownlink and/or track interesting features for capture. For example, for Earth observation, onboard \ncloud-masking algorithms could segment an image with cloudy and non-cloudy labels. Since', 'images': []}]}
+Added answer entry with content length: 471
+Number of images: 0
+Added answer entry with content length: 470
+Number of images: 0
+Added answer entry with content length: 505
+Number of images: 0
+Added answer entry with content length: 495
+Number of images: 0
+Added answer entry with content length: 486
+Number of images: 0
+
+Querying for question: 
+What strategies have been implemented to enhance the project's alignment with funding priorities and objectives?
+Query results: {'Results': [{'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n27\ndeveloped by The Aerospace Corporation (Fig. 30) looks at a system’s \ncapacity to fulfil mission objectives throughout the course of its full \nlifecycle. Once the mission’s requirements and specific functions have \nbeen determined, the possible threats that can affect the mission should \nbe identified, along with potential strategies. The threat’s goals must be \nalso identified because the strategy is a tool for attaining them [322].', 'images': []}, {'content': 'based on an initial, low ﬁdelity evaluation of possible onboard\nautonomy output, e.g., based on the most likely, nominal\nscience and engineering scenario.\nScientists can overload the plan with new observations/goals\nat this stage, and instead of culling the plan to stay within\nresource constraints, science negotiations rank science goals\nby priority, with low priority goals unlikely to be executed\nonboard. The autonomy engineer oversees the merging of\nchanges into the main plan.\nThen the team collectively', 'images': []}, {'content': 'plan speciﬁcation, from strategic to tactical, which largely\naligns with current mission practices of large ground planning\nteams at NASA JPL. Building on previous work at JPL [11]\n[12] [13] [14] we designed a set of UI tools to progressively\ncapture and specify intent as science campaigns. In this work\ncampaigns are composed by: a constrained set of goals (a de-\nsired state value or a high level activity, e.g. survey the mag-\nnetosphere, or monitor for plume activity), metrics to evaluate', 'images': []}, {'content': 'changes into the main plan.\nThen the team collectively\nreviews these preliminary “low ﬁdelity” outputs, implements\niterations as needed and approves advancing to the “high\nﬁdelity” evaluation of possible outcomes and autonomy out-\nput.\nSuch high ﬁdelity evaluation is called here outcome\nprediction phase.\nAt the outcome prediction phase, simulations produce a more\nrealistic and comprehensive view of the new plan’s impact\nto the projected mission progress and performance. Itera-', 'images': []}, {'content': 'to the projected mission progress and performance. Itera-\ntions continue, as the team decides to make minor tweaks\nor drop problematic goals entirely.\nThe team can inspect\nindividual cases or “clusters” of related cases to understand\noutcomes that might happen onboard and investigate prob-\nlematic plans that approach undesired limits. Explanation of\nthese problematic cases (either by manually inspecting logs,\nstate history, timelines and traces or by using an automated', 'images': []}]}
+Added answer entry with content length: 489
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+Added answer entry with content length: 494
+Number of images: 0
+Added answer entry with content length: 481
+Number of images: 0
+Added answer entry with content length: 473
+Number of images: 0
+Completed answers for section: Comment on resubmission (if applicable)
+Number of answers: 25
+
+Processing section: Bibliography
+
+Querying for question: 
+What are the key academic and industry sources that have informed the development of the project proposal?
+Query results: {'Results': [{'content': 'Source\nDB\nDB\nQuery\nObject\nGraph\nFig. 1\nFunctional diagram of the Prepare step of the AI/ML workﬂow.\nframework. A number of FOSS and COTS solutions exist and are implemented either as tools or APIs at the project\nlevel (e.g., DVC∗or the tf.data.Dataset module†) or as an enterprise-level central dataset repository (e.g., Collibra‡).\nBeyond storing the data, centralized dataset repositories provide additional features that aid in the management of', 'images': []}, {'content': 'to the reader. We decided to give importance to work published in the last few years,\navoiding the historical perspective of older and well-established fundamental works.\nAdditionally, we decided to avoid publications which are strongly speculative in\nnature: while visionary ideas are interesting to follow, an important requirement for\nthis survey was a well-motivated applicability for a space-related challenge, ideally\ninspired by an already established or newly proposed mission concept. This narrow', 'images': []}, {'content': 'of the main research topic, corroborating its procedures and techniques. All\nthree cases confirmed the good quality of the proposed methodology, achieving\nsatisfying performance levels in each of the applications’ frameworks.\nWorking for a Ph.D. is not an easy road, it is a path full of stops, sudden turns,\nbacks out and comebacks, and surely does not exhaustively explore a research\nfield. But certainly, it helps pushing towards the accomplishment of evermore', 'images': []}, {'content': 'inspired by an already established or newly proposed mission concept. This narrow\nscope allows our survey to be concise while remaining relevant for the interested\npractitioner.\nMany times, results obtained by one AI technology for a speciﬁc task appear\nstunning, but perform rather poorly when transferred to a different task, which often\nhappens when its strength and weaknesses are not thoroughly understood. However,\ndue to the pioneering works of many researchers combined with the results of large', 'images': []}, {'content': 'shubham-rasal.medium.com/howisro-uses-machine-learning-25be23430713, (accessed 28.08.22). \n[7] T. S. Lee (N.D.). In-situ Resource Utilization (ISRU) Construction Technology for Moon and Mars. International \nMoonBase Summit. Retrieved from: https://moonbasesummit.com/wpcontent/uploads/Tai_Sik.pdf.\nSpaceOps-2023, ID # 116   \nPage 5 of 5', 'images': []}]}
+Added answer entry with content length: 448
+Number of images: 0
+Added answer entry with content length: 505
+Number of images: 0
+Added answer entry with content length: 463
+Number of images: 0
+Added answer entry with content length: 503
+Number of images: 0
+Added answer entry with content length: 336
+Number of images: 0
+
+Querying for question: 
+How do these sources contribute to the theoretical and practical foundations of the research?
+Query results: {'Results': [{'content': 'of the main research topic, corroborating its procedures and techniques. All\nthree cases confirmed the good quality of the proposed methodology, achieving\nsatisfying performance levels in each of the applications’ frameworks.\nWorking for a Ph.D. is not an easy road, it is a path full of stops, sudden turns,\nbacks out and comebacks, and surely does not exhaustively explore a research\nfield. But certainly, it helps pushing towards the accomplishment of evermore', 'images': []}, {'content': 'Eirates), Northrop Grumman Corporation (United States), and the \nSmartSat Cooperative Research Centre (Australia) for their support of \nthis work through the Grant No. FSU-2022-013, the Collaborative \nResearch Project No. RE-04143, and the Doctoral Research Project No. \n2.13s, respectively. The authors would also like to thank Dr Andoh Afful, \nDr Suraj Bijjahalli and Prof. Wei Xiang and Mr Thomas Fahey for their \ninsightful feedback, which helped to improve the quality of this article. \nReferences', 'images': []}, {'content': 'supporting the safety of orbiting spacecraft and debris mitigation [7].\nWith an exponentially growing number of space-related practical ser-\nvices and research interests, a new focus has been appropriately made\non the defense and protection of spacecraft to ensure the continued\nﬂow of information (Cukurtepe and Akgun [13], Jah [20], Brown, Cot-\nton, et al. [7], Contant-Jorgenson, Lála, Schrogl, et al. [11]). A few', 'images': []}, {'content': "address \nthe \nchallenges \nand \nopportunities in integrating AI in the field of space \nexploration. \nFurthermore, the selected papers were scrutinized to \nextract relevant data and insights that could \ncontribute to the research paper. This involved \nidentifying statistical information, experimental \nresults, case studies, and any other data that \nsupported the findings and conclusions of the \nrespective studies. The extracted data and insights \nwere then used to strengthen the research paper's", 'images': []}, {'content': 'Analysis\nOnce we concluded the study, we transcribed the audio from\nthe sessions and compiled the survey responses. To identify\nthemes, we grouped clusters of related observations into\nafﬁnity groups, focusing on topics that related to our research\nquestions.\nFindings\nIn this section, we describe preliminary themes that emerged\nfrom our analysis.\nThe user study participants in general\nsuccessfully used the tools and series of steps to complete\ntheir operations tasks. The operators’ participation, inquiries,', 'images': []}]}
+Added answer entry with content length: 463
+Number of images: 0
+Added answer entry with content length: 502
+Number of images: 0
+Added answer entry with content length: 417
+Number of images: 0
+Added answer entry with content length: 498
+Number of images: 0
+Added answer entry with content length: 512
+Number of images: 0
+
+Querying for question: 
+What recent studies or technological advancements have been particularly influential in shaping the project's goals and methodologies?
+Query results: {'Results': [{'content': 'and fabrication processes, advancements in the scientific research, innovative \nmission concepts enabled by successfully reaching previous mission objectives, can \nbe all seen as reasons for the advancement in the performances of the spacecraft \nplatforms and payloads. Some trends are interesting: mission lifetime has, on \naverage, increased through the years (Figure 11); spacecraft bus mass has increased, \nwhile payload mass has remained constant (Figure 12). In general, the increased', 'images': []}, {'content': 'inspired by an already established or newly proposed mission concept. This narrow\nscope allows our survey to be concise while remaining relevant for the interested\npractitioner.\nMany times, results obtained by one AI technology for a speciﬁc task appear\nstunning, but perform rather poorly when transferred to a different task, which often\nhappens when its strength and weaknesses are not thoroughly understood. However,\ndue to the pioneering works of many researchers combined with the results of large', 'images': []}, {'content': 'that the 35% of the new generation is formed by individuals picked from the old \ngeneration. The selected value ensures a balance between effectiveness of the \nsearch (lower elite population fractions) and survival of fit individuals (higher elite \npopulation fractions). \n8.5 Results \nThe investigation on methodologies to improve and automate the space mission and \nspacecraft design is a vast effort, branching out into many fields of science and', 'images': []}, {'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n12\nincrease the value of both ground and space operations. \n3.2. Human-machine interaction at increasing levels of autonomy \nSince the industrial revolution, machines have been typically used as \na tool to aid humans in executing tasks. Before World War II (WWII), the \nhuman-machine interaction design paradigm was based on “humans \nadapting to machines”, whereas after WWII, ergonomics and human', 'images': []}, {'content': 'concepts from becoming a reality in the early years. \nIn the last decade, the panorama has changed: technology has evolved, and \nmore daring missions have been proposed and are now under development, with \nimproved payloads, communication technologies and propulsion systems. For these \nmissions, the CubeSat standard and, in general, the modified approach to small \nspacecraft and mission design, have a noticeable effect most of the domains', 'images': []}]}
+Added answer entry with content length: 490
+Number of images: 0
+Added answer entry with content length: 503
+Number of images: 0
+Added answer entry with content length: 449
+Number of images: 0
+Added answer entry with content length: 446
+Number of images: 0
+Added answer entry with content length: 442
+Number of images: 0
+
+Querying for question: 
+How have these sources influenced the project's approach to addressing specific challenges in autonomous spacecraft operations?
+Query results: {'Results': [{'content': 'tures, health of spacecraft subsystems, and consumption of\non-board resources). Enabling ground personnel to gain a\nreliable understanding of an autonomous spacecraft’s state\n(e.g.\nhealth, resources, etc.)\nis a challenging problem,\nas the onboard autonomy may alter the spacecraft state in\nresponse to information that is not immediately available on\nthe ground; in addition, propagating the spacecraft state is\ncritical to providing initial conditions to uplink teams. The', 'images': []}, {'content': 'conducted in 2002 regarding the launch of a UAV from a UGV.  \nAdditional work regarding landing and refueling of a Allied \nAerospace 29” iStar UAV  has been conducted and technology \nfrom Carnegie Mellon, the Jet Propulsion Laboratory and \nGeodetics, Inc. is being used to facilitate autonomous landing. \n[32] \n \n \n4. AUTONOMOUS SPACE EXPLORATION \n \nA spacecraft encounters a somewhat unique problem as it \nmoves further and further from earth.  The increasing distance', 'images': []}, {'content': 'within the space segment will lead to less raw data downlinked and \nprocess on the ground, thereby reducing the requirements for spectrum, \nhuman operators and ground-based computational resources. By auto\xad\nmating the processing and interpretation of operational information \nfrom different sources, the technical expenses of operating a spacecraft \nand responding to anomalies can be lowered [71,106,108]. Increasing \nthe level of autonomy within the space segment is therefore critically', 'images': []}, {'content': 'situations, guaranteeing mission success while minimizing any possible risks.\nSubsequently in the constant evolution of on-orbit servicing, the focus on\nspacecraft guidance and control autonomy emerges as a fundamental aspect\nwhich strongly drives the success and efficiency of missions, in order to make\nthe way to a new era of space exploration and applications where spacecrafts\ncan navigate and operate with unprecedented precision and adaptability.', 'images': []}, {'content': 'associated technical, ethical and legal challenges that come with these \nevolving systems. \nThis article starts with a high-level classification of spaceflight sys\xad\ntems (section 1), with a focus on the various categories of Earth orbiting \nsatellites. Then, it moves on to discuss and compare monolithic and \ndistributed satellite configurations (section 2). After that, section 3 fo\xad\ncuses on spacecraft autonomous operations, providing an overview of', 'images': []}]}
+Added answer entry with content length: 473
+Number of images: 0
+Added answer entry with content length: 469
+Number of images: 0
+Added answer entry with content length: 489
+Number of images: 0
+Added answer entry with content length: 453
+Number of images: 0
+Added answer entry with content length: 453
+Number of images: 0
+
+Querying for question: 
+What gaps in the literature has the project identified and how does it aim to fill these gaps?
+Query results: {'Results': [{'content': 'Progress in Aerospace Sciences 144 (2024) 100960\n27\ndeveloped by The Aerospace Corporation (Fig. 30) looks at a system’s \ncapacity to fulfil mission objectives throughout the course of its full \nlifecycle. Once the mission’s requirements and specific functions have \nbeen determined, the possible threats that can affect the mission should \nbe identified, along with potential strategies. The threat’s goals must be \nalso identified because the strategy is a tool for attaining them [322].', 'images': []}, {'content': 'given variability distributions and pushing each input request\nonto a queue. Meanwhile, the worker takes an input request\nfrom the queue and runs a simulation based on the input,\nwhile storing data to a shared database. Figure 14 shows the\nworkﬂow of the prediction engine, from the sampling to the\nstoring of outcomes.\nFigure 14. Overview of the architecture of the Prediction\nEngine.\nInference Tool: Filling in the gaps\nA key challenge in downlink analysis is to reconstruct the', 'images': []}, {'content': 'can be determined by performance of the model and/or a schedule.\nAfter development, the artifacts are tested to ensure proper function and performance. Next a ﬁnal review is conducted\nbefore the packaged automated model pipeline is released for delivery to the target environment.\nThe major steps in the Develop phase are largely the same across the three environments and the diﬀerences at\nworkﬂow level have been discussed in the previous sections. The main diﬀerences are the types of artifacts built during', 'images': []}, {'content': 'the impact gap in green). Furthermore, the operators are also\npresented with a few recommendations on how improve the\nplan to avoid conﬂicts and aid in campaign success. These\nrecommendations are essential in ﬁtting in with the iterative\nworkﬂow of plan development.\nDownlink analysis\nSubsystem Downlink Analysis Tool—The subsystem downlink\nanalysis tool (shown in Figure 11) allows operators to review\nFigure 10. Mission Impact tool: shows an overview of the', 'images': []}, {'content': 'to the projected mission progress and performance. Itera-\ntions continue, as the team decides to make minor tweaks\nor drop problematic goals entirely.\nThe team can inspect\nindividual cases or “clusters” of related cases to understand\noutcomes that might happen onboard and investigate prob-\nlematic plans that approach undesired limits. Explanation of\nthese problematic cases (either by manually inspecting logs,\nstate history, timelines and traces or by using an automated', 'images': []}]}
+Added answer entry with content length: 489
+Number of images: 0
+Added answer entry with content length: 480
+Number of images: 0
+Added answer entry with content length: 510
+Number of images: 0
+Added answer entry with content length: 459
+Number of images: 0
+Added answer entry with content length: 473
+Number of images: 0
+Completed answers for section: Bibliography
+Number of answers: 25
+
+Final section answers structure:
+
+Section: Introduction
+Number of answers: 25
+Answer 1 - Content length: 489
+Number of images: 0
+Answer 2 - Content length: 481
+Number of images: 0
+Answer 3 - Content length: 498
+Number of images: 0
+Answer 4 - Content length: 491
+Number of images: 0
+Answer 5 - Content length: 503
+Number of images: 0
+Answer 6 - Content length: 446
+Number of images: 0
+Answer 7 - Content length: 475
+Number of images: 0
+Answer 8 - Content length: 494
+Number of images: 0
+Answer 9 - Content length: 450
+Number of images: 0
+Answer 10 - Content length: 503
+Number of images: 0
+Answer 11 - Content length: 461
+Number of images: 0
+Answer 12 - Content length: 485
+Number of images: 0
+Answer 13 - Content length: 469
+Number of images: 0
+Answer 14 - Content length: 453
+Number of images: 0
+Answer 15 - Content length: 471
+Number of images: 0
+Answer 16 - Content length: 496
+Number of images: 0
+Answer 17 - Content length: 479
+Number of images: 0
+Answer 18 - Content length: 467
+Number of images: 0
+Answer 19 - Content length: 509
+Number of images: 0
+Answer 20 - Content length: 505
+Number of images: 0
+Answer 21 - Content length: 501
+Number of images: 0
+Answer 22 - Content length: 496
+Number of images: 0
+Answer 23 - Content length: 502
+Number of images: 0
+Answer 24 - Content length: 460
+Number of images: 0
+Answer 25 - Content length: 509
+Number of images: 0
+
+Section: Originality of the Research Project
+Number of answers: 25
+Answer 1 - Content length: 503
+Number of images: 0
+Answer 2 - Content length: 504
+Number of images: 0
+Answer 3 - Content length: 509
+Number of images: 0
+Answer 4 - Content length: 431
+Number of images: 0
+Answer 5 - Content length: 456
+Number of images: 0
+Answer 6 - Content length: 495
+Number of images: 0
+Answer 7 - Content length: 508
+Number of images: 0
+Answer 8 - Content length: 509
+Number of images: 0
+Answer 9 - Content length: 491
+Number of images: 0
+Answer 10 - Content length: 450
+Number of images: 0
+Answer 11 - Content length: 489
+Number of images: 0
+Answer 12 - Content length: 458
+Number of images: 0
+Answer 13 - Content length: 485
+Number of images: 0
+Answer 14 - Content length: 461
+Number of images: 0
+Answer 15 - Content length: 492
+Number of images: 0
+Answer 16 - Content length: 491
+Number of images: 0
+Answer 17 - Content length: 483
+Number of images: 0
+Answer 18 - Content length: 510
+Number of images: 0
+Answer 19 - Content length: 493
+Number of images: 0
+Answer 20 - Content length: 476
+Number of images: 0
+Answer 21 - Content length: 491
+Number of images: 0
+Answer 22 - Content length: 457
+Number of images: 0
+Answer 23 - Content length: 486
+Number of images: 0
+Answer 24 - Content length: 469
+Number of images: 0
+Answer 25 - Content length: 465
+Number of images: 0
+
+Section: Hypothesis, Research Objectives and Envisaged Methodology
+Number of answers: 25
+Answer 1 - Content length: 481
+Number of images: 0
+Answer 2 - Content length: 510
+Number of images: 0
+Answer 3 - Content length: 473
+Number of images: 0
+Answer 4 - Content length: 462
+Number of images: 0
+Answer 5 - Content length: 459
+Number of images: 0
+Answer 6 - Content length: 469
+Number of images: 0
+Answer 7 - Content length: 501
+Number of images: 0
+Answer 8 - Content length: 482
+Number of images: 0
+Answer 9 - Content length: 417
+Number of images: 0
+Answer 10 - Content length: 486
+Number of images: 0
+Answer 11 - Content length: 447
+Number of images: 0
+Answer 12 - Content length: 429
+Number of images: 0
+Answer 13 - Content length: 462
+Number of images: 0
+Answer 14 - Content length: 461
+Number of images: 0
+Answer 15 - Content length: 406
+Number of images: 0
+Answer 16 - Content length: 501
+Number of images: 0
+Answer 17 - Content length: 510
+Number of images: 0
+Answer 18 - Content length: 505
+Number of images: 0
+Answer 19 - Content length: 419
+Number of images: 0
+Answer 20 - Content length: 489
+Number of images: 0
+Answer 21 - Content length: 481
+Number of images: 0
+Answer 22 - Content length: 481
+Number of images: 0
+Answer 23 - Content length: 510
+Number of images: 0
+Answer 24 - Content length: 462
+Number of images: 0
+Answer 25 - Content length: 467
+Number of images: 0
+
+Section: Expected Outcomes / Impact
+Number of answers: 25
+Answer 1 - Content length: 491
+Number of images: 0
+Answer 2 - Content length: 472
+Number of images: 0
+Answer 3 - Content length: 501
+Number of images: 0
+Answer 4 - Content length: 501
+Number of images: 0
+Answer 5 - Content length: 493
+Number of images: 0
+Answer 6 - Content length: 484
+Number of images: 0
+Answer 7 - Content length: 487
+Number of images: 0
+Answer 8 - Content length: 444
+Number of images: 0
+Answer 9 - Content length: 493
+Number of images: 0
+Answer 10 - Content length: 494
+Number of images: 0
+Answer 11 - Content length: 471
+Number of images: 0
+Answer 12 - Content length: 420
+Number of images: 0
+Answer 13 - Content length: 476
+Number of images: 0
+Answer 14 - Content length: 472
+Number of images: 0
+Answer 15 - Content length: 494
+Number of images: 0
+Answer 16 - Content length: 496
+Number of images: 0
+Answer 17 - Content length: 507
+Number of images: 0
+Answer 18 - Content length: 467
+Number of images: 0
+Answer 19 - Content length: 481
+Number of images: 0
+Answer 20 - Content length: 509
+Number of images: 0
+Answer 21 - Content length: 496
+Number of images: 0
+Answer 22 - Content length: 509
+Number of images: 0
+Answer 23 - Content length: 494
+Number of images: 0
+Answer 24 - Content length: 467
+Number of images: 0
+Answer 25 - Content length: 502
+Number of images: 0
+
+Section: Explanations on the management of ethical issues and data protection
+Number of answers: 25
+Answer 1 - Content length: 455
+Number of images: 0
+Answer 2 - Content length: 472
+Number of images: 0
+Answer 3 - Content length: 504
+Number of images: 0
+Answer 4 - Content length: 454
+Number of images: 0
+Answer 5 - Content length: 510
+Number of images: 0
+Answer 6 - Content length: 489
+Number of images: 0
+Answer 7 - Content length: 447
+Number of images: 0
+Answer 8 - Content length: 404
+Number of images: 0
+Answer 9 - Content length: 503
+Number of images: 0
+Answer 10 - Content length: 497
+Number of images: 0
+Answer 11 - Content length: 472
+Number of images: 0
+Answer 12 - Content length: 487
+Number of images: 0
+Answer 13 - Content length: 507
+Number of images: 0
+Answer 14 - Content length: 503
+Number of images: 0
+Answer 15 - Content length: 501
+Number of images: 0
+Answer 16 - Content length: 487
+Number of images: 0
+Answer 17 - Content length: 509
+Number of images: 0
+Answer 18 - Content length: 484
+Number of images: 0
+Answer 19 - Content length: 507
+Number of images: 0
+Answer 20 - Content length: 442
+Number of images: 0
+Answer 21 - Content length: 406
+Number of images: 0
+Answer 22 - Content length: 505
+Number of images: 0
+Answer 23 - Content length: 462
+Number of images: 0
+Answer 24 - Content length: 501
+Number of images: 0
+Answer 25 - Content length: 423
+Number of images: 0
+
+Section: Comment on resubmission (if applicable)
+Number of answers: 25
+Answer 1 - Content length: 481
+Number of images: 0
+Answer 2 - Content length: 488
+Number of images: 0
+Answer 3 - Content length: 460
+Number of images: 0
+Answer 4 - Content length: 473
+Number of images: 0
+Answer 5 - Content length: 510
+Number of images: 0
+Answer 6 - Content length: 481
+Number of images: 0
+Answer 7 - Content length: 460
+Number of images: 0
+Answer 8 - Content length: 459
+Number of images: 0
+Answer 9 - Content length: 495
+Number of images: 0
+Answer 10 - Content length: 484
+Number of images: 0
+Answer 11 - Content length: 505
+Number of images: 0
+Answer 12 - Content length: 417
+Number of images: 0
+Answer 13 - Content length: 473
+Number of images: 0
+Answer 14 - Content length: 469
+Number of images: 0
+Answer 15 - Content length: 481
+Number of images: 0
+Answer 16 - Content length: 471
+Number of images: 0
+Answer 17 - Content length: 470
+Number of images: 0
+Answer 18 - Content length: 505
+Number of images: 0
+Answer 19 - Content length: 495
+Number of images: 0
+Answer 20 - Content length: 486
+Number of images: 0
+Answer 21 - Content length: 489
+Number of images: 0
+Answer 22 - Content length: 510
+Number of images: 0
+Answer 23 - Content length: 494
+Number of images: 0
+Answer 24 - Content length: 481
+Number of images: 0
+Answer 25 - Content length: 473
+Number of images: 0
+
+Section: Bibliography
+Number of answers: 25
+Answer 1 - Content length: 448
+Number of images: 0
+Answer 2 - Content length: 505
+Number of images: 0
+Answer 3 - Content length: 463
+Number of images: 0
+Answer 4 - Content length: 503
+Number of images: 0
+Answer 5 - Content length: 336
+Number of images: 0
+Answer 6 - Content length: 463
+Number of images: 0
+Answer 7 - Content length: 502
+Number of images: 0
+Answer 8 - Content length: 417
+Number of images: 0
+Answer 9 - Content length: 498
+Number of images: 0
+Answer 10 - Content length: 512
+Number of images: 0
+Answer 11 - Content length: 490
+Number of images: 0
+Answer 12 - Content length: 503
+Number of images: 0
+Answer 13 - Content length: 449
+Number of images: 0
+Answer 14 - Content length: 446
+Number of images: 0
+Answer 15 - Content length: 442
+Number of images: 0
+Answer 16 - Content length: 473
+Number of images: 0
+Answer 17 - Content length: 469
+Number of images: 0
+Answer 18 - Content length: 489
+Number of images: 0
+Answer 19 - Content length: 453
+Number of images: 0
+Answer 20 - Content length: 453
+Number of images: 0
+Answer 21 - Content length: 489
+Number of images: 0
+Answer 22 - Content length: 480
+Number of images: 0
+Answer 23 - Content length: 510
+Number of images: 0
+Answer 24 - Content length: 459
+Number of images: 0
+Answer 25 - Content length: 473
+Number of images: 0
