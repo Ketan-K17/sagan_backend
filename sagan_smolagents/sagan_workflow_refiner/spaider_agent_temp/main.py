@@ -194,10 +194,7 @@ async def process_input(user_input: UserInput):
         if user_input.section_number:
             draft_path = tex_file  # Using tex_file as draft path
             s_title, s_text = extract_section(str(draft_path), user_input.section_number)
-            research_query_generator_prompt = RESEARCH_QUERY_GENERATOR_PROMPT.format(
-                section_title=s_title,
-                section_text=s_text
-            )
+            research_query_generator_prompt = RESEARCH_QUERY_GENERATOR_PROMPT
 
             initial_input = {
                 "messages": [

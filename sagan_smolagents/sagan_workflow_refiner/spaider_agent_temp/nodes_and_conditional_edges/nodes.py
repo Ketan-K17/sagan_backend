@@ -12,15 +12,9 @@ import asyncio
 '''LOCAL IMPORTS'''
 from schemas import State
 from prompts.prompts import *
-from models.chatgroq import BuildChatGroq, BuildChatOpenAI
 
 '''IMPORT ALL TOOLS HERE AND CREATE LIST OF TOOLS TO BE PASSED TO THE AGENT.'''
-from tools.script_executor import run_script
-from tools.file_tree import get_file_tree
-# from tools.web_tool import web_search_tool
 from tools.query_chromadb import query_chromadb
-# from utils.mdtopdf import convert_md_to_pdf
-from utils.latextopdf import LaTeXPipeline
 from pathlib import Path
 import importlib.util
 import certifi
@@ -41,11 +35,10 @@ spec.loader.exec_module(config)
 load_dotenv()
 init()
 
-terminal_tools = [run_script, get_file_tree]
 research_tools = [query_chromadb]
 
 '''LLM TO USE'''
-from smolagents import ToolCallingAgent, HfApiModel
+from smolagents import ToolCallingAgent, HfApiModel, CodeAgent
 # select model
 model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
@@ -59,12 +52,12 @@ model = HfApiModel(model_id=model_id)
 # MODEL = "mixtral-8x7b-32768"
 MODEL = "gpt-4o"
 # llm = BuildChatGroq(model=MODEL, temperature=0)
-llm = BuildChatOpenAI(model=MODEL, temperature=0)
+# llm = BuildChatOpenAI(model=MODEL, temperature=0)
 
-llm_with_terminal_tools = llm.bind_tools(terminal_tools)
-llm_with_research_tools = llm.bind_tools(research_tools)
+# llm_with_terminal_tools = llm.bind_tools(terminal_tools)
+# llm_with_research_tools = llm.bind_tools(research_tools)
 
-research_tools_node = ToolNode(research_tools)
+# research_tools_node = ToolNode(research_tools)
 
 message_queues = {}
 
@@ -185,6 +178,7 @@ async def research_query_generator(state: State) -> State:
     Section Title: {state['section_title']}
     Section Text: {state['section_text']}
     """
+    # NOTE: USER MESSAGE IS NOT BEING CONSIDERED HERE.
     state["user_prompt"] = state["messages"][1].content
 
     combined_prompt = RESEARCH_QUERY_GENERATOR_PROMPT + "\n" + user_prompt

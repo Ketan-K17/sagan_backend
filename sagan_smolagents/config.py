@@ -27,9 +27,7 @@ INPUT_PDF_FOLDER = SAGAN_ROOT / "data"
 OUTPUT_BASE = FIRST_WORKFLOW_ROOT # i.e. sagan_workflow/spaider_agent_temp
 OUTPUT_PDF_PATH = OUTPUT_BASE / "output_pdf"
 RETRIEVED_IMAGES_PATH = OUTPUT_BASE / "retrieved_images"
-TEX_OUTPUT_PATH = OUTPUT_PDF_PATH / "output.tex"
-PDF_OUTPUT_PATH = OUTPUT_PDF_PATH / "output.pdf"
-MD_OUTPUT_PATH = OUTPUT_PDF_PATH / "output.md"
+OUTPUT_DOCX_PATH = OUTPUT_PDF_PATH / "output.docx"
 NODEWISE_OUTPUT_PATH = OUTPUT_PDF_PATH / "nodewise_output"
 CONSOLIDATED_TEMPLATE_PATH = OUTPUT_BASE / "utils" / "consolidated_template"
 
