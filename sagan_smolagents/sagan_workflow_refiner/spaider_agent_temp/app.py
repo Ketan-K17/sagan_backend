@@ -8,6 +8,7 @@ import certifi
 import ssl
 from langchain_openai import ChatOpenAI
 import shutil
+import json
 
 # LOCAL IMPORTS.
 from graph import create_graph, compile_graph, print_stream
@@ -77,38 +78,6 @@ llm = ChatOpenAI(
 # Add this to verify the configuration
 print(f"Using SSL cert path: {os.environ['SSL_CERT_FILE']}")
 print(f"API Key configured: {'Yes' if api_key else 'No'}")
-
-
-# def extract_section(draft_path: str, section_number: int) -> tuple[str, str]:
-#     """
-#     Extract section title and text from a markdown file based on section number.
-#     Returns a tuple of (section_title, section_text).
-#     """
-#     with open(draft_path, 'r', encoding='utf-8') as file:
-#         content = file.read()
-    
-#     # Remove any content before the first section
-#     if '# ' in content:
-#         content = content[content.find('# '):]
-    
-#     # Split the content into sections based on level 1 headers
-#     sections = content.split('\n# ')
-#     if sections[0].startswith('# '):  # Handle first section if it starts with #
-#         sections[0] = sections[0][2:]
-    
-#     # Ensure section number is valid
-#     if section_number < 1 or section_number > len(sections):
-#         raise ValueError(f"Section number {section_number} is out of range. File has {len(sections)} sections.")
-    
-#     # Get the requested section
-#     section = sections[section_number - 1]
-    
-#     # Split into title and content, handling subsections
-#     section_parts = section.split('\n', 1)
-#     section_title = section_parts[0].split(':', 1)[1].strip() if ':' in section_parts[0] else section_parts[0].strip()
-#     section_text = section_parts[1].strip() if len(section_parts) > 1 else ""
-    
-#     return section_title, section_text
 
 
 def extract_section(draft_path: str, section_number: int) -> tuple[str, str]:
@@ -202,82 +171,35 @@ runnable_config = RunnableConfig(
 print(runnable_config)
 
 
-
-# if __name__ == "__main__":
-#     # creating graph workflow instance and then compiling it.
-#     verbose = True
-#     builder = create_graph()
-#     graph = compile_graph(builder)
-
-
-#     draft_path = config.TEX_OUTPUT_PATH
-#     section_number = 1
-        
-#     s_title, s_text = extract_section(draft_path, section_number)
-
-#     # printing the graph.
-#     print(graph.get_graph().draw_mermaid())
-
-#     # research_query_generator_prompt = RESEARCH_QUERY_GENERATOR_PROMPT.format(
-#     #     section_title=s_title,
-#     #     section_text=s_text
-#     # )
-
-#     user_prompt = f"""
-#     Section Title: {s_title}
-#     Section Text: {s_text}
-#     """
-#     combined_prompt = RESEARCH_QUERY_GENERATOR_PROMPT + "\n" + user_prompt
-
-#     user_input = input("############# User: ")
-#     initial_input = {
-#         "messages": [SystemMessage(content=combined_prompt), HumanMessage(content=user_input)],
-#         "section_text": s_text,
-#         "section_title": s_title,
-#         "section_number": section_number,
-#         "rough_draft_path": draft_path
-#     }
-
-#     print_stream(graph.stream(initial_input, stream_mode="values", config=runnable_config))
-
-#     user_approval = input("Save changes to the section text? (yes/no): ")
-#     if user_approval.lower() == "yes":
-#         # If approved, continue the graph execution
-#         for event in graph.stream(None, config=runnable_config, stream_mode="values"):
-#             event['messages'][-1].pretty_print()
-            
-#     else:
-#         print("Changes not saved.")
-
-# # Use the function to get section title and text
-# try:
-#     s_title, s_text = extract_section(draft_path, section_number)
-# except Exception as e:
-#     print(f"Error extracting section: {e}")
-#     s_title, s_text = "", ""
-
 # Add at the end of file, replacing the existing main block
 if __name__ == "__main__":
     async def main():
-        verbose = True
-        builder = create_graph()
+        builder = create_graph("1234")
         graph = compile_graph(builder)
 
-        draft_path = config.TEX_OUTPUT_PATH
-        section_number = 1
-        
-        s_title, s_text = extract_section(draft_path, section_number)
-        print(graph.get_graph().draw_mermaid())
+        draft_path = config.OUTPUT_DOCX_PATH
+        section_number = 6
 
-        user_prompt = f"""
-        Section Title: {s_title}
-        Section Text: {s_text}
-        """
-        combined_prompt = RESEARCH_QUERY_GENERATOR_PROMPT + "\n" + user_prompt
+        final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
+        
+        with open(final_state_path, 'r') as f:
+            json_data = json.load(f)
+            generated_sections = json_data.get('state', {}).get('generated_sections', {})
+            
+        # Convert section number to corresponding section title and text
+        section_titles = list(generated_sections.keys())
+        if 1 <= section_number <= len(section_titles):
+            s_title = section_titles[section_number - 1]
+            s_text = generated_sections[s_title]
+        else:
+            raise ValueError(f"Section number {section_number} is out of range")
+            
+
+        print(graph.get_graph().draw_mermaid())
 
         user_input = input("############# User: ")
         initial_input = {
-            "messages": [SystemMessage(content=combined_prompt), HumanMessage(content=user_input)],
+            "user_prompt": user_input,
             "section_text": s_text,
             "section_title": s_title,
             "section_number": section_number,

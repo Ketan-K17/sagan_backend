@@ -5,3 +5,5 @@ Look up a little more about the history of the university of luxembourg, and add
 Modify the section text such that the focus is more on the university of Luxembourg's research activities in space and aerospace industry.
 
 mention about all the relevant funding institutes and regulatory bodies related to space activities in luxembourg.
+
+The bibliography section should only contain references and citations, there should not be any other introductory, explanatory text. Make sure to include all the references and citations in one single list, not multiple lists.

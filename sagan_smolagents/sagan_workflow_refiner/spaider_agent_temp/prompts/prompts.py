@@ -33,7 +33,7 @@ Output Format:
        "research_queries": []
      }}
 
-Here is the section title and text for your reference:
+Here is the section title, section text and user prompt for your reference:
 """
 
 RESEARCH_QUERY_ANSWERER_PROMPT = """
@@ -75,5 +75,11 @@ Output Format: Your output must be a valid JSON object, with key value as 'modif
 
 Also, MAKE SURE to use an accompanying ai message that relays to the user that the modifications have been performed with key values as 'ai_message' and the value being the message by the ai 
 
-Context and other relevant information is below :
+Here is the section title, section text and user prompt, and the contextual info you need to modify the section text for your reference:
+
+Example Output:
+{{
+  "modified_section_text": "...",
+  "ai_message": "The section text has been modified based on the user's request to include more information about the University of Luxembourg."
+}}
 """

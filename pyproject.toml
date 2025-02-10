@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "sagan_multimodal"
+name = "sagan_smolagents"
 version = "0.1.0"
 description = "Sagan Proposal Generator with multiple workflows"
 authors = [
@@ -58,6 +58,7 @@ pypandoc = "^1.15"
 smolagents = "^1.7.0"
 python-docx = "^1.1.2"
 frontend = "^0.0.3"
+lorem = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 python-certifi-win32 = "^1.6.1"

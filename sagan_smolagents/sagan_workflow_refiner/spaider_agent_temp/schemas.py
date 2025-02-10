@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class State(MessagesState):
-    user_prompt: str
+    user_prompt: str # user message given by user.
     section_text: str
     modified_section_text: str
     ai_message: str

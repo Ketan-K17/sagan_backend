@@ -64,9 +64,9 @@ research_tools = [query_chromadb]
 '''LLM TO USE'''
 from smolagents import ToolCallingAgent, HfApiModel
 # select model
-# model_id = "meta-llama/Llama-3.3-70B-Instruct"
+model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
-model_id = "Qwen/Qwen2.5-Coder-32B-Instruct"
+# model_id = "Qwen/Qwen2.5-Coder-32B-Instruct"
 # model_id = "meta-llama/Meta-Llama-3.1-70B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 # model_id = "NousResearch/Hermes-3-Llama-3.1-8B"

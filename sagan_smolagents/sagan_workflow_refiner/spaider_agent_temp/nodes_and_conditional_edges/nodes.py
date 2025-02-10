@@ -9,6 +9,12 @@ from colorama import init, Fore, Back, Style
 from fastapi import WebSocket,WebSocketDisconnect,HTTPException
 import asyncio
 
+# docx related imports
+from docx import Document
+import lorem
+from docx.oxml import OxmlElement
+from docx.text.paragraph import Paragraph
+
 '''LOCAL IMPORTS'''
 from schemas import State
 from prompts.prompts import *
@@ -45,19 +51,6 @@ model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 # model_id = "NousResearch/Hermes-3-Llama-3.1-8B"
 model = HfApiModel(model_id=model_id)  
-# MODEL = "llama-3.1-70b-versatile"
-# MODEL = "llama-3.1-8b-instant"
-# MODEL = "gemma2-9b-it"
-# MODEL = "llama3-groq-70b-8192-tool-use-preview"
-# MODEL = "mixtral-8x7b-32768"
-MODEL = "gpt-4o"
-# llm = BuildChatGroq(model=MODEL, temperature=0)
-# llm = BuildChatOpenAI(model=MODEL, temperature=0)
-
-# llm_with_terminal_tools = llm.bind_tools(terminal_tools)
-# llm_with_research_tools = llm.bind_tools(research_tools)
-
-# research_tools_node = ToolNode(research_tools)
 
 message_queues = {}
 
@@ -171,31 +164,56 @@ async def research_query_generator(state: State) -> State:
     """
     session_id = "1234"
     print(f"{Fore.YELLOW}################ RESEARCH QUERY GENERATOR BEGIN #################")
-    empty_prompt = """{{managed_agents_descriptions}}"""
-    # create the agent; this is equivalent of the llm object we previously used.
-    agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
+    empty_prompt = """ """
+    
+    agent = ToolCallingAgent(
+        model=model, 
+        tools=[], 
+        prompt_templates={"system_prompt": empty_prompt}
+    )
+    
     user_prompt = f"""
     Section Title: {state['section_title']}
     Section Text: {state['section_text']}
+    User Prompt: {state['user_prompt']}
     """
-    # NOTE: USER MESSAGE IS NOT BEING CONSIDERED HERE.
-    state["user_prompt"] = state["messages"][1].content
 
     combined_prompt = RESEARCH_QUERY_GENERATOR_PROMPT + "\n" + user_prompt
 
     try:
-        # Generate queries with LLM
-        #response = llm.invoke(state["messages"])
-        response = agent.provide_final_answer(combined_prompt)
-        if not response or not hasattr(response, 'content'):
-            raise ValueError("Invalid response from LLM.")
-
-        # Extract research queries
-        response_content = json.loads(response)
+        # Get response from agent
+        response = agent.provide_final_answer(combined_prompt, images=None)
+        
+        # Debug logging
+        print("\nRaw response from agent:")
+        print("-" * 50)
+        print(response)
+        print("-" * 50)
+        
+        # Try to clean the response if it contains extra text
+        try:
+            # Look for JSON-like structure
+            if '{' in response:
+                json_start = response.find('{')
+                json_end = response.rfind('}') + 1
+                response = response[json_start:json_end]
+            
+            response_content = json.loads(response)
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error: {e}")
+            print("Falling back to empty research queries")
+            response_content = {"research_queries": []}
+        
+        # Extract research queries with fallback
         research_queries = response_content.get('research_queries', [])
+        if not isinstance(research_queries, list):
+            print("Warning: research_queries is not a list, converting to empty list")
+            research_queries = []
+            
         print("Generated Research Queries:", research_queries)
 
         # Ask the user via WebSocket if they want to modify queries
+        # --------- NOTE: TO ASK JYOTI ABOUT THIS --------
         print("323")
         await ws_manager.send_message("1234",{
             "type":"question1",
@@ -208,7 +226,7 @@ async def research_query_generator(state: State) -> State:
         user_input_str = await ws_manager.get_message(session_id, 'question1')
         print(user_input_str,"user_input_str 434")
         # user_input = json.loads(user_input_str)
-                   
+                
         # user_input_value = user_input.get("value")
         # print( user_input_value,"user input 434", user_input_value and  user_input_value.lower() == 'yes')
         print(f"------------------------Received message: {user_input_str}")
@@ -229,7 +247,7 @@ async def research_query_generator(state: State) -> State:
             
             # Add new queries
             while True:
-               
+                
                 await ws_manager.send_message("1234",{
                     "type":"question2",
                     "data":"Would you like to add a new query? (yes/no)"
@@ -260,6 +278,7 @@ async def research_query_generator(state: State) -> State:
                     modified_queries.append(new_query)
 
             research_queries = modified_queries
+        # ------------------------------------------------
 
         # Update state
         state["research_needed"] = bool(research_queries)
@@ -271,8 +290,9 @@ async def research_query_generator(state: State) -> State:
     except Exception as e:
         print(f"Error in research_query_generator: {str(e)}")
         state["messages"] = [str(e)]
+        state["research_needed"] = False
+        state["research_queries"] = []
         return state
-
 
 # new code below be aware llm code ahead
 
@@ -308,70 +328,33 @@ def research_query_answerer(state: State) -> State:
     """
     print(f"{Fore.BLUE}################ RESEARCH QUERY ANSWERER BEGIN #################")
 
-    try:
-        if not state.get("research_needed"):
-            state["context"] = []
-            return state
-
-        section_title=state.get("section_title"),
-        section_text=state.get("section_text"),
-        research_queries=state.get("research_queries")
-        # Add the query answerer prompt to messages
-
-        user_prompt = """
-        Section Title: {section_title}
-        Section Text: {section_text}
-        Research Queries: {research_queries}"""
-
-        research_query_answerer_prompt = RESEARCH_QUERY_ANSWERER_PROMPT + "\n" + user_prompt
-        state["messages"].append(research_query_answerer_prompt)
-
-        context = []
-        for query in state["research_queries"]:
-            result = query_chromadb(
-                str(config.VECTOR_DB_PATHS['astro_db']),  # Use path from config
-                config.MODEL_SETTINGS['SENTENCE_TRANSFORMER'],  # Use model setting from config
-                query
-            )
-            context.extend(result)
-
-        state["context"] = context
-
-        print(f"\n\n\n\nstate at the end of query answerer: \n")
-        ## printing messages
-        print("Messages: ")
-        messages = state["messages"]
-        if len(messages) >= 3:
-            for message in messages[-3:]:
-                print(f"{message.type}: {message.content}")
-        else:
-            for message in messages:
-                print(f"{message.type}: {message.content}")
-
-        ## printing fields other than messages.
-        for field_name, field_value in state.items():
-            if field_name != "messages":
-                print(f"- {field_name.capitalize()}: {field_value}")
-        print(f"################ QUERY ANSWERER END #################{Style.RESET_ALL}")
+    if not state.get("research_needed"):
+        state["context"] = []
         return state
 
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        print(f"################ QUERY ANSWERER END #################{Style.RESET_ALL}")
-        state["messages"] = [str(e)]
-        state["section_title"] = None
-        state["section_text"] = None
-        state["rough_draft"] = None
-        state["research_queries"] = None
-        state["context"] = None
-        return state
+    context = []
+    for query in state["research_queries"]:
+        result = query_chromadb(
+            str(config.VECTOR_DB_PATHS['astro_db']),  # Use path from config
+            config.MODEL_SETTINGS['SENTENCE_TRANSFORMER'],  # Use model setting from config
+            query
+        )
+        context.extend(result)
+
+    state["context"] = context
+
+    print(f"################ QUERY ANSWERER END #################{Style.RESET_ALL}")
+    return state
 
 
 def formatter(state: State):
     print(f"{Fore.LIGHTGREEN_EX}################ FORMATTING NODE BEGIN #################")
-    empty_prompt = """{{managed_agents_descriptions}}"""
-    # create the agent; this is equivalent of the llm object we previously used.
-    agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
+    empty_prompt = """ """
+    agent = ToolCallingAgent(
+        model=model, 
+        tools=[], 
+        prompt_templates={"system_prompt": empty_prompt}
+    )
 
     # Ensure state values are not None
     section_title = state.get("section_title", "")
@@ -386,48 +369,34 @@ def formatter(state: State):
     User Prompt: {user_prompt}
     Context: {context}
     """
-    
-
-    # populating the agent prompt
-    # formatter_prompt = FORMATTER_PROMPT.format(
-    #     user_prompt=user_prompt,
-    #     section_text=section_text,
-    #     context=context
-    # )
 
     combined_prompt = FORMATTER_PROMPT + "\n" + formatter_user_prompt
-
-    # appending the formatter prompt to list of messages
-    state["messages"].append(SystemMessage(content=combined_prompt))
-    
-    # invoking the llm, response in json.
-    #response = llm.invoke(state["messages"])
-    response = agent.provide_final_answer(combined_prompt)
-    raw_response = response
+    raw_response = agent.provide_final_answer(combined_prompt, images=None)
 
     try:
-        # Parse the JSON response
-        json_str = raw_response
-        if '```json' in json_str:
-            json_str = json_str.split('```json')[1].split('```')[0].strip()
+        # Try to clean the response if it contains extra text
+        if '{' in raw_response:
+            json_start = raw_response.find('{')
+            json_end = raw_response.rfind('}') + 1
+            raw_response = raw_response[json_start:json_end]
         
-        
-        # Parse JSON
-        response_json = json.loads(json_str)
-        
-        # Extract modified_section_text
-        state["modified_section_text"] = response_json.get("modified_section_text")
-        
-        state["ai_message"] = response_json.get("ai_message")
-
+        response_data = json.loads(raw_response)
     except json.JSONDecodeError as e:
-        print(f"Error parsing JSON: {e}")
-        state["modified_section_text"] = None
-        state["ai_message"] = f"Error processing your request: {str(e)}"
-    except Exception as e:
-        print(f"Error processing response: {e}")
-        state["modified_section_text"] = None
-        state["ai_message"] = f"Error processing your request: {str(e)}"
+        print(f"Error parsing JSON response: {e}")
+        print("Raw response:", raw_response)
+        # Fallback values if JSON parsing fails
+        response_data = {
+            'modified_section_text': state.get('section_text', ''),
+            'ai_message': 'Error: Could not process the text modification'
+        }
+    
+    # Extract the fields with fallback values
+    modified_section_text = response_data.get('modified_section_text', '')
+    ai_message = response_data.get('ai_message', '')
+
+    # Update state with the extracted values
+    state['modified_section_text'] = modified_section_text
+    state['ai_message'] = ai_message
 
     print(f"################ FORMATTING NODE END #################{Style.RESET_ALL}")
     return state
@@ -459,79 +428,86 @@ async def human_input_node(state: State):
     print(f"################ HUMAN INPUT NODE END #################{Style.RESET_ALL}")
     return state
 
+# helper functions for docx editing.
+def insert_paragraph_after(paragraph, text=""):
+    """
+    Insert a new paragraph immediately after the given paragraph and set its text.
+    """
+    # Create a new XML element for a paragraph
+    new_p_element = OxmlElement("w:p")
+    # Insert the new element right after the current paragraph's element
+    paragraph._p.addnext(new_p_element)
+    # Wrap the new element in a Paragraph object
+    new_paragraph = Paragraph(new_p_element, paragraph._parent)
+    # Add a run with the provided text
+    new_paragraph.add_run(text)
+    return new_paragraph
+
+def fill_section_with_text(doc_path: str, section_title: str, section_text: str):
+    """
+    Open the document at 'doc_path', find the paragraph containing section_title,
+    and replace all content after it until the next section with section_text.
+    
+    Args:
+        doc_path (str): Path to the Word document
+        section_title (str): Title of the section to modify
+        section_text (str): New text to replace the section content with
+    """
+    # Load the document
+    doc = Document(doc_path)
+    
+    # Find the section and its content
+    section_start = None
+    for i, paragraph in enumerate(doc.paragraphs):
+        if section_title.lower() in paragraph.text.lower():
+            section_start = i
+            break
+    
+    if section_start is None:
+        print(f"Section '{section_title}' not found in document")
+        return
+    
+    # Find the end of this section (next heading or document end)
+    section_end = len(doc.paragraphs)
+    for i in range(section_start + 1, len(doc.paragraphs)):
+        if doc.paragraphs[i].style.name.startswith('Heading'):
+            section_end = i
+            break
+    
+    # Remove all paragraphs between section start and end (except the heading)
+    for i in range(section_end - 1, section_start, -1):
+        p = doc.paragraphs[i]._element
+        p.getparent().remove(p)
+    
+    # Insert the new text after the section heading
+    insert_paragraph_after(doc.paragraphs[section_start], section_text)
+    
+    # Save the modified document back to the same file
+    doc.save(doc_path)
 
 
 def save_changes(state: State):
     print(f"{Fore.CYAN}################ SAVING CHANGES NODE BEGIN #################")
-    try:
-        # Only save if user approved
-        if state.get("user_approval") == 'yes':
-            tex_file_path = state.get("rough_draft_path")
-            if not tex_file_path:
-                raise ValueError("No LaTeX file path provided in state")
+    
+    # Only save if user approved
+    state["user_approval"] = "yes"
+    if state.get("user_approval") == 'yes':
+        docx_file_path = state.get("rough_draft_path")
 
-            # Read the entire LaTeX file
-            with open(tex_file_path, 'r', encoding='utf-8') as file:
-                content = file.read()
-
-            # Extract the document content between \begin{document} and \end{document}
-            doc_start = content.find('\\begin{document}')
-            doc_end = content.find('\\end{document}')
-
-            if doc_start == -1 or doc_end == -1:
-                raise ValueError("Could not find document environment in LaTeX file")
-
-            preamble = content[:doc_start + len('\\begin{document}')]
-            postamble = content[doc_end:]
-            main_content = content[doc_start + len('\\begin{document}'):doc_end]
-
-            # Split the content into sections based on \section commands
-            import re
-            section_pattern = r'(\\section\{[^}]*\}[\s\S]*?)(?=\\section\{|$)'
-            sections = re.findall(section_pattern, main_content)
-
-            # Validate section number
-            section_number = state.get("section_number", 0)
-            if section_number < 1 or section_number > len(sections):
-                raise ValueError(f"Section number {section_number} is out of range. File has {len(sections)} sections.")
-
-            # Get the modified section text from state
-            modified_text = state.get("modified_section_text")
-            if not modified_text:
-                raise ValueError("No modified text provided in state")
-
-            # Replace the section content while preserving the section command
-            section_header_match = re.match(r'(\\section\{[^}]*\})', sections[section_number - 1])
-            if section_header_match:
-                section_header = section_header_match.group(1)
-                sections[section_number - 1] = f"{section_header}\n{modified_text}\n"
-            else:
-                # If the section does not have a header, replace the content directly
-                sections[section_number - 1] = modified_text
-
-            # Reconstruct the document
-            new_main_content = ''.join(sections)
-            new_content = preamble + new_main_content + postamble
-
-            # Write back to file
-            with open(tex_file_path, 'w', encoding='utf-8') as file:
-                file.write(new_content)
-
-            print("Changes saved successfully to LaTeX file!")
-            state["save_success"] = True
-        else:
-            print("User disapproved changes. No changes saved.")
-            state["save_success"] = False
-
-    except Exception as e:
-        print(f"Error saving changes to LaTeX file: {str(e)}")
-        state["save_success"] = False
-        state["save_error"] = str(e)
-
-    # Debugging: print state information
-    for field_name, field_value in state.items():
-        if field_name != "messages":
-            print(f"- {field_name.capitalize()}: {field_value}")
+        # Get required values from state
+        section_title = state.get("section_title")
+        modified_text = state.get("modified_section_text")
+            
+        # Use helper function to update the document
+        fill_section_with_text(
+            doc_path=docx_file_path,
+            section_title=section_title,
+            section_text=modified_text
+        )
+        
+        print("Changes saved successfully to DOCX file!")
+    else:
+        print("User disapproved changes. No changes saved.")
 
     print(f"################ SAVING CHANGES NODE END #################{Style.RESET_ALL}")
     return state

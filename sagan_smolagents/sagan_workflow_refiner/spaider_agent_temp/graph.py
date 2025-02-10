@@ -13,8 +13,14 @@ from schemas import State
 
 load_dotenv()
 
-# def create_graph(session_id: str):
-def create_graph():
+def async_handler(async_func):
+    """Wrapper to handle async functions in the graph."""
+    async def wrapper(state):
+        return await async_func(state)
+    return wrapper
+
+def create_graph(session_id: str):
+# def create_graph():
     # GRAPH INSTANCE
     builder = StateGraph(State)
     
@@ -23,38 +29,19 @@ def create_graph():
     # builder.add_node("research_query_generator", lambda state: research_query_generator(state, session_id))
     builder.add_node("research_query_generator", research_query_generator)
     builder.add_node("research_query_answerer", research_query_answerer)
-    builder.add_node("formatter", formatter)
-    builder.add_node("research_tools_node", research_tools_node)  
-    # builder.add_node("human_input_node", lambda state: human_input_node(state, session_id))
+    builder.add_node("formatter", formatter)  
+    # builder.add_node("human_input_node", async_handler(human_input_node))
     # added below comment for publish api to work
     # builder.add_node("human_input_node", human_input_node)
-    # builder.add_node("save_changes", save_changes)
+    builder.add_node("save_changes", save_changes)
 
     # ADD EDGES TO THE GRAPH
     builder.add_edge(START, "research_query_generator")
     builder.add_edge("research_query_generator", "research_query_answerer")
-    builder.add_conditional_edges(
-        "research_query_answerer",
-        research_tools_condition,
-        {
-            "research_tools_node": "research_tools_node",
-            "formatter": "formatter"
-        }
-    )
-    builder.add_edge("research_tools_node", "research_query_answerer")
-    builder.add_edge("formatter", END)
-    # added below comment for publish api to work
-    # builder.add_edge("formatter", "human_input_node")
-    # builder.add_edge("save_changes", END)
-    # builder.add_edge("human_input_node", END)
-#     builder.add_conditional_edges(
-#     "human_input_node",  # The node to evaluate
-#     routing_function,    # The routing function
-#     {                 # Mapping of outputs to next nodes
-#         "yes": "save_changes",
-#         "no": "formatter"
-#     }
-# )
+    builder.add_edge("research_query_answerer", "formatter")
+    builder.add_edge("formatter", "save_changes")
+    builder.add_edge("save_changes", END)
+
     return builder
 
 
@@ -65,10 +52,27 @@ def compile_graph(builder):
     return graph
 
 def print_stream(stream):
+    """Print all fields from the state, with fallback handling for empty messages"""
     for s in stream:
-        message = s["messages"][-1]
-        if isinstance(message, tuple):
-            print(message)
-        else:
-            message.pretty_print()
+        print("\n=== State Update ===")
+        
+        # Handle messages separately with fallback for empty list
+        if "messages" in s:
+            if s["messages"]:  # If messages list is not empty
+                message = s["messages"][-1]
+                print("\nLatest Message:")
+                if isinstance(message, tuple):
+                    print(message)
+                else:
+                    message.pretty_print()
+            else:
+                print("\nMessages: []")
+        
+        # Print all other fields in the state
+        for key, value in s.items():
+            if key != "messages":  # Skip messages as we handled them above
+                print(f"\n{key}:")
+                print(value)
+        
+        print("\n" + "="*20)
 
