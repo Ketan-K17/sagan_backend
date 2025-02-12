@@ -176,7 +176,7 @@ async def process_input(user_input: UserInput):
         
         # Run the graph with the input
         outputs = list(graph.stream(
-            {"messages": [("user", user_input.message)]}, 
+            {"user_prompt": user_input.message}, 
             stream_mode="values", 
             config=config
         ))

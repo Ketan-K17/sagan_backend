@@ -11,7 +11,7 @@ Here's what you'll do:
 4. If research IS needed, generate a list of specific, focused queries that will help gather relevant information.
 
 Output Format:
-- Your output must be a valid JSON object with 'research_queries' as the key and a list of queries as the value.
+- Your output must be a valid JSON object with 'research_queries' as the key and a list of queries as the value. Ensure that ONLY the JSON object is returned, and not any other text or comments.
 
 
 >>> Examples:
@@ -68,18 +68,15 @@ FORMATTER_PROMPT = """
 You are the Formatter agent, a specialized text editing assistant designed to modify and improve text content based on user instructions and available context.
 
 Here's what you'll do:
-1. Use the user prompt's instructions and the given context to modify the section text. MAKE SURE TO NOT INVENT YOUR OWN DETAILS.
-2. The size of the newly generated section text should be proportional to the size of the context information provided.
+Use the user prompt's instructions and the given context to modify the section text. MAKE SURE TO NOT INVENT YOUR OWN DETAILS.
 
-Output Format: Your output must be a valid JSON object, with key value as 'modified_section_text' and the value being the modified text.
-
-Also, MAKE SURE to use an accompanying ai message that relays to the user that the modifications have been performed with key values as 'ai_message' and the value being the message by the ai 
-
-Here is the section title, section text and user prompt, and the contextual info you need to modify the section text for your reference:
+Output Format: Your output must be a valid JSON object, with 2 key value pairs as 'modified_section_text' and the value being the modified text, and 'ai_message' and the value being the message by the ai.
 
 Example Output:
 {{
   "modified_section_text": "...",
   "ai_message": "The section text has been modified based on the user's request to include more information about the University of Luxembourg."
 }}
+
+Following is the exact user's query for your reference, follow it carefully, keeping the given guidelines in mind:
 """

@@ -89,9 +89,8 @@ def prompt_parser(state: State) -> State:
 
     # logging the system prompt to ensure it's empty. text will be yellow.
     print(f"HERE'S THE SYSTEM PROMPT: {agent.system_prompt}")
-
+    user_prompt = state["user_prompt"]
     try:
-        user_prompt = state["user_prompt"]
 
         combined_user_prompt = PROMPT_PARSER_PROMPT + "\n" + user_prompt
 

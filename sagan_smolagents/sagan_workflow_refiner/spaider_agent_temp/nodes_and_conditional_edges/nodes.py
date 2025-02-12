@@ -46,7 +46,9 @@ research_tools = [query_chromadb]
 '''LLM TO USE'''
 from smolagents import ToolCallingAgent, HfApiModel, CodeAgent
 # select model
-model_id = "meta-llama/Llama-3.3-70B-Instruct"
+# model_id = "Qwen/Qwen2.5-Coder-32B-Instruct"
+model_id = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+# model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 # model_id = "NousResearch/Hermes-3-Llama-3.1-8B"
@@ -192,7 +194,6 @@ async def research_query_generator(state: State) -> State:
         
         # Try to clean the response if it contains extra text
         try:
-            # Look for JSON-like structure
             if '{' in response:
                 json_start = response.find('{')
                 json_end = response.rfind('}') + 1
@@ -212,78 +213,81 @@ async def research_query_generator(state: State) -> State:
             
         print("Generated Research Queries:", research_queries)
 
-        # Ask the user via WebSocket if they want to modify queries
-        # --------- NOTE: TO ASK JYOTI ABOUT THIS --------
-        print("323")
-        await ws_manager.send_message("1234",{
-            "type":"question1",
-            "data":"Would you like to modify or add queries? (yes/no)"
-        })
-        # user_input = await ws_manager.wait_for_response(
-        #     "1234"
-        # )
-        # print("327",user_input)
-        user_input_str = await ws_manager.get_message(session_id, 'question1')
-        print(user_input_str,"user_input_str 434")
-        # user_input = json.loads(user_input_str)
-                
-        # user_input_value = user_input.get("value")
-        # print( user_input_value,"user input 434", user_input_value and  user_input_value.lower() == 'yes')
-        print(f"------------------------Received message: {user_input_str}")
-        if  user_input_str and  user_input_str.lower() == 'yes':
-            modified_queries = []
-            
-            # Modify existing queries
-            for i, query in enumerate(research_queries, start=1):
-                print('do this later')
-                # await ws_manager.send_message("1234",{
-                #     "type":"question",
-                #     "data":f"Modify query {i} (or leave blank to keep it unchanged):"
-                # })
-                # new_query = await ws_manager.wait_for_response(
-                #     "1234"
-                # )
-                # modified_queries.append(new_query or query)
-            
-            # Add new queries
-            while True:
-                
-                await ws_manager.send_message("1234",{
-                    "type":"question2",
-                    "data":"Would you like to add a new query? (yes/no)"
-                })
-                add_more= await ws_manager.get_message(session_id, 'question2')
-                # add_more = await ws_manager.wait_for_response(
-                #     "1234"
-                # )
-
-                print("351",add_more)
-                # add_more = await ws_manager.query_user(
-                #     session_id, "Would you like to add a new query? (yes/no)"
-                # )
-                if add_more and add_more.lower() != 'yes':
-                    break
-                await ws_manager.send_message(session_id,{
-                    "type":"question3",
-                    "data":f"Enter new query {len(modified_queries) + 1}:"
-                })
-
-                new_query = await ws_manager.get_message(session_id,"question3")
-                print(new_query,"new_query")
-                # new_query = await ws_manager.query_user(
-                #     session_id, f"Enter new query {len(modified_queries) + 1}:"
-                # )
-
-                if new_query:
-                    modified_queries.append(new_query)
-
-            research_queries = modified_queries
-        # ------------------------------------------------
-
-        # Update state
-        state["research_needed"] = bool(research_queries)
+        # Save the queries to state before attempting WebSocket communication
         state["research_queries"] = research_queries
-        print(f"Final Research Queries: {research_queries}")
+        state["research_needed"] = bool(research_queries)
+
+        try:
+            # WebSocket communication attempt
+            session_id = "1234"
+            await ws_manager.send_message("1234", {
+                "type": "question1",
+                "data": "Would you like to modify or add queries? (yes/no)"
+            })
+            user_input_str = await ws_manager.get_message(session_id, 'question1')
+            
+            if user_input_str and user_input_str.lower() == 'yes':
+                modified_queries = []
+                modified_queries = research_queries
+                
+                # Modify existing queries
+                for i, query in enumerate(research_queries, start=1):
+                    # print('do this later')
+                    await ws_manager.send_message("1234",{
+                        "type":"question",
+                        "data":f"Modify query {i} (or leave blank to keep it unchanged):"
+                    })
+                    new_query = await ws_manager.wait_for_response(
+                        "1234"
+                    )
+                    modified_queries.append(new_query or query)
+                
+                # Add new queries
+                while True:
+                    
+                    await ws_manager.send_message("1234",{
+                        "type":"question2",
+                        "data":"Would you like to add a new query? (yes/no)"
+                    })
+                    add_more= await ws_manager.get_message(session_id, 'question2')
+                    # add_more = await ws_manager.wait_for_response(
+                    #     "1234"
+                    # )
+
+                    print("351",add_more)
+                    # add_more = await ws_manager.query_user(
+                    #     session_id, "Would you like to add a new query? (yes/no)"
+                    # )
+                    if add_more and add_more.lower() != 'yes':
+                        break
+                    await ws_manager.send_message(session_id,{
+                        "type":"question3",
+                        "data":f"Enter new query {len(modified_queries) + 1}:"
+                    })
+
+                    new_query = await ws_manager.get_message(session_id,"question3")
+                    print(new_query,"new_query")
+                    # new_query = await ws_manager.query_user(
+                    #     session_id, f"Enter new query {len(modified_queries) + 1}:"
+                    # )
+
+                    if new_query:
+                        modified_queries.append(new_query)
+
+                research_queries = modified_queries
+            # ------------------------------------------------
+
+            # Update state
+            state["research_needed"] = bool(research_queries)
+            state["research_queries"] = research_queries
+            print(f"Final Research Queries: {research_queries}")
+
+            return state
+
+        except Exception as ws_error:
+            print(f"WebSocket communication error: {ws_error}")
+            # Continue with existing queries if WebSocket fails
+            pass
 
         return state
 
@@ -356,43 +360,71 @@ def formatter(state: State):
         prompt_templates={"system_prompt": empty_prompt}
     )
 
-    # Ensure state values are not None
-    section_title = state.get("section_title", "")
-    user_prompt = state.get("user_prompt", "")
-    section_text = state.get("section_text", "")
-    context = state.get("context", "")
+    # Ensure state values are not None and convert to string if needed
+    section_title = str(state.get("section_title", ""))
+    user_prompt = str(state.get("user_prompt", ""))
+    section_text = str(state.get("section_text", ""))
+    context = "\n".join(state.get("context", [])) if isinstance(state.get("context"), list) else str(state.get("context", ""))
 
-
+    # Modify the formatter prompt to be more specific about maintaining structure
     formatter_user_prompt = f"""
-    Section Title: {section_title}
-    Section Text: {section_text}
-    User Prompt: {user_prompt}
-    Context: {context}
+    You are tasked with modifying a section of text while preserving its overall structure.
+
+    Section Title: {section_title}  
+    
+    Original Section Text:
+    {section_text}
+    
+    User's Modification Request:
+    {user_prompt}
+    
+    Additional Context:
+    {context}
+    
+    Instructions:
+    1. Keep all existing subsections intact
+    2. Only modify the specific parts relevant to the user's request
+    3. Maintain the same formatting and structure as the original
+    4. Return the COMPLETE section with your modifications
+    5. Your response should be in JSON format with the following structure:
+    {{
+        "modified_section_text": "entire section text with modifications",
+        "ai_message": "brief description of changes made"
+    }}
     """
 
     combined_prompt = FORMATTER_PROMPT + "\n" + formatter_user_prompt
     raw_response = agent.provide_final_answer(combined_prompt, images=None)
 
+    # Debug logging
+    print("\nRaw response from agent:")
+    print("-" * 50)
+    print(raw_response)
+    print("-" * 50)
+
     try:
-        # Try to clean the response if it contains extra text
+        # First try to extract just the JSON part if present
         if '{' in raw_response:
             json_start = raw_response.find('{')
             json_end = raw_response.rfind('}') + 1
-            raw_response = raw_response[json_start:json_end]
-        
-        response_data = json.loads(raw_response)
+            json_str = raw_response[json_start:json_end]
+            response_data = json.loads(json_str)
+        else:
+            # If no JSON found, try to parse the whole response
+            response_data = json.loads(raw_response)
+            
     except json.JSONDecodeError as e:
         print(f"Error parsing JSON response: {e}")
         print("Raw response:", raw_response)
-        # Fallback values if JSON parsing fails
+        # Create a more informative fallback response
         response_data = {
             'modified_section_text': state.get('section_text', ''),
-            'ai_message': 'Error: Could not process the text modification'
+            'ai_message': f'Error: Could not process the text modification. Raw response: {raw_response[:100]}...'
         }
     
     # Extract the fields with fallback values
-    modified_section_text = response_data.get('modified_section_text', '')
-    ai_message = response_data.get('ai_message', '')
+    modified_section_text = response_data.get('modified_section_text', section_text)
+    ai_message = response_data.get('ai_message', 'No message provided')
 
     # Update state with the extracted values
     state['modified_section_text'] = modified_section_text
@@ -490,7 +522,7 @@ def save_changes(state: State):
     print(f"{Fore.CYAN}################ SAVING CHANGES NODE BEGIN #################")
     
     # Only save if user approved
-    state["user_approval"] = "yes"
+    state["user_approval"] = "yes" # line added adhoc to test the workflow
     if state.get("user_approval") == 'yes':
         docx_file_path = state.get("rough_draft_path")
 

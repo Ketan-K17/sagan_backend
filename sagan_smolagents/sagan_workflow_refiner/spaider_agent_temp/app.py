@@ -178,7 +178,7 @@ if __name__ == "__main__":
         graph = compile_graph(builder)
 
         draft_path = config.OUTPUT_DOCX_PATH
-        section_number = 6
+        section_number = 2
 
         final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
         
@@ -196,6 +196,8 @@ if __name__ == "__main__":
             
 
         print(graph.get_graph().draw_mermaid())
+
+        print("Chosen section: ", s_title)
 
         user_input = input("############# User: ")
         initial_input = {
