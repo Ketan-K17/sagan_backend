@@ -14,10 +14,10 @@ import asyncio
 import json
 import uuid
 import importlib.util
+from docx import Document
+from docx.oxml import OxmlElement
+from docx.text.paragraph import Paragraph
 
-# Import LaTeX and Markdown conversion utilities
-from utils.latex_to_markdown import create_markdown_pipeline
-from utils.latextopdf import LaTeXPipeline
 from nodes_and_conditional_edges.nodes import ws_manager,research_query_generator
 from models.chatgroq import BuildChatGroq, BuildChatOpenAI
 # LOCAL IMPORTS
@@ -50,9 +50,6 @@ class UpdateLatexInput(BaseModel):
     """Input model for updating complete LaTeX document"""
     latex_content: str
 
-MODEL = "gpt-4o"
-# llm = BuildChatGroq(model=MODEL, temperature=0)
-llm = BuildChatOpenAI(model=MODEL, temperature=0)
 # Initialize FastAPI app
 app = FastAPI()
 
@@ -74,7 +71,7 @@ DATA_RFP_FOLDER.mkdir(exist_ok=True)
 
 # Initialize graph
 verbose = True
-builder = create_graph()
+builder = create_graph("1234")
 graph = compile_graph(builder)
 
 # Configure runnable
@@ -83,79 +80,118 @@ runnable_config = RunnableConfig(
     configurable={"thread_id": "1"}
 )
 
-def extract_section(draft_path: str, section_number: int) -> tuple[str, str]:
+# helper function to get section_title and section_text from formatting node state JSON.
+def get_section_info(section_number: int) -> tuple[str, str]:
     """
-    Extract section title and text from a LaTeX file based on section number.
-    Returns a tuple of (section_title, section_text).
-    """
-    import re
-
-    def clean_latex_command(text: str) -> str:
-        """Remove LaTeX commands from text while preserving content."""
-        # Remove comments
-        text = re.sub(r'%.*$', '', text, flags=re.MULTILINE)
-        # Remove specific LaTeX commands while keeping their content
-        text = re.sub(r'\\textbf{(.*?)}', r'\1', text)
-        text = re.sub(r'\\textit{(.*?)}', r'\1', text)
-        text = re.sub(r'\\emph{(.*?)}', r'\1', text)
-        return text.strip()
-
-    try:
-        with open(draft_path, 'r', encoding='utf-8') as file:
-            content = file.read()
-
-        # Extract content between \begin{document} and \end{document}
-        doc_match = re.search(r'\\begin{document}(.*?)\\end{document}', content, re.DOTALL)
-        if not doc_match:
-            raise ValueError("Could not find document environment in LaTeX file")
-        
-        main_content = doc_match.group(1)
-
-        # Find all sections
-        sections = []
-        section_titles = []
-        
-        # Regular expression for section commands
-        section_pattern = r'\\section\{([^}]+)\}'
-        
-        # Find all section positions
-        section_matches = list(re.finditer(section_pattern, main_content))
-        
-        if not section_matches:
-            # Handle case with no sections
-            return "", clean_latex_command(main_content)
-        
-        # Process each section
-        for i, match in enumerate(section_matches):
-            section_start = match.start()
-            section_end = section_matches[i + 1].start() if i < len(section_matches) - 1 else len(main_content)
-            
-            # Extract title and content
-            section_content = main_content[section_start:section_end]
-            title_match = re.search(section_pattern, section_content)
-            
-            if title_match:
-                title = clean_latex_command(title_match.group(1))
-                # Get content after the section command
-                content_start = title_match.end()
-                content = section_content[content_start:].strip()
-                
-                section_titles.append(title)
-                sections.append(clean_latex_command(content))
-
-        # Validate section number
-        if section_number < 1 or section_number > len(sections):
-            raise ValueError(f"Section number {section_number} is out of range. File has {len(sections)} sections.")
-
-        # Get the requested section
-        section_index = section_number - 1
-        return section_titles[section_index], sections[section_index]
-
-    except FileNotFoundError:
-        raise FileNotFoundError(f"LaTeX file not found: {draft_path}")
-    except Exception as e:
-        raise ValueError(f"Error processing LaTeX file: {str(e)}")
+    Extract section title and text for a given section number from the formatting node state JSON.
     
+    Args:
+        section_number (int): The section number to extract (1-based indexing)
+        
+    Returns:
+        tuple[str, str]: A tuple containing (section_title, section_text)
+        
+    Raises:
+        ValueError: If section number is invalid or if JSON data is malformed
+        FileNotFoundError: If the state JSON file doesn't exist
+    """
+    final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
+    
+    with open(final_state_path, 'r') as f:
+        json_data = json.load(f)
+        generated_sections = json_data.get('state', {}).get('generated_sections', {})
+        
+    # Convert section number to corresponding section title and text
+    section_titles = list(generated_sections.keys())
+    if 1 <= section_number <= len(section_titles):
+        s_title = section_titles[section_number - 1]
+        s_text = generated_sections[s_title]
+        return s_title, s_text
+    else:
+        raise ValueError(f"Section number {section_number} is out of range. Available sections: {len(section_titles)}")
+    
+# helper function to read the contents of a docx file.
+def read_docx_file(file_path: str) -> str:
+    """
+    Read the contents of a DOCX file and return its text as a string.
+    
+    Args:
+        file_path (str): Path to the DOCX file
+        
+    Returns:
+        str: Text content of the DOCX file
+    """
+    try:
+        # Load the document
+        doc = Document(file_path)
+        
+        # Extract text from paragraphs
+        full_text = []
+        for para in doc.paragraphs:
+            full_text.append(para.text)
+        
+        # Join all paragraphs with newlines
+        return '\n'.join(full_text)
+    
+    except Exception as e:
+        return f"Error reading file: {str(e)}"
+
+# helper functions for docx editing.
+def insert_paragraph_after(paragraph, text=""):
+    """
+    Insert a new paragraph immediately after the given paragraph and set its text.
+    """
+    # Create a new XML element for a paragraph
+    new_p_element = OxmlElement("w:p")
+    # Insert the new element right after the current paragraph's element
+    paragraph._p.addnext(new_p_element)
+    # Wrap the new element in a Paragraph object
+    new_paragraph = Paragraph(new_p_element, paragraph._parent)
+    # Add a run with the provided text
+    new_paragraph.add_run(text)
+    return new_paragraph
+
+def fill_section_with_text(doc_path: str, section_title: str, section_text: str):
+    """
+    Open the document at 'doc_path', find the paragraph containing section_title,
+    and replace all content after it until the next section with section_text.
+    
+    Args:
+        doc_path (str): Path to the Word document
+        section_title (str): Title of the section to modify
+        section_text (str): New text to replace the section content with
+    """
+    # Load the document
+    doc = Document(doc_path)
+    
+    # Find the section and its content
+    section_start = None
+    for i, paragraph in enumerate(doc.paragraphs):
+        if section_title.lower() in paragraph.text.lower():
+            section_start = i
+            break
+    
+    if section_start is None:
+        print(f"Section '{section_title}' not found in document")
+        return
+    
+    # Find the end of this section (next heading or document end)
+    section_end = len(doc.paragraphs)
+    for i in range(section_start + 1, len(doc.paragraphs)):
+        if doc.paragraphs[i].style.name.startswith('Heading'):
+            section_end = i
+            break
+    
+    # Remove all paragraphs between section start and end (except the heading)
+    for i in range(section_end - 1, section_start, -1):
+        p = doc.paragraphs[i]._element
+        p.getparent().remove(p)
+    
+    # Insert the new text after the section heading
+    insert_paragraph_after(doc.paragraphs[section_start], section_text)
+    
+    # Save the modified document back to the same file
+    doc.save(doc_path)
 
 
 @app.websocket("/ws/{session_id}")
@@ -184,23 +220,17 @@ async def process_input(user_input: UserInput):
 
         # Step 2: Default paths and configurations
         output_dir = Path(config.OUTPUT_PDF_PATH)
-        tex_file = output_dir / "output.tex"
-        pdf_file = output_dir / "output.pdf"
-        md_file = output_dir / "output.md"
+        docx_file = output_dir / "output.docx"
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Step 3: Extract section if section number and draft path are provided
         if user_input.section_number:
-            draft_path = tex_file  # Using tex_file as draft path
-            s_title, s_text = extract_section(str(draft_path), user_input.section_number)
-            research_query_generator_prompt = RESEARCH_QUERY_GENERATOR_PROMPT
+            draft_path = docx_file  # Using tex_file as draft path
+            s_title, s_text = get_section_info(user_input.section_number)
 
             initial_input = {
-                "messages": [
-                    SystemMessage(content=research_query_generator_prompt),
-                    HumanMessage(content=user_input.message)
-                ],
+                "user_prompt": user_input.message,
                 "section_text": s_text,
                 "section_title": s_title,
                 "section_number": user_input.section_number,
@@ -251,78 +281,35 @@ async def process_input(user_input: UserInput):
 
             # Step 6: Handle file processing for successful state
             if response_data.get("success"):
-                print("Save was successful, processing PDF and Markdown conversions...")
+                print("Save was successful. Writing to docx file...")
 
-                # Verify files exist
-                if not tex_file.exists():
-                    print(f"TeX file missing at: {tex_file}")
+                # Verify whether docx file exists
+                if not docx_file.exists():
+                    print(f"Docx file missing at: {docx_file}")
                     raise HTTPException(
                         status_code=404,
-                        detail="LaTeX file not found after compilation"
+                        detail="Docx file not found after formatting"
                     )
 
-                if not pdf_file.exists():
-                    print(f"PDF file missing at: {pdf_file}")
-                    raise HTTPException(
-                        status_code=404,
-                        detail="PDF file not generated successfully"
-                    )
-
-                print("Both files exist, proceeding with markdown conversion")
-
-                # Convert to Markdown
-                md_pipeline = create_markdown_pipeline()
-                md_result = md_pipeline.convert_latex_to_markdown(str(tex_file), str(output_dir))
+                print("Docx file exists, proceeding with writing to docx file...")
 
                 try:
-                    # Read LaTeX content
-                    with open(tex_file, 'r', encoding='utf-8') as f:
-                        latex_content = f.read()
-                    print("Successfully read LaTeX content")
-
-                    # Read PDF content
-                    with open(pdf_file, 'rb') as f:
-                        pdf_content = base64.b64encode(f.read()).decode('utf-8')
-                    print("Successfully read PDF content")
-
-                    # Handle Markdown content
-                    markdown_content = None
-                    if md_result["success"]:
-                        markdown_content = md_result["markdown_content"]
-                        # Save to file
-                        with open(md_file, 'w', encoding='utf-8') as f:
-                            f.write(markdown_content)
-                        print("Successfully created Markdown file")
+                    docx_content = read_docx_file(docx_file)
+                    print("Successfully read docx content")
 
                     # Update response data with file information
                     response_data.update({
-                        "tex_file": latex_content,
-                        "pdf_file": pdf_content,
-                        "md_file": markdown_content,
+                        "docx_file": docx_content,
                         "file_paths": {
-                            "tex": str(tex_file),
-                            "pdf": str(pdf_file),
-                            "md": str(md_file) if markdown_content else None
+                            "docx": str(docx_file),
                         }
                     })
 
-                    if not markdown_content:
-                        response_data["markdown_error"] = md_result.get("error", "Unknown conversion error")
-                        print(f"Markdown conversion failed: {response_data['markdown_error']}")
-
-                    # Clean up auxiliary files
-                    aux_extensions = ['.aux', '.log', '.out', '.fls', '.fdb_latexmk', '.synctex.gz']
-                    for ext in aux_extensions:
-                        aux_file = output_dir / f"output{ext}"
-                        if aux_file.exists():
-                            aux_file.unlink()
-                    print("Cleaned up auxiliary files")
-
                 except Exception as e:
-                    print(f"Error processing output files: {str(e)}")
+                    print(f"Error processing output file: {str(e)}")
                     raise HTTPException(
                         status_code=500,
-                        detail=f"Error processing output files: {str(e)}"
+                        detail=f"Error processing output file: {str(e)}"
                     )
             else:
                 print("No file processing needed or save was not successful")
@@ -354,9 +341,9 @@ async def process_input(user_input: UserInput):
 
 
 @app.post("/publish")
-async def publish(update_request:  PublishInput):
+async def publish(update_request: PublishInput):
     """
-    API to update a specific section in the tex_file and regenerate pdf and markdown files.
+    API to update a specific section in the docx_file.
     """
     try:
         # Extract input parameters
@@ -373,120 +360,45 @@ async def publish(update_request:  PublishInput):
 
         # File paths
         output_dir = Path(config.OUTPUT_PDF_PATH)
-        tex_file = output_dir / "output.tex"
-        pdf_file = output_dir / "output.pdf"
-        md_file = output_dir / "output.md"
+        docx_file = output_dir / "output.docx"
 
-        if not tex_file.exists():
+        if not docx_file.exists():
             raise HTTPException(
                 status_code=404,
-                detail="LaTeX file not found at the specified path"
+                detail="Docx file not found at the specified path"
             )
-
-        # Read the current content of the TeX file
-        with open(tex_file, 'r', encoding='utf-8') as f:
-            tex_content = f.read()
-
-        # Update the specific section
-        doc_start = tex_content.find('\\begin{document}')
-        doc_end = tex_content.find('\\end{document}')
-        if doc_start == -1 or doc_end == -1:
-            raise ValueError("Could not find document environment in LaTeX file")
-
-        preamble = tex_content[:doc_start + len('\\begin{document}')]
-        postamble = tex_content[doc_end:]
-        main_content = tex_content[doc_start + len('\\begin{document}'):doc_end]
-
-        # Use regex to split the document into sections
-        import re
-        section_pattern = r'(\\section\{[^}]*\}[\s\S]*?)(?=\\section\{|$)'
-        sections = re.findall(section_pattern, main_content)
-
-        # print(sections,"sections 1298")
-
-        # Validate section number
-        if section_number < 1 or section_number > len(sections):
-            raise ValueError(f"Section number {section_number} is out of range. File has {len(sections)} sections.")
-
-        # Replace the section content while preserving the section command
-        section_header_match = re.match(r'(\\section\{[^}]*\})', sections[section_number - 1])
-        if section_header_match:
-            section_header = section_header_match.group(1)
-            sections[section_number - 1] = f"{section_header}\n{modified_text}\n"
-        else:
-            sections[section_number - 1] = modified_text
-
-        # Reconstruct the document
-        new_main_content = ''.join(sections)
-        new_tex_content = preamble + new_main_content + postamble
-
-        # Write the updated TeX content back to the file
-        with open(tex_file, 'w', encoding='utf-8') as f:
-            f.write(new_tex_content)
-
-        print("Updated the TeX file with modified section text.")
-
-        # Ensure the PDF file exists
-        if not pdf_file.exists():
-            raise HTTPException(
-                status_code=404,
-                detail="PDF file not found. Ensure LaTeX to PDF conversion is enabled."
-            )
-
-        # Markdown conversion
-
-        md_pipeline = create_markdown_pipeline()
-        md_result = md_pipeline.convert_latex_to_markdown(str(tex_file), str(output_dir))
-        pipeline = LaTeXPipeline()
-        pdf_result = pipeline.latex_to_pdf(tex_file, output_dir)
-        print(pdf_result,"pdf result 436")
 
         try:
-            # Read LaTeX content
-            with open(tex_file, 'r', encoding='utf-8') as f:
-                latex_content = f.read()
+            # Get the section title for the given section number
+            s_title, _ = get_section_info(section_number)
+            
+            # Update the specific section using the helper function
+            fill_section_with_text(
+                doc_path=str(docx_file),
+                section_title=s_title,
+                section_text=modified_text
+            )
 
-            # Read PDF content
-            with open(pdf_file, 'rb') as f:
-                pdf_content = base64.b64encode(f.read()).decode('utf-8')
+            # Read the updated docx content
+            docx_content = read_docx_file(str(docx_file))
 
-            # Handle Markdown content
-            markdown_content = None
-            if md_result["success"]:
-                markdown_content = md_result["markdown_content"]
-                # Save the markdown content to file
-                with open(md_file, 'w', encoding='utf-8') as f:
-                    f.write(markdown_content)
-                print("Successfully created Markdown file.")
+            print("Updated the docx file with modified section text.")
 
-            # Prepare the response
             response_data = {
                 "success": True,
-                "message": "Section updated and files regenerated successfully",
-                "tex_file": latex_content,
-                "pdf_file": pdf_content,
-                "md_file": markdown_content,
+                "message": "Section updated successfully",
+                "docx_file": docx_content,
                 "file_paths": {
-                    "tex": str(tex_file),
-                    "pdf": str(pdf_file),
-                    "md": str(md_file) if markdown_content else None
+                    "docx": str(docx_file),
                 }
             }
-
-            # Clean up auxiliary files
-            aux_extensions = ['.aux', '.log', '.out', '.fls', '.fdb_latexmk', '.synctex.gz']
-            for ext in aux_extensions:
-                aux_file = output_dir / f"output{ext}"
-                if aux_file.exists():
-                    aux_file.unlink()
-            print("Cleaned up auxiliary files.")
 
             return JSONResponse(response_data)
 
         except Exception as e:
             raise HTTPException(
                 status_code=500,
-                detail=f"Error processing output files: {str(e)}"
+                detail=f"Error processing output file: {str(e)}"
             )
 
     except Exception as e:

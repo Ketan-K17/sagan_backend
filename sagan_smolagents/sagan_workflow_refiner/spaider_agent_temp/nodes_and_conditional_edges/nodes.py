@@ -11,7 +11,6 @@ import asyncio
 
 # docx related imports
 from docx import Document
-import lorem
 from docx.oxml import OxmlElement
 from docx.text.paragraph import Paragraph
 

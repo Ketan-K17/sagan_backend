@@ -7,7 +7,7 @@ class State(MessagesState):
     user_prompt: str # user message given by user.
     section_text: str
     modified_section_text: str
-    ai_message: str
+    ai_message: str # comments on modification to the docx file in the formatting node.
     research_needed: bool
     section_title: str
     rough_draft_path: str # path to the .md file containing the draft from first workflow
