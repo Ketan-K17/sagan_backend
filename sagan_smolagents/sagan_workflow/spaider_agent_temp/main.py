@@ -81,52 +81,52 @@ class UserInput(BaseModel):
 DATA_RFP_FOLDER = Path("data_rfp")
 DATA_RFP_FOLDER.mkdir(exist_ok=True)
 
-def extract_sections(latex_content):
-    """
-    Extract all top-level section titles (i.e., \section{}) from LaTeX content.
-    Returns a list of section titles.
-    """
-    import re
+# def extract_sections(latex_content):
+#     """
+#     Extract all top-level section titles (i.e., \section{}) from LaTeX content.
+#     Returns a list of section titles.
+#     """
+#     import re
     
-    def clean_latex_command(text: str) -> str:
-        """Remove LaTeX commands from text while preserving content."""
-        # Remove comments
-        text = re.sub(r'%.*$', '', text, flags=re.MULTILINE)
-        # Remove specific LaTeX commands while keeping their content
-        text = re.sub(r'\\textbf{(.*?)}', r'\1', text)
-        text = re.sub(r'\\textit{(.*?)}', r'\1', text)
-        text = re.sub(r'\\emph{(.*?)}', r'\1', text)
-        return text.strip()
+#     def clean_latex_command(text: str) -> str:
+#         """Remove LaTeX commands from text while preserving content."""
+#         # Remove comments
+#         text = re.sub(r'%.*$', '', text, flags=re.MULTILINE)
+#         # Remove specific LaTeX commands while keeping their content
+#         text = re.sub(r'\\textbf{(.*?)}', r'\1', text)
+#         text = re.sub(r'\\textit{(.*?)}', r'\1', text)
+#         text = re.sub(r'\\emph{(.*?)}', r'\1', text)
+#         return text.strip()
 
-    try:
-        # Extract content between \begin{document} and \end{document}
-        doc_match = re.search(r'\\begin{document}(.*?)\\end{document}', latex_content, re.DOTALL)
-        if not doc_match:
-            # If no document environment found, process the entire content
-            main_content = latex_content
-        else:
-            main_content = doc_match.group(1)
+#     try:
+#         # Extract content between \begin{document} and \end{document}
+#         doc_match = re.search(r'\\begin{document}(.*?)\\end{document}', latex_content, re.DOTALL)
+#         if not doc_match:
+#             # If no document environment found, process the entire content
+#             main_content = latex_content
+#         else:
+#             main_content = doc_match.group(1)
 
-        # Regular expression for section commands
-        section_pattern = r'\\section\{([^}]+)\}'
+#         # Regular expression for section commands
+#         section_pattern = r'\\section\{([^}]+)\}'
         
-        # Find all section matches
-        section_matches = list(re.finditer(section_pattern, main_content))
+#         # Find all section matches
+#         section_matches = list(re.finditer(section_pattern, main_content))
         
-        if not section_matches:
-            # Handle case with no sections
-            return []
+#         if not section_matches:
+#             # Handle case with no sections
+#             return []
 
-        # Extract section titles
-        section_titles = []
-        for match in section_matches:
-            title = clean_latex_command(match.group(1))
-            section_titles.append(title)
-        # print(section_titles,"section titlkes 470")
-        return section_titles
+#         # Extract section titles
+#         section_titles = []
+#         for match in section_matches:
+#             title = clean_latex_command(match.group(1))
+#             section_titles.append(title)
+#         # print(section_titles,"section titlkes 470")
+#         return section_titles
 
-    except Exception as e:
-        raise ValueError(f"Error processing LaTeX content: {str(e)}")
+#     except Exception as e:
+#         raise ValueError(f"Error processing LaTeX content: {str(e)}")
 
 @app.post("/upload-files")
 async def upload_files(files: list[UploadFile] = File(...)):
@@ -169,12 +169,11 @@ async def upload_files(files: list[UploadFile] = File(...)):
         "successful_uploads": successful_uploads
     })
 
-@app.post("/process-input-first-wrokflow")
+@app.post("/process-input-first-workflow")
 async def process_input(user_input: UserInput):
     try:   
         print(f"Processing input: {user_input.message}")
         
-        # Run the graph with the input
         outputs = list(graph.stream(
             {"user_prompt": user_input.message}, 
             stream_mode="values", 
@@ -186,116 +185,47 @@ async def process_input(user_input: UserInput):
         # Get the file paths
         project_root = Path(__file__).parent.parent
         output_dir = project_root / "spaider_agent_temp" / "output_pdf"
-        tex_file = output_dir / "output.tex"
-        pdf_file = output_dir / "output.pdf"
-        md_file = output_dir / "output.md"  # Define markdown file path
+        docx_file = output_dir / "output.docx"
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
 
         try:
-            # First check if the tex file exists
-            if not tex_file.exists():
+            if not docx_file.exists():
                 raise HTTPException(
                     status_code=404,
-                    detail=f"LaTeX file not found at {tex_file}"
+                    detail=f"docx file not found at {docx_file}"
                 )
 
-            print(f"Found LaTeX file at: {tex_file}")
-            print(f"Looking for PDF file at: {pdf_file}")
-
-            # Additional debug information
+            print(f"Found docx file at: {docx_file}")
             print(f"Files in output directory: {list(output_dir.glob('*'))}")
 
-            # Check files with detailed logging
-            if not tex_file.exists():
-                print(f"TeX file missing at: {tex_file}")
+            if not docx_file.exists():
+                print(f"docx file missing at: {docx_file}")
                 raise HTTPException(
                     status_code=404,
-                    detail="LaTeX file not found after compilation"
+                    detail="docx file not found after compilation"
                 )
 
-            if not pdf_file.exists():
-                print(f"PDF file missing at: {pdf_file}")
-                raise HTTPException(
-                    status_code=404,
-                    detail="PDF file not generated successfully"
-                )
+            print("Docx file found.")
 
-            print("Both files exist, proceeding with conversion")
-
-            # Convert to Markdown
-            from utils.latex_to_markdown import create_markdown_pipeline
-            md_pipeline = create_markdown_pipeline()
-            md_result = md_pipeline.convert_latex_to_markdown(str(tex_file), str(output_dir))
-
-            # Read all files
-            try:
-                # Read LaTeX content
-                with open(tex_file, 'r', encoding='utf-8') as f:
-                    latex_content = f.read()
-                print("Successfully read LaTeX content")
-
-                right_section_headings =  extract_sections(latex_content)
-
-                # Read PDF content
-                with open(pdf_file, 'rb') as f:
-                    pdf_content = base64.b64encode(f.read()).decode('utf-8')
-                print("Successfully read PDF content")
-
-                # Read or create Markdown content
-                markdown_content = None
-                if md_result["success"]:
-                    # Save markdown to file if not already saved
-                    if md_result["markdown_content"]:
-                        with open(md_file, 'w', encoding='utf-8') as f:
-                            f.write(md_result["markdown_content"])
-                        
-                        # Read the saved markdown file
-                        with open(md_file, 'r', encoding='utf-8') as f:
-                            markdown_content = f.read()
-                        print("Successfully created and read Markdown file")
-
-                response_data = {
-                    "ai_message": state.get('ai_message'),
-                    "tex_file": latex_content,
-                    "pdf_file": pdf_content,
-                    "md_file": markdown_content,
-                    "section_headings": right_section_headings,
-                    "success": True,
-                    "file_paths": {
-                        "tex": str(tex_file),
-                        "pdf": str(pdf_file),
-                        "md": str(md_file) if markdown_content else None
-                    }
+            # Convert PosixPath objects to strings before JSON serialization
+            response_data = {
+                "ai_message": state.get('ai_message'),
+                "docx_file": str(docx_file),  # Convert to string
+                "success": True,
+                "file_paths": {
+                    "docx": str(docx_file),  # Convert to string
                 }
+            }
 
-                if not markdown_content:
-                    response_data["markdown_error"] = md_result.get("error", "Unknown conversion error")
-                    print(f"Markdown conversion failed: {response_data['markdown_error']}")
-
-                # Clean up auxiliary files but keep the main outputs
-                aux_extensions = ['.aux', '.log', '.out', '.fls', '.fdb_latexmk', '.synctex.gz']
-                for ext in aux_extensions:
-                    aux_file = output_dir / f"output{ext}"
-                    if aux_file.exists():
-                        aux_file.unlink()
-                print("Cleaned up auxiliary files")
-
-                return JSONResponse(response_data)
-
-            except Exception as e:
-                print(f"Error reading files: {str(e)}")
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Error reading generated files: {str(e)}"
-                )
+            return JSONResponse(response_data)
 
         except subprocess.CalledProcessError as e:
-            print(f"LaTeX compilation error: {e.stderr}")
+            print(f"Docx generation error: {e.stderr}")
             raise HTTPException(
                 status_code=500,
-                detail=f"LaTeX compilation failed: {e.stderr}"
+                detail=f"Docx generation failed: {e.stderr}"
             )
     
     except Exception as e:

@@ -93,7 +93,7 @@ Guidelines to ask questions:
 3. Include both high-level conceptual questions and specific technical details.
 4. Generate at least 5 questions per section.
 
-Your output MUST be in JSON format, with section names as keys and lists of questions as values. Make sure there is no additional text accompanying the JSON object.
+Your output MUST be in JSON format, with section names as keys and lists of questions as values. Make sure there is NO additional text or other formatting like ''' and '''json accompanying the JSON object.
 
 >>> Example:
 Section Topics: ["Introduction", "Methodology"]
