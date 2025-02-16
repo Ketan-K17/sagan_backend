@@ -66,8 +66,6 @@ from smolagents import ToolCallingAgent, HfApiModel
 # select model
 model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
-# model_id = "Qwen/Qwen2.5-Coder-32B-Instruct"
-# model_id = "meta-llama/Meta-Llama-3.1-70B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 # model_id = "NousResearch/Hermes-3-Llama-3.1-8B"
 model = HfApiModel(model_id=model_id)   
@@ -80,7 +78,12 @@ def prompt_parser(state: State) -> State:
     Given a user prompt, this node parses the prompt to extract the project title and description based on the project title.
     """
     print(f"{Fore.YELLOW}################ PROMPT PARSER BEGIN #################")
-    empty_prompt = """"""
+    # NOTE: the custom_agent_prompt will likely not be used for any of the agents, and will be set to an empty string, with the bare minimum of placeholder text. This will be the case for all nodes, unless the node has access to actual tools.
+    empty_prompt = """ """
+
+    # create the agent; this is equivalent of the llm object we previously used.
+    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
+
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
@@ -90,7 +93,12 @@ def prompt_parser(state: State) -> State:
     # logging the system prompt to ensure it's empty. text will be yellow.
     print(f"HERE'S THE SYSTEM PROMPT: {agent.system_prompt}")
     user_prompt = state["user_prompt"]
+    print(user_prompt,"user prompt")
+    
     try:
+
+        
+
 
         combined_user_prompt = PROMPT_PARSER_PROMPT + "\n" + user_prompt
 
@@ -123,7 +131,10 @@ def abstract_questions_generator(state: State) -> State:
     project_title = state.get("project_title", "")
     project_description = state.get("project_description", "")
     
-    empty_prompt = """ """
+    empty_prompt = """   """
+    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
+
+
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
@@ -169,14 +180,16 @@ def abstract_answers_generator(state: State) -> State:
     print(f"{Fore.BLUE}################ ABSTRACT ANSWERS GENERATOR BEGIN #################")
     abstract_questions = state["abstract_questions"]
     sys_prompt = ABSTRACT_ANSWERS_GENERATOR_PROMPT
-    empty_prompt = """"""
+    empty_prompt = """  """
 
     try:
+        # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
+
         agent = ToolCallingAgent(
-            model=model, 
-            tools=[], 
-            prompt_templates={"system_prompt": empty_prompt}
-        )
+        model=model, 
+        tools=[], 
+        prompt_templates={"system_prompt": empty_prompt}
+    )
         # Use the research tools to actually query the database
         qa_pairs = {}
         for question in abstract_questions:
@@ -229,7 +242,8 @@ def section_topic_extractor(state: State) -> State:
     This node extracts the topics for each section of the project from the template pdf given by the user.
     """
     print(f"{Fore.CYAN}################ SECTION TOPIC EXTRACTOR BEGIN #################")
-    empty_prompt = """"""
+    empty_prompt = """    """
+    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
@@ -287,7 +301,8 @@ def section_wise_question_generator(state: State) -> State:
     formatted_topics = "\n".join(section_topics)
     combined_prompt = SECTION_WISE_QUESTION_GENERATOR_PROMPT + "\nsection_topics: " + formatted_topics + "\nproject_title: " + project_title + "\nproject_description: " + project_description + "\nabstract_text: " + abstract_text
 
-    empty_prompt = """"""
+    empty_prompt = """  """
+    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
@@ -438,7 +453,8 @@ def section_wise_answers_generator(state: State) -> State:
 def plan_node(state: State):
     print(f"{Fore.LIGHTYELLOW_EX}################ PLAN NODE BEGIN #################")
     
-    empty_prompt = """"""
+    empty_prompt = """ """
+    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
@@ -485,7 +501,8 @@ def generation_node(state: dict) -> dict:
     """
     print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE BEGIN #################")
     
-    empty_prompt = """"""
+    empty_prompt = """ """
+    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
