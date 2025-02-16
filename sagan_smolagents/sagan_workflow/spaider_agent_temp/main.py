@@ -81,53 +81,6 @@ class UserInput(BaseModel):
 DATA_RFP_FOLDER = Path("data_rfp")
 DATA_RFP_FOLDER.mkdir(exist_ok=True)
 
-# def extract_sections(latex_content):
-#     """
-#     Extract all top-level section titles (i.e., \section{}) from LaTeX content.
-#     Returns a list of section titles.
-#     """
-#     import re
-    
-#     def clean_latex_command(text: str) -> str:
-#         """Remove LaTeX commands from text while preserving content."""
-#         # Remove comments
-#         text = re.sub(r'%.*$', '', text, flags=re.MULTILINE)
-#         # Remove specific LaTeX commands while keeping their content
-#         text = re.sub(r'\\textbf{(.*?)}', r'\1', text)
-#         text = re.sub(r'\\textit{(.*?)}', r'\1', text)
-#         text = re.sub(r'\\emph{(.*?)}', r'\1', text)
-#         return text.strip()
-
-#     try:
-#         # Extract content between \begin{document} and \end{document}
-#         doc_match = re.search(r'\\begin{document}(.*?)\\end{document}', latex_content, re.DOTALL)
-#         if not doc_match:
-#             # If no document environment found, process the entire content
-#             main_content = latex_content
-#         else:
-#             main_content = doc_match.group(1)
-
-#         # Regular expression for section commands
-#         section_pattern = r'\\section\{([^}]+)\}'
-        
-#         # Find all section matches
-#         section_matches = list(re.finditer(section_pattern, main_content))
-        
-#         if not section_matches:
-#             # Handle case with no sections
-#             return []
-
-#         # Extract section titles
-#         section_titles = []
-#         for match in section_matches:
-#             title = clean_latex_command(match.group(1))
-#             section_titles.append(title)
-#         # print(section_titles,"section titlkes 470")
-#         return section_titles
-
-#     except Exception as e:
-#         raise ValueError(f"Error processing LaTeX content: {str(e)}")
-
 @app.post("/upload-files")
 async def upload_files(files: list[UploadFile] = File(...)):
     if not all(file.content_type == "application/pdf" for file in files):
