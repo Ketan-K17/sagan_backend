@@ -7,13 +7,24 @@ import ssl
 import shutil
 import sys
 from pathlib import Path
-
+import json
+import importlib.util
 
 
 # Add parent directory to Python path to enable relative imports
 current_dir = Path(__file__).parent
 project_root = current_dir.parent.parent
 sys.path.append(str(project_root))
+
+# Dynamically resolve the path to config.py
+CURRENT_FILE = Path(__file__).resolve()
+SAGAN_MULTIMODAL = CURRENT_FILE.parent.parent.parent
+CONFIG_PATH = SAGAN_MULTIMODAL / "config.py"
+
+# Load config.py dynamically
+spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+config = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(config)
 
 # Import config after setting up path
 from config import FIRST_WORKFLOW_ROOT, SSL_CERT_PATH
@@ -55,11 +66,11 @@ from typing import List
 from pydantic import BaseModel
 from pypdf import PdfReader
 from docx import Document
-import mammoth
+# import mammoth
 from io import BytesIO
 from langchain_core.runnables.config import RunnableConfig
 from graph import create_graph, compile_graph, print_stream
-from html2docx import html2docx
+# from html2docx import html2docx
 app = FastAPI()
 
 # Add CORS middleware
@@ -75,7 +86,7 @@ app.add_middleware(
 builder = create_graph()
 graph = compile_graph(builder)
 
-config = RunnableConfig(
+runnable_config = RunnableConfig(
     recursion_limit=50,
     configurable={"thread_id": "1"}
 )
@@ -86,6 +97,35 @@ class UserInput(BaseModel):
 # Define paths
 DATA_RFP_FOLDER = Path("data_rfp")
 DATA_RFP_FOLDER.mkdir(exist_ok=True)
+
+# helper function to get section_title and section_text from formatting node state JSON.
+def get_generated_sections() -> dict:
+    """
+    Extract and return the generated_sections dictionary from the formatting node state JSON.
+    
+    Returns:
+        dict: Dictionary containing section titles as keys and their content as values
+        
+    Raises:
+        FileNotFoundError: If the state JSON file doesn't exist
+        ValueError: If JSON data is malformed or missing required fields
+    """
+    final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
+    
+    try:
+        with open(final_state_path, 'r') as f:
+            json_data = json.load(f)
+            generated_sections = json_data.get('state', {}).get('generated_sections', {})
+            
+            if not generated_sections:
+                raise ValueError("No generated sections found in state file")
+                
+            return generated_sections
+            
+    except FileNotFoundError:
+        raise FileNotFoundError(f"State file not found at {final_state_path}")
+    except json.JSONDecodeError:
+        raise ValueError("Invalid JSON in state file")
 
 @app.post("/upload-files")
 async def upload_files(files: list[UploadFile] = File(...)):
@@ -147,7 +187,7 @@ async def process_input(user_input: UserInput):
         outputs = list(graph.stream(
             {"user_prompt": user_input.message}, 
             stream_mode="values", 
-            config=config
+            config=runnable_config
         ))
 
         state = outputs[-1]
@@ -485,13 +525,6 @@ async def convert_to_docx(html: str = Form(...)):
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         filename="output.docx"
     )
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
