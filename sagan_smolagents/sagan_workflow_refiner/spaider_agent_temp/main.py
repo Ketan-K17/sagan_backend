@@ -96,10 +96,19 @@ def get_section_info(section_number: int) -> tuple[str, str]:
         FileNotFoundError: If the state JSON file doesn't exist
     """
     final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
+
+    print("1")
     
-    with open(final_state_path, 'r') as f:
+    with open(final_state_path, 'r', encoding='utf-8') as f:
         json_data = json.load(f)
         generated_sections = json_data.get('state', {}).get('generated_sections', {})
+
+        
+    # with open(final_state_path, 'r') as f:
+    #     json_data = json.load(f)
+    #     generated_sections = json_data.get('state', {}).get('generated_sections', {})
+
+        print("2")
         
     # Convert section number to corresponding section title and text
     section_titles = list(generated_sections.keys())
@@ -217,7 +226,6 @@ async def process_input(user_input: UserInput):
         # await ws_manager.connect(session_id,{
         #    "message":"hey  from 943"
         # })
-
         # Step 2: Default paths and configurations
         output_dir = Path(config.OUTPUT_PDF_PATH)
         docx_file = output_dir / "output.docx"
@@ -226,9 +234,8 @@ async def process_input(user_input: UserInput):
 
         # Step 3: Extract section if section number and draft path are provided
         if user_input.section_number:
-            draft_path = docx_file  # Using tex_file as draft path
+            draft_path = docx_file  # Using tex_file as draft 
             s_title, s_text = get_section_info(user_input.section_number)
-
             initial_input = {
                 "user_prompt": user_input.message,
                 "section_text": s_text,

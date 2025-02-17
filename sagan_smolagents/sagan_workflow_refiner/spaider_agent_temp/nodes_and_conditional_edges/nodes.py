@@ -219,6 +219,22 @@ async def research_query_generator(state: State) -> State:
         try:
             # WebSocket communication attempt
             session_id = "1234"
+
+            if research_queries:
+                await ws_manager.send_message("1234", {
+                    "type": "queries",
+                    "data": research_queries
+                })
+
+            # await ws_manager.send_message("1234", {
+            #     "type": "queries",
+            #     "data": research_queries
+            # })
+            
+            if bool(research_queries) is False:
+                return state
+
+
             await ws_manager.send_message("1234", {
                 "type": "question1",
                 "data": "Would you like to modify or add queries? (yes/no)"

@@ -70,7 +70,10 @@ from docx import Document
 from io import BytesIO
 from langchain_core.runnables.config import RunnableConfig
 from graph import create_graph, compile_graph, print_stream
-# from html2docx import html2docx
+from html2docx import html2docx
+import mammoth
+
+import csv
 app = FastAPI()
 
 # Add CORS middleware
@@ -98,8 +101,140 @@ class UserInput(BaseModel):
 DATA_RFP_FOLDER = Path("data_rfp")
 DATA_RFP_FOLDER.mkdir(exist_ok=True)
 
+DATA_RFP_FOLDER = Path("data_rfp")
+FOLDERS = {
+    "Proposal Files": DATA_RFP_FOLDER / "Proposal Files",
+    "Additional Files": DATA_RFP_FOLDER / "Additional Files",
+    "sota": DATA_RFP_FOLDER / "sota",
+    "methodology": DATA_RFP_FOLDER / "methodology",
+    "other": DATA_RFP_FOLDER / "other",
+}
+
+# Ensure all folders exist
+for folder in FOLDERS.values():
+    folder.mkdir(parents=True, exist_ok=True)
+
+
+UPLOAD_DIRECTORY = "uploaded_resumes"
+CSV_DIRECTORY = "csv_data"
+
+
+# Ensure the upload directory exists
+os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+os.makedirs(CSV_DIRECTORY, exist_ok=True)
+
+
+class CompanyInfo(BaseModel):
+    name: str
+    address: str
+    teamSize: str
+    website: str
+
+class PersonInfo(BaseModel):
+    firstName: str
+    lastName: str
+    position: str
+
+class ProjectInfo(BaseModel):
+    projectName: str
+    description: str
+    issuingOrg: str
+    callLink: str
+
+
+
+DATA_RFP_FOLDER = Path("data_rfp")
+FOLDERS = {
+    "Proposal Files": DATA_RFP_FOLDER / "Proposal Files",
+    "Additional Files": DATA_RFP_FOLDER / "Additional Files",
+    "sota": DATA_RFP_FOLDER / "sota",
+    "methodology": DATA_RFP_FOLDER / "methodology",
+    "other": DATA_RFP_FOLDER / "other",
+}
+
+# Ensure all folders exist
+for folder in FOLDERS.values():
+    folder.mkdir(parents=True, exist_ok=True)
+
+
+UPLOAD_DIRECTORY = "uploaded_resumes"
+CSV_DIRECTORY = "csv_data"
+
+
+# Ensure the upload directory exists
+os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+os.makedirs(CSV_DIRECTORY, exist_ok=True)
+
+
+class CompanyInfo(BaseModel):
+    name: str
+    address: str
+    teamSize: str
+    website: str
+
+class PersonInfo(BaseModel):
+    firstName: str
+    lastName: str
+    position: str
+
+class ProjectInfo(BaseModel):
+    projectName: str
+    description: str
+    issuingOrg: str
+    callLink: str
+
+
+def extract_sections(latex_content):
+    """
+    Extract all top-level section titles (i.e., \section{}) from LaTeX content.
+    Returns a list of section titles.
+    """
+    import re
+    
+    def clean_latex_command(text: str) -> str:
+        """Remove LaTeX commands from text while preserving content."""
+        # Remove comments
+        text = re.sub(r'%.*$', '', text, flags=re.MULTILINE)
+        # Remove specific LaTeX commands while keeping their content
+        text = re.sub(r'\\textbf{(.*?)}', r'\1', text)
+        text = re.sub(r'\\textit{(.*?)}', r'\1', text)
+        text = re.sub(r'\\emph{(.*?)}', r'\1', text)
+        return text.strip()
+
+    try:
+        # Extract content between \begin{document} and \end{document}
+        doc_match = re.search(r'\\begin{document}(.*?)\\end{document}', latex_content, re.DOTALL)
+        if not doc_match:
+            # If no document environment found, process the entire content
+            main_content = latex_content
+        else:
+            main_content = doc_match.group(1)
+
+        # Regular expression for section commands
+        section_pattern = r'\\section\{([^}]+)\}'
+        
+        # Find all section matches
+        section_matches = list(re.finditer(section_pattern, main_content))
+        
+        if not section_matches:
+            # Handle case with no sections
+            return []
+
+        # Extract section titles
+        section_titles = []
+        for match in section_matches:
+            title = clean_latex_command(match.group(1))
+            section_titles.append(title)
+        # print(section_titles,"section titlkes 470")
+        return section_titles
+
+    except Exception as e:
+        raise ValueError(f"Error processing LaTeX content: {str(e)}")
+
+
 # helper function to get section_title and section_text from formatting node state JSON.
-def get_generated_sections() -> dict:
+def get_generated_sections() -> list:
+# def get_generated_sections() -> dict:
     """
     Extract and return the generated_sections dictionary from the formatting node state JSON.
     
@@ -113,30 +248,133 @@ def get_generated_sections() -> dict:
     final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
     
     try:
-        with open(final_state_path, 'r') as f:
+       with open(final_state_path, 'r', encoding='utf-8') as f:
             json_data = json.load(f)
             generated_sections = json_data.get('state', {}).get('generated_sections', {})
+        # with open(final_state_path, 'r',) as f:
+        #     json_data = json.load(f)
+        #     generated_sections = json_data.get('state', {}).get('generated_sections', {})
             
             if not generated_sections:
                 raise ValueError("No generated sections found in state file")
                 
-            return generated_sections
+            section_titles = list(generated_sections.keys())
+            print(section_titles,"sections")
+            return section_titles
+       
+
+            # return generated_sections
             
     except FileNotFoundError:
         raise FileNotFoundError(f"State file not found at {final_state_path}")
     except json.JSONDecodeError:
         raise ValueError("Invalid JSON in state file")
 
+# @app.post("/upload-files")
+# async def upload_files(files: list[UploadFile] = File(...)):
+#     if not all(file.content_type == "application/pdf" for file in files):
+#         return JSONResponse(status_code=400, content={"message": "Invalid file type. Please upload only PDF files."})
+
+#     successful_uploads = []
+#     failed_uploads = []
+
+#     for file in files:
+#         file_location = DATA_RFP_FOLDER / file.filename
+#         try:
+#             with open(file_location, "wb") as f:
+#                 f.write(await file.read())
+
+#             # Validate the PDF and read all pages
+#             with open(file_location, "rb") as pdf_file:
+#                 reader = PdfReader(pdf_file)
+#                 # Iterate through all pages to ensure the PDF is fully readable
+#                 for page_num, page in enumerate(reader.pages):
+#                     text = page.extract_text()
+#                     print(f"Text from file '{file.filename}' page {page_num + 1}: {text}")
+
+#             successful_uploads.append(file.filename)
+
+#         except Exception as e:
+#             # Delete the file if it's not a valid PDF or an error occurred
+#             if file_location.exists():
+#                 os.remove(file_location)
+#             failed_uploads.append(file.filename)
+
+#     if failed_uploads:
+#         return JSONResponse(status_code=400, content={
+#             "message": "Some files were not valid PDFs.",
+#             "failed_uploads": failed_uploads
+#         })
+
+#     return JSONResponse(content={
+#         "message": "All files uploaded and verified successfully!",
+#         "successful_uploads": successful_uploads
+#     })
+
+
+
+
+# @app.post("/upload-files")
+# async def upload_files(files: list[UploadFile] = File(...)):
+#     if not all(file.content_type == "application/pdf" for file in files):
+#         return JSONResponse(status_code=400, content={"message": "Invalid file type. Please upload only PDF files."})
+
+#     successful_uploads = []
+#     failed_uploads = []
+
+#     for file in files:
+#         file_location = DATA_RFP_FOLDER / file.filename
+#         try:
+#             with open(file_location, "wb") as f:
+#                 f.write(await file.read())
+
+#             # Validate the PDF and read all pages
+#             with open(file_location, "rb") as pdf_file:
+#                 reader = PdfReader(pdf_file)
+#                 # Iterate through all pages to ensure the PDF is fully readable
+#                 for page_num, page in enumerate(reader.pages):
+#                     text = page.extract_text()
+#                     print(f"Text from file '{file.filename}' page {page_num + 1}: {text}")
+
+#             successful_uploads.append(file.filename)
+
+#         except Exception as e:
+#             # Delete the file if it's not a valid PDF or an error occurred
+#             if file_location.exists():
+#                 os.remove(file_location)
+#             failed_uploads.append(file.filename)
+
+#     if failed_uploads:
+#         return JSONResponse(status_code=400, content={
+#             "message": "Some files were not valid PDFs.",
+#             "failed_uploads": failed_uploads
+#         })
+
+#     return JSONResponse(content={
+#         "message": "All files uploaded and verified successfully!",
+#         "successful_uploads": successful_uploads
+#     })
+
+
+
+
 @app.post("/upload-files")
-async def upload_files(files: list[UploadFile] = File(...)):
-    if not all(file.content_type == "application/pdf" for file in files):
-        return JSONResponse(status_code=400, content={"message": "Invalid file type. Please upload only PDF files."})
+async def upload_files(files: list[UploadFile] = File(...), folder: str = Form(...)):
+    if folder not in FOLDERS:
+        return JSONResponse(status_code=400, content={"message": f"Invalid folder: {folder}"})
+
+    target_folder = FOLDERS[folder]
 
     successful_uploads = []
     failed_uploads = []
 
     for file in files:
-        file_location = DATA_RFP_FOLDER / file.filename
+        if file.content_type != "application/pdf":
+            failed_uploads.append(file.filename)
+            continue
+
+        file_location = target_folder / file.filename
+
         try:
             with open(file_location, "wb") as f:
                 f.write(await file.read())
@@ -144,7 +382,6 @@ async def upload_files(files: list[UploadFile] = File(...)):
             # Validate the PDF and read all pages
             with open(file_location, "rb") as pdf_file:
                 reader = PdfReader(pdf_file)
-                # Iterate through all pages to ensure the PDF is fully readable
                 for page_num, page in enumerate(reader.pages):
                     text = page.extract_text()
                     print(f"Text from file '{file.filename}' page {page_num + 1}: {text}")
@@ -152,7 +389,6 @@ async def upload_files(files: list[UploadFile] = File(...)):
             successful_uploads.append(file.filename)
 
         except Exception as e:
-            # Delete the file if it's not a valid PDF or an error occurred
             if file_location.exists():
                 os.remove(file_location)
             failed_uploads.append(file.filename)
@@ -172,17 +408,10 @@ async def upload_files(files: list[UploadFile] = File(...)):
 async def process_input(user_input: UserInput):
     try:   
 
-        # data = await request.json()  # Read incoming JSON
-        # print("Received request data:", data)  # Debug log
-        # return {"message": "Debugging request", "received_data": data}
+       
         print(f"Processing input: {user_input.message}")
         
-        # Run the graph with the input
-        # outputs = list(graph.stream(
-        #     {"messages": [("user", user_input.message)]}, 
-        #     stream_mode="values", 
-        #     config=config
-        # ))
+       
 
         outputs = list(graph.stream(
             {"user_prompt": user_input.message}, 
@@ -195,48 +424,33 @@ async def process_input(user_input: UserInput):
         # Get the file paths
         project_root = Path(__file__).parent.parent
         output_dir = project_root / "spaider_agent_temp" / "output_pdf"
-        docx_file = output_dir / "output.docx"
+       
+        docx_file = output_dir / "output.docx"  # Define markdown file path
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        try:
-            if not docx_file.exists():
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"docx file not found at {docx_file}"
-                )
+    
+        with open(docx_file, "rb") as file:
+            encoded_string = base64.b64encode(file.read()).decode('utf-8')
+        
+        sections  = get_generated_sections()
 
-            print(f"Found docx file at: {docx_file}")
-            print(f"Files in output directory: {list(output_dir.glob('*'))}")
 
-            if not docx_file.exists():
-                print(f"docx file missing at: {docx_file}")
-                raise HTTPException(
-                    status_code=404,
-                    detail="docx file not found after compilation"
-                )
-
-            print("Docx file found.")
-
-            # Convert PosixPath objects to strings before JSON serialization
-            response_data = {
-                "ai_message": state.get('ai_message'),
-                "docx_file": str(docx_file),  # Convert to string
-                "success": True,
-                "file_paths": {
-                    "docx": str(docx_file),  # Convert to string
+        response_data = {
+                    "ai_message": state.get('ai_message'),
+                    "docx_file": encoded_string,
+                    
+                    "section_headings":sections,
+                    "success": True,
+                   
                 }
-            }
+        return JSONResponse(response_data)
+        
+       
 
-            return JSONResponse(response_data)
-
-        except subprocess.CalledProcessError as e:
-            print(f"Docx generation error: {e.stderr}")
-            raise HTTPException(
-                status_code=500,
-                detail=f"Docx generation failed: {e.stderr}"
-            )
+       
+      
     
     except Exception as e:
         print(f"Error in process-input endpoint: {str(e)}")
@@ -244,6 +458,154 @@ async def process_input(user_input: UserInput):
             status_code=500, 
             detail=str(e)
         )
+# @app.post("/process-input-first-workflow")
+# # async def process_input(request: Request):
+# async def process_input(user_input: UserInput):
+#     try:   
+
+#         # data = await request.json()  # Read incoming JSON
+#         # print("Received request data:", data)  # Debug log
+#         # return {"message": "Debugging request", "received_data": data}
+#         print(f"Processing input: {user_input.message}")
+        
+#         # Run the graph with the input
+#         # outputs = list(graph.stream(
+#         #     {"messages": [("user", user_input.message)]}, 
+#         #     stream_mode="values", 
+#         #     config=config
+#         # ))
+
+#         outputs = list(graph.stream(
+#             {"user_prompt": user_input.message}, 
+#             stream_mode="values", 
+#             config=config
+#         ))
+
+#         state = outputs[-1]
+
+#         # Get the file paths
+#         project_root = Path(__file__).parent.parent
+#         output_dir = project_root / "spaider_agent_temp" / "output_pdf"
+#         # tex_file = output_dir / "output.tex"
+#         # pdf_file = output_dir / "output.pdf"
+#         # md_file = output_dir / "output.md"  # Define markdown file path
+#         docx_file = output_dir / "output.docx"  # Define markdown file path
+        
+#         # Ensure output directory exists
+#         output_dir.mkdir(parents=True, exist_ok=True)
+
+#         try:
+#             # First check if the tex file exists
+#             if not tex_file.exists():
+#                 raise HTTPException(
+#                     status_code=404,
+#                     detail=f"LaTeX file not found at {tex_file}"
+#                 )
+
+#             print(f"Found LaTeX file at: {tex_file}")
+#             print(f"Looking for PDF file at: {pdf_file}")
+
+#             # Additional debug information
+#             print(f"Files in output directory: {list(output_dir.glob('*'))}")
+
+#             # Check files with detailed logging
+#             if not tex_file.exists():
+#                 print(f"TeX file missing at: {tex_file}")
+#                 raise HTTPException(
+#                     status_code=404,
+#                     detail="LaTeX file not found after compilation"
+#                 )
+
+#             if not pdf_file.exists():
+#                 print(f"PDF file missing at: {pdf_file}")
+#                 raise HTTPException(
+#                     status_code=404,
+#                     detail="PDF file not generated successfully"
+#                 )
+
+#             print("Both files exist, proceeding with conversion")
+
+#             # Convert to Markdown
+#             from utils.latex_to_markdown import create_markdown_pipeline
+#             md_pipeline = create_markdown_pipeline()
+#             md_result = md_pipeline.convert_latex_to_markdown(str(tex_file), str(output_dir))
+
+#             # Read all files
+#             try:
+#                 # Read LaTeX content
+#                 with open(tex_file, 'r', encoding='utf-8') as f:
+#                     latex_content = f.read()
+#                 print("Successfully read LaTeX content")
+
+#                 right_section_headings =  extract_sections(latex_content)
+
+#                 # Read PDF content
+#                 with open(pdf_file, 'rb') as f:
+#                     pdf_content = base64.b64encode(f.read()).decode('utf-8')
+#                 print("Successfully read PDF content")
+
+#                 # Read or create Markdown content
+#                 markdown_content = None
+#                 if md_result["success"]:
+#                     # Save markdown to file if not already saved
+#                     if md_result["markdown_content"]:
+#                         with open(md_file, 'w', encoding='utf-8') as f:
+#                             f.write(md_result["markdown_content"])
+                        
+#                         # Read the saved markdown file
+#                         with open(md_file, 'r', encoding='utf-8') as f:
+#                             markdown_content = f.read()
+#                         print("Successfully created and read Markdown file")
+
+#                 response_data = {
+#                     "ai_message": state.get('ai_message'),
+#                     "tex_file": latex_content,
+#                     "pdf_file": pdf_content,
+#                     "md_file": markdown_content,
+#                     "section_headings": state['section_title'],
+#                     "success": True,
+#                     "file_paths": {
+#                         "tex": str(tex_file),
+#                         "pdf": str(pdf_file),
+#                         "docx": str(docx_file),
+#                         "md": str(md_file) if markdown_content else None
+#                     }
+#                 }
+
+#                 if not markdown_content:
+#                     response_data["markdown_error"] = md_result.get("error", "Unknown conversion error")
+#                     print(f"Markdown conversion failed: {response_data['markdown_error']}")
+
+#                 # Clean up auxiliary files but keep the main outputs
+#                 aux_extensions = ['.aux', '.log', '.out', '.fls', '.fdb_latexmk', '.synctex.gz']
+#                 for ext in aux_extensions:
+#                     aux_file = output_dir / f"output{ext}"
+#                     if aux_file.exists():
+#                         aux_file.unlink()
+#                 print("Cleaned up auxiliary files")
+
+#                 return JSONResponse(response_data)
+
+#             except Exception as e:
+#                 print(f"Error reading files: {str(e)}")
+#                 raise HTTPException(
+#                     status_code=500,
+#                     detail=f"Error reading generated files: {str(e)}"
+#                 )
+
+#         except subprocess.CalledProcessError as e:
+#             print(f"LaTeX compilation error: {e.stderr}")
+#             raise HTTPException(
+#                 status_code=500,
+#                 detail=f"LaTeX compilation failed: {e.stderr}"
+#             )
+    
+#     except Exception as e:
+#         print(f"Error in process-input endpoint: {str(e)}")
+#         raise HTTPException(
+#             status_code=500, 
+#             detail=str(e)
+#         )
 
 @app.post("/interact")
 async def interact(user_input: UserInput):
@@ -292,7 +654,7 @@ def download_document():
   
 @app.get("/download-base64")
 def download_document_base64():
-    file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/original.docx")
+    file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
     
     with open(file_path, "rb") as file:
         encoded_string = base64.b64encode(file.read()).decode('utf-8')
@@ -328,129 +690,7 @@ def download_document_base64():
 class DocxContent(BaseModel):
     content: str
 
-@app.post("/save-docx")
-async def save_docx(docx_data: DocxContent):
-    try:
-        # Get the file paths
-        file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
-        
-        # Load the original document to preserve formatting
-        original_doc = Document(file_path)
-        
-        # Convert base64 content to document
-        docx_bytes = base64.b64decode(docx_data.content)
-        edited_doc = Document(BytesIO(docx_bytes))
-        
-        # Create new document preserving original styles
-        new_doc = Document()
-        
-        # Copy all styles from original document
-        for style in original_doc.styles:
-            if style.name not in new_doc.styles:
-                new_doc.styles.add_style(
-                    style.name, 
-                    style.type, 
-                    style.base_style
-                )
-        
-        # Transfer content from edited document while preserving original formatting
-        for i, paragraph in enumerate(edited_doc.paragraphs):
-            # Create new paragraph
-            new_paragraph = new_doc.add_paragraph()
-            
-            # Copy original paragraph formatting if available
-            if i < len(original_doc.paragraphs):
-                original_paragraph = original_doc.paragraphs[i]
-                new_paragraph.style = original_paragraph.style
-                new_paragraph.paragraph_format.alignment = original_paragraph.paragraph_format.alignment
-                new_paragraph.paragraph_format.space_before = original_paragraph.paragraph_format.space_before
-                new_paragraph.paragraph_format.space_after = original_paragraph.paragraph_format.space_after
-                new_paragraph.paragraph_format.line_spacing = original_paragraph.paragraph_format.line_spacing
-            
-            # Add text with original run formatting
-            for run in paragraph.runs:
-                new_run = new_paragraph.add_run(run.text)
-                if i < len(original_doc.paragraphs) and original_doc.paragraphs[i].runs:
-                    original_run = original_doc.paragraphs[i].runs[0]
-                    new_run.font.name = original_run.font.name
-                    new_run.font.size = original_run.font.size
-                    new_run.font.bold = original_run.font.bold
-                    new_run.font.italic = original_run.font.italic
-                    if original_run.font.color is not None:
-                        new_run.font.color.rgb = original_run.font.color.rgb
-        
-        # Copy section properties from original
-        for i, section in enumerate(original_doc.sections):
-            if i < len(new_doc.sections):
-                new_section = new_doc.sections[i]
-                new_section.page_height = section.page_height
-                new_section.page_width = section.page_width
-                new_section.left_margin = section.left_margin
-                new_section.right_margin = section.right_margin
-                new_section.top_margin = section.top_margin
-                new_section.bottom_margin = section.bottom_margin
-                new_section.header_distance = section.header_distance
-                new_section.footer_distance = section.footer_distance
-        
-        # Save the updated document
-        new_doc.save(file_path)
-            
-        return {"message": "Document saved successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save document: {str(e)}")
 
-# class DocxContent(BaseModel):
-#     content: str
-#     changes: dict  
-
-
-# @app.post("/save-docx")
-# async def save_docx(docx_data: DocxContent):
-#     try:
-#         file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/original.docx")
-        
-#         # Load the original document
-#         doc = Document(file_path)
-        
-#         # Update the changed paragraphs
-#         changes = docx_data.changes
-#         for idx, new_text in changes.items():
-#             idx = int(idx)
-#             if idx < len(doc.paragraphs):
-#                 # Preserve the paragraph's style and formatting
-#                 original_style = doc.paragraphs[idx].style
-#                 original_runs = doc.paragraphs[idx].runs
-                
-#                 # Clear existing runs
-#                 for run in doc.paragraphs[idx].runs:
-#                     run.clear()
-                
-#                 # Update text while preserving formatting
-#                 if original_runs:
-#                     # If there were formatted runs, try to preserve formatting
-#                     words = new_text.split()
-#                     for i, word in enumerate(words):
-#                         run = doc.paragraphs[idx].add_run(word + ' ')
-#                         # Apply formatting from original run if available
-#                         if i < len(original_runs):
-#                             run.bold = original_runs[i].bold
-#                             run.italic = original_runs[i].italic
-#                             run.underline = original_runs[i].underline
-#                             run.font.size = original_runs[i].font.size
-#                             run.font.name = original_runs[i].font.name
-#                 else:
-#                     # If no formatting, just add the text
-#                     doc.paragraphs[idx].add_run(new_text)
-                
-#                 # Restore the original style
-#                 doc.paragraphs[idx].style = original_style
-        
-#         # Save the document
-#         doc.save(file_path)
-            
-#         return {"message": "Document saved successfully"}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Failed to save document: {str(e)}")
 
 class DocumentContent(BaseModel):
     content: str  # Quill's HTML content
@@ -461,19 +701,19 @@ async def upload_docx(data: DocumentContent = Body(...)):
 
     try:
         docx_content = html2docx(data.content, title="Document")
-        with open("./output_pdf/original.docx", "wb") as f:
+        with open("./output_pdf/output.docx", "wb") as f:
             f.write(docx_content.getvalue())
         print("Document created successfully")
     except Exception as e:
         print("Error creating document:", e)
         return {"error": str(e)}
 
-    return {"message": "Document saved successfully!", "filename": "original.docx"}
+    return {"message": "Document saved successfully!", "filename": "output.docx"}
 
 
 @app.get("/convert-to-html/")
 async def convert_to_html():
-    file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/original.docx")
+    file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found.")
     with open(file_path, "rb") as docx_file:
@@ -525,6 +765,63 @@ async def convert_to_docx(html: str = Form(...)):
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         filename="output.docx"
     )
+
+
+
+
+
+@app.post("/upload_resume")
+async def upload_resume(section: str = Form(...), file: UploadFile = File(...)):
+    file_location = os.path.join(UPLOAD_DIRECTORY, f"{section}_resume_{file.filename}")
+    
+    with open(file_location, "wb") as buffer:
+        buffer.write(await file.read())
+    
+    return {"message": "File uploaded successfully", "file_name": f"{section}_resume_{file.filename}"}
+
+
+
+def overwrite_csv(filename, data, fieldnames):
+    file_path = os.path.join(CSV_DIRECTORY, filename)
+    
+    with open(file_path, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow(data)
+
+# Endpoints to store data into individual CSV files (overwriting old data)
+@app.post("/store_project_info/")
+def store_project_info(project: ProjectInfo):
+    overwrite_csv("project_info.csv", project.dict(), ["projectName", "description", "issuingOrg", "callLink"])
+    return {"message": "Project information stored successfully"}
+
+
+@app.post("/store_company_info/")
+def store_company_info(company: CompanyInfo):
+    overwrite_csv("company_info.csv", company.dict(), ["name", "address", "teamSize", "website"])
+    return {"message": "Company information stored successfully"}
+
+@app.post("/store_author_info/")
+def store_author_info(author: PersonInfo):
+    overwrite_csv("author_info.csv", author.dict(), ["firstName", "lastName", "position"])
+    return {"message": "Author information stored successfully"}
+
+@app.post("/store_pi_info/")
+def store_pi_info(pi: PersonInfo):
+    overwrite_csv("pi_info.csv", pi.dict(), ["firstName", "lastName", "position"])
+    return {"message": "PI information stored successfully"}
+
+@app.post("/store_copi_info/")
+def store_copi_info(copi: PersonInfo):
+    overwrite_csv("copi_info.csv", copi.dict(), ["firstName", "lastName", "position"])
+    return {"message": "Co-PI information stored successfully"}
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
