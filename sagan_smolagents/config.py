@@ -207,4 +207,4 @@ if current_project_id:
 
 
 if __name__ == "__main__":
-    pass
+    print_project_paths()

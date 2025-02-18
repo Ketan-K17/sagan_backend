@@ -9,7 +9,7 @@ from typing import List
 from pydantic import BaseModel
 from pypdf import PdfReader
 from typing import Dict
-
+from colorama import Fore, Style, init
 # getting config file here: 
 
 
@@ -71,6 +71,37 @@ async def create_project(project_details: ProjectDetails):
         # Print project paths
         config.print_project_paths()
 
+        ui = sagan_utils.UIHandler()
+
+        # WRITE CODE FOR USER TO UPLOAD DATA FILES HERE (AND CONVERT TO VECTORDB)
+        print(f"\n{Fore.YELLOW}Select input files for vector database:{Style.RESET_ALL}")
+        data_files = ui.select_files("Select input files", [
+                    ('PDF files', '*.pdf'),
+                    ('Text files', '*.txt'),
+                    ('Word files', '*.docx'),
+                    ('CSV files', '*.csv')
+                ])
+        
+        if data_files:
+            print(f"\n{Fore.YELLOW}Processing data files...{Style.RESET_ALL}")
+            if sagan_utils.create_data_vectordb(project_id, data_files):
+                print(f"{Fore.GREEN}Data vector database created successfully!{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}Failed to create data vector database.{Style.RESET_ALL}")
+
+        
+
+        # WRITE CODE FOR USER TO UPLOAD TEMPLATE FILE HERE (AND CONVERT TO VECTORDB)
+        print(f"\n{Fore.YELLOW}Select template file:{Style.RESET_ALL}")
+        template_file = ui.select_template()
+                
+        if template_file:
+            print(f"\n{Fore.YELLOW}Processing template...{Style.RESET_ALL}")
+            if sagan_utils.create_template_vectordb(project_id, template_file):
+                print(f"{Fore.GREEN}Template vector database created successfully!{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}Failed to create template vector database.{Style.RESET_ALL}")
+
         
         return JSONResponse(content={
             "message": "Project created and loaded successfully",
@@ -106,7 +137,13 @@ async def load_project(request: LoadProjectRequest):
 
 
         config.print_project_paths()
-        
+
+
+        # WRITE CODE FOR USER TO UPDATE DATA FILES HERE (AND ADD TO VECTORDB)
+        print(f"\n{Fore.YELLOW}Select input files to add to vector database:{Style.RESET_ALL}")
+        sagan_utils.handle_project_choice(project_id)
+
+
         return JSONResponse(content={
             "status": "success",
             "message": "Project loaded successfully",
