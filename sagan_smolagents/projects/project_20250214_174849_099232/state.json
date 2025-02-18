@@ -1,0 +1,19 @@
+{
+    "project_id": "project_20250214_174849_099232",
+    "name": "potato",
+    "created_at": "20250214_174849_099232",
+    "last_modified": "20250214_174849_099232",
+    "paths": {
+      "root": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232",
+      "data": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\data",
+      "vectordb": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\vectordb",
+      "template": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\template",
+      "workflow1_output": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\workflow1_output",
+      "workflow2_output": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\workflow2_output",
+      "state": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\state.json",
+      "nodewise_output": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\workflow1_output\\nodewise_output",
+      "retrieved_images": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\workflow1_output\\retrieved_images",
+      "output_docx": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250214_174849_099232\\workflow1_output\\output.docx"
+    },
+    "workflows_completed": []
+  }

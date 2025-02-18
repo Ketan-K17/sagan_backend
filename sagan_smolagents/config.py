@@ -2,10 +2,16 @@ from pathlib import Path
 import os
 import certifi 
 
+
+# ----------- importing project id ---------------
+# import sagan
+# project_id = sagan.project_id
+# -------------------------------------------------
+
 # Base paths
 # PROJECT_ROOT = Path(__file__).parent # i.e. spaider_agent_temp
-# SAGAN_ROOT = PROJECT_ROOT.parent.parent # i.e. sagan_multimodal
-SAGAN_ROOT = Path(__file__).parent # i.e. sagan_multimodal
+# SAGAN_ROOT = PROJECT_ROOT.parent.parent # i.e. sagan_smolagents
+SAGAN_ROOT = Path(__file__).parent # i.e. sagan_smolagents
 FIRST_WORKFLOW_ROOT = SAGAN_ROOT / "sagan_workflow" / "spaider_agent_temp"
 SECOND_WORKFLOW_ROOT = SAGAN_ROOT / "sagan_workflow_refiner" / "spaider_agent_temp"
 
@@ -46,6 +52,14 @@ MODEL_SETTINGS = {
 SSL_CERT_PATH = Path(certifi.where())
 
 
+
+##### ------------PROJECTS ---------------
+PROJECTS_BASE = SAGAN_ROOT / "projects"
+
+# project_root = PROJECTS_BASE / project_id
+
+
+
 def create_directories():
     """Create all necessary directories if they don't exist."""
     directories = [
@@ -79,3 +93,7 @@ def verify_paths():
 
 # Create directories when config is imported
 create_directories()
+
+
+if __name__ == "__main__":
+    print(project_id)
