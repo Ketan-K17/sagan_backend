@@ -1,4 +1,5 @@
-from typing import Dict, Path
+from typing import Dict
+from pathlib import Path
 
 def get_project_paths(project_id: str, projects_base: Path) -> Dict[str, Path]:
     """

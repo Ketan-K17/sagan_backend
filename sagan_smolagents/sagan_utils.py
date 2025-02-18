@@ -1,8 +1,10 @@
 from datetime import datetime
 import json
 from typing import Dict
+from pathlib import Path
 
 import config_utils
+import config
 
 def create_project_id():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
@@ -13,32 +15,31 @@ def create_project_id():
 def create_new_project(name: str) -> Dict:
         """Create new project structure"""
         project_id = create_project_id()
+        timestamp = project_id.replace("project_", "")  # Extract timestamp from project_id
+
+
+        # Get paths first
+        paths = config_utils.get_project_paths(project_id, config.PROJECTS_BASE)
         
-        try:
-            # Get paths first
-            paths = config_utils.get_project_paths(project_id, config.PROJECTS_BASE)
-            
-            # Create directories
-            for path in paths.values():
-                if isinstance(path, Path) and not path.suffix:
-                    path.mkdir(parents=True, exist_ok=True)
-                    logger.debug(f"Created directory: {path}")
-            
-            state = {
-                "project_id": project_id,
-                "name": name,
-                "created_at": timestamp,
-                "last_modified": timestamp,
-                "paths": {k: str(v) for k, v in paths.items()},  # Convert paths to strings
-                "workflows_completed": []
-            }
-            
-            self._save_state(paths["state"], state)
-            return state
-            
-        except Exception as e:
-            logger.error(f"Failed to create project: {e}")
-            raise
+        # Create directories
+        for path in paths.values():
+            if isinstance(path, Path) and not path.suffix:
+                path.mkdir(parents=True, exist_ok=True)
+        
+        state = {
+            "project_id": project_id,
+            "name": name,
+            "created_at": timestamp,
+            "last_modified": timestamp,
+            "paths": {k: str(v) for k, v in paths.items()},  # Convert paths to strings
+            "workflows_completed": []
+        }
+        # Save state file explicitly
+        state_path = paths["state"]
+        with open(state_path, 'w') as f:
+            json.dump(state, f, indent=4)
+
+        return state
 
 
 def get_all_projects() -> Dict:
