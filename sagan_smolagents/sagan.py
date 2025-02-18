@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from pypdf import PdfReader
 from typing import Dict
 from colorama import Fore, Style, init
+import json
 # getting config file here: 
 
 
@@ -62,14 +63,18 @@ async def list_projects():
 async def create_project(project_details: ProjectDetails):
     try:
         # Create new project using existing utility
-        project_id = sagan_utils.create_project_id()
+        # project_id = sagan_utils.create_project_id()
         project_state = sagan_utils.create_new_project(project_details.project_name)
         
         # Update config paths with new project_id
-        config.update_project_paths(project_id)
+        config.update_project_paths(project_state["project_id"])
 
         # Print project paths
         config.print_project_paths()
+
+        # Write project_id to cookie.json
+        cookie_path = Path("cookie.json")
+        cookie_path.write_text(json.dumps({"project_id": project_state["project_id"]}))
 
         ui = sagan_utils.UIHandler()
 
@@ -84,10 +89,12 @@ async def create_project(project_details: ProjectDetails):
         
         if data_files:
             print(f"\n{Fore.YELLOW}Processing data files...{Style.RESET_ALL}")
-            if sagan_utils.create_data_vectordb(project_id, data_files):
+            try:
+                sagan_utils.create_data_vectordb(project_state["project_id"], data_files)
                 print(f"{Fore.GREEN}Data vector database created successfully!{Style.RESET_ALL}")
-            else:
-                print(f"{Fore.RED}Failed to create data vector database.{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.RED}CREATE PROJECT ENDPOINT: Failed to create data vector database - {str(e)}{Style.RESET_ALL}")
+                raise HTTPException(status_code=500, detail=f"Failed to create data vector database: {str(e)}")
 
         
 
@@ -97,15 +104,15 @@ async def create_project(project_details: ProjectDetails):
                 
         if template_file:
             print(f"\n{Fore.YELLOW}Processing template...{Style.RESET_ALL}")
-            if sagan_utils.create_template_vectordb(project_id, template_file):
+            if sagan_utils.create_template_vectordb(project_state["project_id"], template_file):
                 print(f"{Fore.GREEN}Template vector database created successfully!{Style.RESET_ALL}")
             else:
-                print(f"{Fore.RED}Failed to create template vector database.{Style.RESET_ALL}")
+                print(f"{Fore.RED}CREATE PROJECT ENDPOINT: Failed to create template vector database.{Style.RESET_ALL}")
 
         
         return JSONResponse(content={
             "message": "Project created and loaded successfully",
-            "project_id": project_id,
+            "project_id": project_state["project_id"],
             "project_state": project_state
         })
     except Exception as e:
@@ -138,6 +145,9 @@ async def load_project(request: LoadProjectRequest):
 
         config.print_project_paths()
 
+        # Write project_id to cookie.json
+        cookie_path = Path("cookie.json")
+        cookie_path.write_text(json.dumps({"project_id": project_id}))
 
         # WRITE CODE FOR USER TO UPDATE DATA FILES HERE (AND ADD TO VECTORDB)
         print(f"\n{Fore.YELLOW}Select input files to add to vector database:{Style.RESET_ALL}")

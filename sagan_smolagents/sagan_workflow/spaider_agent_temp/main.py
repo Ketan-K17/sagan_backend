@@ -5,14 +5,28 @@ import ssl
 import shutil
 import sys
 from pathlib import Path
-
+import json
+import importlib, importlib.util
 # Add parent directory to Python path to enable relative imports
 current_dir = Path(__file__).parent
 project_root = current_dir.parent.parent
 sys.path.append(str(project_root))
 
-# Import config after setting up path
+# Load config.py dynamically
+CONFIG_PATH = project_root / "config.py"
+config_spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+configfile = importlib.util.module_from_spec(config_spec)
+config_spec.loader.exec_module(configfile)
+# Import config and read cookie file
 from config import FIRST_WORKFLOW_ROOT, SSL_CERT_PATH
+
+with open(project_root / "cookie.json", "r") as f:
+    cookie_data = json.load(f)
+    project_id = cookie_data.get("project_id")
+
+print(f"Project ID: {project_id}")
+
+configfile.update_project_paths(project_id)
 
 # Set up SSL certificate first, before any other imports
 try:
@@ -54,6 +68,8 @@ from pypdf import PdfReader
 from langchain_core.runnables.config import RunnableConfig
 from graph import create_graph, compile_graph, print_stream
 
+
+
 app = FastAPI()
 
 # Add CORS middleware
@@ -69,7 +85,7 @@ app.add_middleware(
 builder = create_graph()
 graph = compile_graph(builder)
 
-config = RunnableConfig(
+runnable_config = RunnableConfig(
     recursion_limit=50,
     configurable={"thread_id": "1"}
 )
@@ -122,6 +138,7 @@ async def upload_files(files: list[UploadFile] = File(...)):
         "successful_uploads": successful_uploads
     })
 
+# ADD PROJECT ID AS INPUT FROM FRONTEND
 @app.post("/process-input-first-workflow")
 async def process_input(user_input: UserInput):
     try:   
@@ -130,14 +147,14 @@ async def process_input(user_input: UserInput):
         outputs = list(graph.stream(
             {"user_prompt": user_input.message}, 
             stream_mode="values", 
-            config=config
+            config=runnable_config
         ))
 
         state = outputs[-1]
 
         # Get the file paths
         project_root = Path(__file__).parent.parent
-        output_dir = project_root / "spaider_agent_temp" / "output_pdf"
+        output_dir = configfile.NODEWISE_OUTPUT_PATH / "output_pdf"
         docx_file = output_dir / "output.docx"
         
         # Ensure output directory exists
@@ -201,7 +218,7 @@ async def interact(user_input: UserInput):
     try:
         # Stream the responses from the graph
         async def event_generator():
-            for response in graph.stream({"messages": [("user", message)]}, stream_mode="values", config=config):
+            for response in graph.stream({"messages": [("user", message)]}, stream_mode="values", config=runnable_config):
                 yield f"data: {response}\n\n"
 
         return StreamingResponse(event_generator(), media_type="text/event-stream")

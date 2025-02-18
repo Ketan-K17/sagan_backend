@@ -119,7 +119,7 @@ def save_state_for_testing(state: State, node_name: str, output_dir: Path = conf
 
 
 # reconstructs the state for a given node, given its .json file in outputpdf/nodewise_output
-def load_state_for_testing(node_name: str, output_dir: Path = config.   NODEWISE_OUTPUT_PATH) -> State:
+def load_state_for_testing(node_name: str, output_dir: Path = config.NODEWISE_OUTPUT_PATH) -> State:
     """
     Load a previously saved state for testing purposes.
     Reconstructs the full State object with proper message types and metadata.

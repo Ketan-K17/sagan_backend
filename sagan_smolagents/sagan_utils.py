@@ -141,12 +141,15 @@ def create_data_vectordb(project_id: str, files: List[Path]) -> bool:
                 chunk_overlap=chunk_settings["data_db"]["chunk_overlap"]
             )
 
+            print("\n\nupdating state\n")
             update_state(paths["state"], {
                 "vectordb": {
                     "data": str(vectordb_dir),
                     "files": processed_files
                 }
             })
+            print("\n\nstate updated\n")
+
 
         except Exception as e:
             print(f"Failed to create data vectordb: {e}")

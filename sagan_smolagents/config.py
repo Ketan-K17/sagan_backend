@@ -78,7 +78,7 @@ def update_project_paths(project_id: str):
         
         # Update input/output paths
         global INPUT_PDF_FOLDER, TEMPLATE_FOLDER, FIRST_WORKFLOW_OUTPUT_FOLDER, SECOND_WORKFLOW_OUTPUT_FOLDER, RETRIEVED_IMAGES_PATH
-        global OUTPUT_DOCX_PATH, NODEWISE_OUTPUT_FOLDER
+        global OUTPUT_DOCX_PATH, NODEWISE_OUTPUT_PATH
         
         INPUT_PDF_FOLDER = project_root / "data"
         TEMPLATE_FOLDER = project_root / "template"
@@ -86,7 +86,7 @@ def update_project_paths(project_id: str):
         SECOND_WORKFLOW_OUTPUT_FOLDER = project_root / "workflow2_output"
         RETRIEVED_IMAGES_PATH = FIRST_WORKFLOW_OUTPUT_FOLDER / "retrieved_images"
         OUTPUT_DOCX_PATH = FIRST_WORKFLOW_OUTPUT_FOLDER / "output.docx"
-        NODEWISE_OUTPUT_FOLDER = FIRST_WORKFLOW_OUTPUT_FOLDER / "nodewise_output"
+        NODEWISE_OUTPUT_PATH = FIRST_WORKFLOW_OUTPUT_FOLDER / "nodewise_output"
 
 def get_current_project_id():
     """Returns the currently active project_id"""
