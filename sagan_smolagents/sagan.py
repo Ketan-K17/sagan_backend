@@ -67,9 +67,13 @@ async def create_project(project_details: ProjectDetails):
         
         # Update config paths with new project_id
         config.update_project_paths(project_id)
+
+        # Print project paths
+        config.print_project_paths()
+
         
         return JSONResponse(content={
-            "message": "Project created successfully",
+            "message": "Project created and loaded successfully",
             "project_id": project_id,
             "project_state": project_state
         })
