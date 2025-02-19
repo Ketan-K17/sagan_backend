@@ -27,8 +27,8 @@ import os
 
 # Dynamically resolve the path to config.py
 CURRENT_FILE = Path(__file__).resolve()
-SAGAN_MULTIMODAL = CURRENT_FILE.parent.parent.parent.parent
-CONFIG_PATH = SAGAN_MULTIMODAL / "config.py"
+project_root = CURRENT_FILE.parent.parent.parent.parent
+CONFIG_PATH = project_root / "config.py"
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
@@ -36,6 +36,11 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
 config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
+
+# getting project_id from cookie.json
+with open(project_root / "cookie.json", "r") as f:
+    cookie_data = json.load(f)
+    project_id = cookie_data.get("project_id")
 
 load_dotenv()
 init()
@@ -163,6 +168,15 @@ async def research_query_generator(state: State) -> State:
     """
     Node to generate research queries and allow user modification via WebSocket.
     """
+    # Dynamically load config
+    CURRENT_FILE = Path(__file__).resolve()
+    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
+    CONFIG_PATH = SAGAN_ROOT / "config.py"
+    
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+    
     session_id = "1234"
     print(f"{Fore.YELLOW}################ RESEARCH QUERY GENERATOR BEGIN #################")
     empty_prompt = """ """
@@ -329,6 +343,17 @@ def research_query_answerer(state: State) -> State:
     Takes the generated queries and executes them against the vector database.
     Only runs if research_needed is True.
     """
+    # Dynamically load config
+    CURRENT_FILE = Path(__file__).resolve()
+    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
+    CONFIG_PATH = SAGAN_ROOT / "config.py"
+    
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+
+    updated_paths = config.update_project_paths(project_id)
+    
     print(f"{Fore.BLUE}################ RESEARCH QUERY ANSWERER BEGIN #################")
 
     if not state.get("research_needed"):
@@ -338,8 +363,8 @@ def research_query_answerer(state: State) -> State:
     context = []
     for query in state["research_queries"]:
         result = query_chromadb(
-            str(config.VECTOR_DB_PATHS['astro_db']),  # Use path from config
-            config.MODEL_SETTINGS['SENTENCE_TRANSFORMER'],  # Use model setting from config
+            str(updated_paths['vector_db_paths']['data_db']),  # Use path from config
+            updated_paths['model_settings']['SENTENCE_TRANSFORMER'],  # Use model setting from config
             query
         )
         context.extend(result)
@@ -351,6 +376,15 @@ def research_query_answerer(state: State) -> State:
 
 
 def formatter(state: State):
+    # Dynamically load config
+    CURRENT_FILE = Path(__file__).resolve()
+    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
+    CONFIG_PATH = SAGAN_ROOT / "config.py"
+    
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+    
     print(f"{Fore.LIGHTGREEN_EX}################ FORMATTING NODE BEGIN #################")
     empty_prompt = """ """
     agent = ToolCallingAgent(

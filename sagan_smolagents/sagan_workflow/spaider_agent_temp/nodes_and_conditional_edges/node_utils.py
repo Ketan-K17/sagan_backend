@@ -18,13 +18,18 @@ from schemas import State
 
 # Dynamically resolve the path to config.py
 CURRENT_FILE = Path(__file__).resolve()
-SAGAN_MULTIMODAL = CURRENT_FILE.parent.parent.parent.parent
-CONFIG_PATH = SAGAN_MULTIMODAL / "config.py"
+project_root = CURRENT_FILE.parent.parent.parent.parent
+CONFIG_PATH = project_root / "config.py"
 
 # Load config.py dynamically
 spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
 config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
+
+# getting project_id from cookie.json
+with open(project_root / "cookie.json", "r") as f:
+    cookie_data = json.load(f)
+    project_id = cookie_data.get("project_id")
 
 
 # print the state in the node_test scripts in a readable format.
@@ -82,11 +87,27 @@ def serialize_state(state: State, node_name: str) -> Dict[str, Any]:
     return serialized
 
 # saves the state in outputpdf/nodewise_output in .txt format (to be read by human) and .json format (to be read by machine to reconstruct state)
-def save_state_for_testing(state: State, node_name: str, output_dir: Path = config.NODEWISE_OUTPUT_PATH):
+def save_state_for_testing(state: State, node_name: str):
     """
     Save the state in a format suitable for testing.
     Creates both a human-readable and a machine-readable version.
     """
+
+    # Dynamically load config and get NODEWISE_OUTPUT_PATH
+    CURRENT_FILE = Path(__file__).resolve()
+    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
+    CONFIG_PATH = SAGAN_ROOT / "config.py"
+    
+    # Load config.py dynamically
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+
+    updated_paths = config.update_project_paths(project_id)
+    
+    # Use the path from config
+    output_dir = updated_paths['nodewise_output']
+    
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Save machine-readable JSON version
@@ -119,11 +140,26 @@ def save_state_for_testing(state: State, node_name: str, output_dir: Path = conf
 
 
 # reconstructs the state for a given node, given its .json file in outputpdf/nodewise_output
-def load_state_for_testing(node_name: str, output_dir: Path = config.NODEWISE_OUTPUT_PATH) -> State:
+def load_state_for_testing(node_name: str, output_dir: Path = None) -> State:
     """
     Load a previously saved state for testing purposes.
     Reconstructs the full State object with proper message types and metadata.
     """
+    if output_dir is None:
+        # Dynamically load config and get NODEWISE_OUTPUT_PATH
+        CURRENT_FILE = Path(__file__).resolve()
+        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
+        CONFIG_PATH = SAGAN_ROOT / "config.py"
+        
+        # Load config.py dynamically
+        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+        config = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(config)
+        
+        # Use the path from config
+        updated_paths = config.update_project_paths(project_id)
+        output_dir = updated_paths['nodewise_output']
+    
     json_path = output_dir / f"{node_name}_state.json"
     if not json_path.exists():
         raise FileNotFoundError(f"No saved state found for node: {node_name}")

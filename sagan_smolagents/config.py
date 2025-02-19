@@ -60,21 +60,41 @@ PROJECTS_BASE = SAGAN_ROOT / "projects"
 # project_root = PROJECTS_BASE / project_id
 
 
-def update_project_paths(project_id: str):
-    """Updates all project-specific paths based on the provided project_id"""
+def update_project_paths(project_id: str) -> dict:
+    """
+    Updates all project-specific paths based on the provided project_id and returns them.
+    
+    Args:
+        project_id (str): The project ID to use for path updates
+        
+    Returns:
+        dict: Dictionary containing all updated paths
+    """
     global current_project_id
     current_project_id = project_id
+    
+    paths = {}
     
     # Update paths that need to be project-specific
     if project_id:
         project_root = PROJECTS_BASE / project_id
+        paths['project_root'] = project_root
         
         # Update vector DB paths
         global VECTOR_DB_PATHS
         VECTOR_DB_PATHS = {
             'data_db': project_root / "vectordb" / "data_db",
-            'template_db': project_root / "vectordb" / "testdb",
+            'template_db': project_root / "vectordb" / "template_db",
         }
+        paths['vector_db_paths'] = VECTOR_DB_PATHS
+
+        MODEL_SETTINGS = {
+            'NOMIC_EMBED': "nomic-ai/nomic-embed-text-v1",
+            'SENTENCE_TRANSFORMER': "sentence-transformers/all-MiniLM-L6-v2",
+            'DEFAULT_K': 3,
+            'MIN_RELEVANCE_SCORE': 0.5
+        }
+        paths['model_settings'] = MODEL_SETTINGS
         
         # Update input/output paths
         global INPUT_PDF_FOLDER, TEMPLATE_FOLDER, FIRST_WORKFLOW_OUTPUT_FOLDER, SECOND_WORKFLOW_OUTPUT_FOLDER, RETRIEVED_IMAGES_PATH
@@ -87,6 +107,19 @@ def update_project_paths(project_id: str):
         RETRIEVED_IMAGES_PATH = FIRST_WORKFLOW_OUTPUT_FOLDER / "retrieved_images"
         OUTPUT_DOCX_PATH = FIRST_WORKFLOW_OUTPUT_FOLDER / "output.docx"
         NODEWISE_OUTPUT_PATH = FIRST_WORKFLOW_OUTPUT_FOLDER / "nodewise_output"
+        
+        # Add all paths to return dictionary
+        paths.update({
+            'input_pdf_folder': INPUT_PDF_FOLDER,
+            'template_folder': TEMPLATE_FOLDER,
+            'workflow1_output': FIRST_WORKFLOW_OUTPUT_FOLDER,
+            'workflow2_output': SECOND_WORKFLOW_OUTPUT_FOLDER,
+            'retrieved_images': RETRIEVED_IMAGES_PATH,
+            'output_docx': OUTPUT_DOCX_PATH,
+            'nodewise_output': NODEWISE_OUTPUT_PATH
+        })
+        
+    return paths
 
 def get_current_project_id():
     """Returns the currently active project_id"""

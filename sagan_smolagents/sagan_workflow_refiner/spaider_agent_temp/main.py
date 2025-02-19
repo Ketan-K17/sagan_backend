@@ -27,13 +27,18 @@ from prompts.prompts import RESEARCH_QUERY_GENERATOR_PROMPT
 
 # Dynamically resolve the path to config.py
 CURRENT_FILE = Path(__file__).resolve()
-SAGAN_MULTIMODAL = CURRENT_FILE.parent.parent.parent
-CONFIG_PATH = SAGAN_MULTIMODAL / "config.py"
+project_root = CURRENT_FILE.parent.parent.parent
+CONFIG_PATH = project_root / "config.py"
 
 # Load config.py dynamically
 spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
 config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
+
+# getting project_id from cookie.json
+with open(project_root / "cookie.json", "r") as f:
+    cookie_data = json.load(f)
+    project_id = cookie_data.get("project_id")
 
 # Update UserInput model to include human input fields
 class UserInput(BaseModel):
@@ -95,7 +100,19 @@ def get_section_info(section_number: int) -> tuple[str, str]:
         ValueError: If section number is invalid or if JSON data is malformed
         FileNotFoundError: If the state JSON file doesn't exist
     """
-    final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
+    # Dynamically resolve the path to config.py
+    CURRENT_FILE = Path(__file__).resolve()
+    project_root = CURRENT_FILE.parent.parent.parent
+    CONFIG_PATH = project_root / "config.py"
+
+    # Load config.py dynamically
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    configfile = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(configfile)
+
+    updated_paths = configfile.update_project_paths(project_id)
+    
+    final_state_path = updated_paths['nodewise_output'] / "formatting_node_state.json"
     
     with open(final_state_path, 'r') as f:
         json_data = json.load(f)
@@ -214,17 +231,22 @@ async def process_input(user_input: UserInput):
     try:
         # Step 1: Generate a session ID and connect WebSocket
         session_id = "1234"
-        # await ws_manager.connect(session_id,{
-        #    "message":"hey  from 943"
-        # })
 
-        # Step 2: Default paths and configurations
-        output_dir = Path(config.OUTPUT_PDF_PATH)
-        docx_file = output_dir / "output.docx"
-        # Ensure output directory exists
-        output_dir.mkdir(parents=True, exist_ok=True)
+        # Step 2: Dynamically load config and get paths
+        CURRENT_FILE = Path(__file__).resolve()
+        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent
+        CONFIG_PATH = SAGAN_ROOT / "config.py"
+        
+        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+        config = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(config)
 
-        # Step 3: Extract section if section number and draft path are provided
+        updated_paths = config.update_project_paths(project_id)
+        
+        # Step 3: Default paths and configurations
+        docx_file = updated_paths['output_docx']
+
+        # Step 4: Extract section if section number and draft path are provided
         if user_input.section_number:
             draft_path = docx_file  # Using tex_file as draft path
             s_title, s_text = get_section_info(user_input.section_number)
@@ -239,7 +261,7 @@ async def process_input(user_input: UserInput):
         else:
             initial_input = {"messages": [("user", user_input.message)]}
 
-        # Step 4: Process through graph and capture the final state
+        # Step 5: Process through graph and capture the final state
         state = None
         try:
             async for output in graph.astream(
@@ -264,7 +286,7 @@ async def process_input(user_input: UserInput):
             print(f"AI Message in state: {state.get('ai_message')}")
             print(f"Modified text in state: {bool(state.get('modified_section_text'))}")
 
-            # Step 5: Build initial response data
+            # Step 6: Build initial response data
             response_data = {
                 "success": True,
                 "message": "Processing completed",
@@ -279,7 +301,7 @@ async def process_input(user_input: UserInput):
             print(f"AI Message: {response_data['ai_message']}")
             print(f"Modified text present: {bool(response_data['modified_section_text'])}")
 
-            # Step 6: Handle file processing for successful state
+            # Step 7: Handle file processing for successful state
             if response_data.get("success"):
                 print("Save was successful. Writing to docx file...")
 
@@ -346,7 +368,7 @@ async def publish(update_request: PublishInput):
     API to update a specific section in the docx_file.
     """
     try:
-        # Extract input parameters
+        # Step 1: Extract input parameters
         modified_text = update_request.modified_text
         section_number = update_request.section_number
         # modified_text = update_request.get("modified_section_text")
@@ -358,9 +380,19 @@ async def publish(update_request: PublishInput):
                 detail="Both 'modified_section_text' and 'section_number' are required"
             )
 
-        # File paths
-        output_dir = Path(config.OUTPUT_PDF_PATH)
-        docx_file = output_dir / "output.docx"
+        # Step 2: Dynamically load config and get paths
+        CURRENT_FILE = Path(__file__).resolve()
+        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent
+        CONFIG_PATH = SAGAN_ROOT / "config.py"
+        
+        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+        config = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(config)
+
+        updated_paths = config.update_project_paths(project_id)
+        
+        # Step 3: File paths
+        docx_file = updated_paths['output_docx']
 
         if not docx_file.exists():
             raise HTTPException(
@@ -417,8 +449,7 @@ async def update_latex(update_request: UpdateLatexInput):
     Accepts full LaTeX content from frontend and updates all related files.
     """
     try:
-        # Extract input parameters
-        
+        # Step 1: Extract input parameters
         latex_content = update_request.latex_content
 
         if not latex_content:
@@ -427,7 +458,16 @@ async def update_latex(update_request: UpdateLatexInput):
                 detail="LaTeX content is required"
             )
 
-        # File paths
+        # Step 2: Dynamically load config and get paths
+        CURRENT_FILE = Path(__file__).resolve()
+        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent
+        CONFIG_PATH = SAGAN_ROOT / "config.py"
+        
+        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+        config = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(config)
+        
+        # Step 3: File paths
         output_dir = Path(config.OUTPUT_PDF_PATH)
         
         tex_file = output_dir / "output.tex"

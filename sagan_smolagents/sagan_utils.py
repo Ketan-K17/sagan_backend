@@ -13,12 +13,12 @@ import ingest_data.ingest_data as ingest_data
 
 chunk_settings = {
             "data_db": {
-                "chunk_size": 256,
-                "chunk_overlap": 50
+                "chunk_size": 512,
+                "chunk_overlap": 100
             },
             "template_db": {
-                "chunk_size": 128,  # Smaller chunks for template
-                "chunk_overlap": 24
+                "chunk_size": 512,  # Smaller chunks for template
+                "chunk_overlap": 100
             }
                 }
 

@@ -20,13 +20,12 @@ config_spec.loader.exec_module(configfile)
 # Import config and read cookie file
 from config import FIRST_WORKFLOW_ROOT, SSL_CERT_PATH
 
+# getting project_id from cookie.json
 with open(project_root / "cookie.json", "r") as f:
     cookie_data = json.load(f)
     project_id = cookie_data.get("project_id")
 
-print(f"Project ID: {project_id}")
-
-configfile.update_project_paths(project_id)
+print(f"Incumbent Project's ID: {project_id}")
 
 # Set up SSL certificate first, before any other imports
 try:
@@ -151,14 +150,17 @@ async def process_input(user_input: UserInput):
         ))
 
         state = outputs[-1]
+        CURRENT_FILE = Path(__file__).resolve()
+        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
+        CONFIG_PATH = SAGAN_ROOT / "config.py"
+    
+        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+        configfile = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(configfile)
 
+        updated_paths = configfile.update_project_paths(project_id)
         # Get the file paths
-        project_root = Path(__file__).parent.parent
-        output_dir = configfile.NODEWISE_OUTPUT_PATH / "output_pdf"
-        docx_file = output_dir / "output.docx"
-        
-        # Ensure output directory exists
-        output_dir.mkdir(parents=True, exist_ok=True)
+        docx_file = updated_paths['output_docx']
 
         try:
             if not docx_file.exists():
@@ -168,7 +170,6 @@ async def process_input(user_input: UserInput):
                 )
 
             print(f"Found docx file at: {docx_file}")
-            print(f"Files in output directory: {list(output_dir.glob('*'))}")
 
             if not docx_file.exists():
                 print(f"docx file missing at: {docx_file}")
