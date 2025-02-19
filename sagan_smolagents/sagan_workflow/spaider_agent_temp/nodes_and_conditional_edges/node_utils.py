@@ -26,12 +26,6 @@ spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
 config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
 
-# Add this with other imports at the top
-CONFIG_UTILS_PATH = SAGAN_MULTIMODAL / "config_utils.py"
-config_utils_spec = importlib.util.spec_from_file_location("config_utils", CONFIG_UTILS_PATH)
-config_utils = importlib.util.module_from_spec(config_utils_spec)
-config_utils_spec.loader.exec_module(config_utils)
-
 
 # print the state in the node_test scripts in a readable format.
 def print_state(state):
@@ -88,27 +82,11 @@ def serialize_state(state: State, node_name: str) -> Dict[str, Any]:
     return serialized
 
 # saves the state in outputpdf/nodewise_output in .txt format (to be read by human) and .json format (to be read by machine to reconstruct state)
-def save_state_for_testing(state: State, node_name: str):
+def save_state_for_testing(state: State, node_name: str, output_dir: Path = config.NODEWISE_OUTPUT_PATH):
     """
     Save the state in a format suitable for testing.
     Creates both a human-readable and a machine-readable version.
-    
-    Args:
-        state (State): The state object to save
-        node_name (str): Name of the node this state is from
-        output_dir (Path, optional): Override for output directory. If None, uses project paths.
     """
-    # Read cookie file to get project_id
-    cookie_path = SAGAN_MULTIMODAL / "cookie.json"
-    with open(cookie_path, 'r') as f:
-        cookie_data = json.load(f)
-        project_id = cookie_data.get("project_id")
-    
-    # Get project-specific paths if output_dir not provided
-    paths = config_utils.get_project_paths(project_id, config.PROJECTS_BASE)
-    output_dir = paths["nodewise_output"]
-    print(f"SAVE_STATE_FOR_TESTING: Using output directory: {output_dir}")
-    
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Save machine-readable JSON version

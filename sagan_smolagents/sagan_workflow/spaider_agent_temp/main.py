@@ -11,25 +11,18 @@ import importlib, importlib.util
 current_dir = Path(__file__).parent
 project_root = current_dir.parent.parent
 sys.path.append(str(project_root))
-CONFIG_PATH = project_root / "config.py"
-CONFIG_UTILS_PATH = project_root / "config_utils.py"
 
+# Load config.py dynamically
+CONFIG_PATH = project_root / "config.py"
 config_spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
 configfile = importlib.util.module_from_spec(config_spec)
 config_spec.loader.exec_module(configfile)
-
-config_utils_spec = importlib.util.spec_from_file_location("config_utils", CONFIG_UTILS_PATH)
-config_utils = importlib.util.module_from_spec(config_utils_spec)
-config_utils_spec.loader.exec_module(config_utils)
-
 # Import config and read cookie file
 from config import FIRST_WORKFLOW_ROOT, SSL_CERT_PATH
 
 with open(project_root / "cookie.json", "r") as f:
     cookie_data = json.load(f)
     project_id = cookie_data.get("project_id")
-
-
 
 print(f"Project ID: {project_id}")
 
@@ -160,9 +153,8 @@ async def process_input(user_input: UserInput):
         state = outputs[-1]
 
         # Get the file paths
-        paths = config_utils.get_project_paths(project_id, configfile.PROJECTS_BASE)
-        output_dir = paths["nodewise_output"]
-        print(f"PROCESS INPUT ENDPOINT: Output directory: {output_dir}")
+        project_root = Path(__file__).parent.parent
+        output_dir = configfile.NODEWISE_OUTPUT_PATH / "output_pdf"
         docx_file = output_dir / "output.docx"
         
         # Ensure output directory exists
