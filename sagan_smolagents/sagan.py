@@ -62,21 +62,33 @@ async def list_projects():
 @app.post("/create_project")
 async def create_project(project_details: ProjectDetails):
     try:
+        print(f"\n{Fore.YELLOW}Starting project creation for: {project_details.project_name}{Style.RESET_ALL}")
+        
         # Create new project using existing utility
-        # project_id = sagan_utils.create_project_id()
         project_state = sagan_utils.create_new_project(project_details.project_name)
+        print(f"Project state created: {project_state}")
         
         # Update config paths with new project_id
         config.update_project_paths(project_state["project_id"])
+        print(f"Updated project paths for ID: {project_state['project_id']}")
 
         # Print project paths
         config.print_project_paths()
 
         # Write project_id to cookie.json
-        cookie_path = Path("cookie.json")
-        cookie_path.write_text(json.dumps({"project_id": project_state["project_id"]}))
+        try:
+            cookie_path = Path("cookie.json")
+            cookie_path.write_text(json.dumps({"project_id": project_state["project_id"]}))
+            print("Cookie file written successfully")
+        except Exception as cookie_error:
+            print(f"{Fore.RED}Error writing cookie file: {str(cookie_error)}{Style.RESET_ALL}")
+            raise
 
-        ui = sagan_utils.UIHandler()
+        try:
+            ui = sagan_utils.UIHandler()
+        except Exception as ui_error:
+            print(f"{Fore.RED}Error creating UI Handler: {str(ui_error)}{Style.RESET_ALL}")
+            raise
 
         # WRITE CODE FOR USER TO UPLOAD DATA FILES HERE (AND CONVERT TO VECTORDB)
         print(f"\n{Fore.YELLOW}Select input files for vector database:{Style.RESET_ALL}")
