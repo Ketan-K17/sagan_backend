@@ -418,12 +418,8 @@ async def upload_files(files: list[UploadFile] = File(...), folder: str = Form(.
 @app.post("/process-input-first-workflow")
 async def process_input(user_input: UserInput):
     try:   
-
-       
         print(f"Processing input: {user_input.message}")
         
-       
-
         outputs = list(graph.stream(
             {"user_prompt": user_input.message}, 
             stream_mode="values", 
@@ -432,191 +428,35 @@ async def process_input(user_input: UserInput):
 
         state = outputs[-1]
 
-        # Get the file paths
-        project_root = Path(__file__).parent.parent
-        output_dir = project_root / "spaider_agent_temp" / "output_pdf"
-       
-        docx_file = output_dir / "output.docx"  # Define markdown file path
+        # Get updated paths from config
+        updated_paths = config.update_project_paths(project_id)
+        
+        # Use the correct output path from config
+        output_dir = updated_paths['workflow1_output']
+        docx_file = output_dir / "output.docx"
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    
         with open(docx_file, "rb") as file:
             encoded_string = base64.b64encode(file.read()).decode('utf-8')
         
-        sections  = get_generated_sections()
-
+        sections = get_generated_sections()
 
         response_data = {
-                    "ai_message": state.get('ai_message'),
-                    "docx_file": encoded_string,
-                    
-                    "section_headings":sections,
-                    "success": True,
-                   
-                }
+            "ai_message": state.get('ai_message'),
+            "docx_file": encoded_string,
+            "section_headings": sections,
+            "success": True,
+        }
         return JSONResponse(response_data)
-        
-       
 
-       
-      
-    
     except Exception as e:
         print(f"Error in process-input endpoint: {str(e)}")
         raise HTTPException(
             status_code=500, 
             detail=str(e)
         )
-# @app.post("/process-input-first-workflow")
-# # async def process_input(request: Request):
-# async def process_input(user_input: UserInput):
-#     try:   
-
-#         # data = await request.json()  # Read incoming JSON
-#         # print("Received request data:", data)  # Debug log
-#         # return {"message": "Debugging request", "received_data": data}
-#         print(f"Processing input: {user_input.message}")
-        
-#         # Run the graph with the input
-#         # outputs = list(graph.stream(
-#         #     {"messages": [("user", user_input.message)]}, 
-#         #     stream_mode="values", 
-#         #     config=config
-#         # ))
-
-#         outputs = list(graph.stream(
-#             {"user_prompt": user_input.message}, 
-#             stream_mode="values", 
-#             config=config
-#         ))
-
-#         state = outputs[-1]
-
-#         # Get the file paths
-#         project_root = Path(__file__).parent.parent
-#         output_dir = project_root / "spaider_agent_temp" / "output_pdf"
-#         # tex_file = output_dir / "output.tex"
-#         # pdf_file = output_dir / "output.pdf"
-#         # md_file = output_dir / "output.md"  # Define markdown file path
-#         docx_file = output_dir / "output.docx"  # Define markdown file path
-        
-#         # Ensure output directory exists
-#         output_dir.mkdir(parents=True, exist_ok=True)
-
-#         try:
-#             # First check if the tex file exists
-#             if not tex_file.exists():
-#                 raise HTTPException(
-#                     status_code=404,
-#                     detail=f"LaTeX file not found at {tex_file}"
-#                 )
-
-#             print(f"Found LaTeX file at: {tex_file}")
-#             print(f"Looking for PDF file at: {pdf_file}")
-
-#             # Additional debug information
-#             print(f"Files in output directory: {list(output_dir.glob('*'))}")
-
-#             # Check files with detailed logging
-#             if not tex_file.exists():
-#                 print(f"TeX file missing at: {tex_file}")
-#                 raise HTTPException(
-#                     status_code=404,
-#                     detail="LaTeX file not found after compilation"
-#                 )
-
-#             if not pdf_file.exists():
-#                 print(f"PDF file missing at: {pdf_file}")
-#                 raise HTTPException(
-#                     status_code=404,
-#                     detail="PDF file not generated successfully"
-#                 )
-
-#             print("Both files exist, proceeding with conversion")
-
-#             # Convert to Markdown
-#             from utils.latex_to_markdown import create_markdown_pipeline
-#             md_pipeline = create_markdown_pipeline()
-#             md_result = md_pipeline.convert_latex_to_markdown(str(tex_file), str(output_dir))
-
-#             # Read all files
-#             try:
-#                 # Read LaTeX content
-#                 with open(tex_file, 'r', encoding='utf-8') as f:
-#                     latex_content = f.read()
-#                 print("Successfully read LaTeX content")
-
-#                 right_section_headings =  extract_sections(latex_content)
-
-#                 # Read PDF content
-#                 with open(pdf_file, 'rb') as f:
-#                     pdf_content = base64.b64encode(f.read()).decode('utf-8')
-#                 print("Successfully read PDF content")
-
-#                 # Read or create Markdown content
-#                 markdown_content = None
-#                 if md_result["success"]:
-#                     # Save markdown to file if not already saved
-#                     if md_result["markdown_content"]:
-#                         with open(md_file, 'w', encoding='utf-8') as f:
-#                             f.write(md_result["markdown_content"])
-                        
-#                         # Read the saved markdown file
-#                         with open(md_file, 'r', encoding='utf-8') as f:
-#                             markdown_content = f.read()
-#                         print("Successfully created and read Markdown file")
-
-#                 response_data = {
-#                     "ai_message": state.get('ai_message'),
-#                     "tex_file": latex_content,
-#                     "pdf_file": pdf_content,
-#                     "md_file": markdown_content,
-#                     "section_headings": state['section_title'],
-#                     "success": True,
-#                     "file_paths": {
-#                         "tex": str(tex_file),
-#                         "pdf": str(pdf_file),
-#                         "docx": str(docx_file),
-#                         "md": str(md_file) if markdown_content else None
-#                     }
-#                 }
-
-#                 if not markdown_content:
-#                     response_data["markdown_error"] = md_result.get("error", "Unknown conversion error")
-#                     print(f"Markdown conversion failed: {response_data['markdown_error']}")
-
-#                 # Clean up auxiliary files but keep the main outputs
-#                 aux_extensions = ['.aux', '.log', '.out', '.fls', '.fdb_latexmk', '.synctex.gz']
-#                 for ext in aux_extensions:
-#                     aux_file = output_dir / f"output{ext}"
-#                     if aux_file.exists():
-#                         aux_file.unlink()
-#                 print("Cleaned up auxiliary files")
-
-#                 return JSONResponse(response_data)
-
-#             except Exception as e:
-#                 print(f"Error reading files: {str(e)}")
-#                 raise HTTPException(
-#                     status_code=500,
-#                     detail=f"Error reading generated files: {str(e)}"
-#                 )
-
-#         except subprocess.CalledProcessError as e:
-#             print(f"LaTeX compilation error: {e.stderr}")
-#             raise HTTPException(
-#                 status_code=500,
-#                 detail=f"LaTeX compilation failed: {e.stderr}"
-#             )
-    
-#     except Exception as e:
-#         print(f"Error in process-input endpoint: {str(e)}")
-#         raise HTTPException(
-#             status_code=500, 
-#             detail=str(e)
-#         )
 
 @app.post("/interact")
 async def interact(user_input: UserInput):
