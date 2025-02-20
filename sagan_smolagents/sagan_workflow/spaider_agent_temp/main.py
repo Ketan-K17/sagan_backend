@@ -431,49 +431,30 @@ async def process_input(user_input: UserInput):
         ))
 
         state = outputs[-1]
-        CURRENT_FILE = Path(__file__).resolve()
-        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent
-        CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-        configfile = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(configfile)
 
-        updated_paths = configfile.update_project_paths(project_id)
         # Get the file paths
         project_root = Path(__file__).parent.parent
         output_dir = project_root / "spaider_agent_temp" / "output_pdf"
-        docx_file = output_dir / "output.docx"
+       
+        docx_file = output_dir / "output.docx"  # Define markdown file path
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        try:
-            if not docx_file.exists():
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"docx file not found at {docx_file}"
-                )
+    
+        with open(docx_file, "rb") as file:
+            encoded_string = base64.b64encode(file.read()).decode('utf-8')
+        
+        sections  = get_generated_sections()
 
-            print(f"Found docx file at: {docx_file}")
-            print(f"Files in output directory: {list(output_dir.glob('*'))}")
 
-            if not docx_file.exists():
-                print(f"docx file missing at: {docx_file}")
-                raise HTTPException(
-                    status_code=404,
-                    detail="docx file not found after compilation"
-                )
-
-            print("Docx file found.")
-
-            # Convert PosixPath objects to strings before JSON serialization
-            response_data = {
-                "ai_message": state.get('ai_message'),
-                "docx_file": str(docx_file),  # Convert to string
-                "success": True,
-                "file_paths": {
-                    "docx": str(docx_file),  # Convert to string
+        response_data = {
+                    "ai_message": state.get('ai_message'),
+                    "docx_file": encoded_string,
+                    
+                    "section_headings":sections,
+                    "success": True,
+                   
                 }
         return JSONResponse(response_data)
         
