@@ -115,10 +115,19 @@ def get_section_info(section_number: int) -> tuple[str, str]:
     updated_paths = configfile.update_project_paths(project_id)
     
     final_state_path = updated_paths['nodewise_output'] / "formatting_node_state.json"
+
+    print("1")
     
-    with open(final_state_path, 'r') as f:
+    with open(final_state_path, 'r', encoding='utf-8') as f:
         json_data = json.load(f)
         generated_sections = json_data.get('state', {}).get('generated_sections', {})
+
+        
+    # with open(final_state_path, 'r') as f:
+    #     json_data = json.load(f)
+    #     generated_sections = json_data.get('state', {}).get('generated_sections', {})
+
+        print("2")
         
     # Convert section number to corresponding section title and text
     section_titles = list(generated_sections.keys())
@@ -250,9 +259,8 @@ async def process_input(user_input: UserInput):
 
         # Step 4: Extract section if section number and draft path are provided
         if user_input.section_number:
-            draft_path = docx_file  # Using tex_file as draft path
+            draft_path = docx_file  # Using tex_file as draft 
             s_title, s_text = get_section_info(user_input.section_number)
-
             initial_input = {
                 "user_prompt": user_input.message,
                 "section_text": s_text,

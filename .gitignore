@@ -158,3 +158,34 @@ sagan_multimodal/sagan_workflow_refiner/spaider_agent_temp/formatter_response.tx
 
 
 sagan_multimodal/ingest_data/extracted_images/*
+
+
+
+# Ignore binary files
+*.bin
+
+# Ignore Python bytecode and compiled files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Ignore document and output files
+*.docx
+*.pdf
+
+# Ignore certificate files
+*.pem
+
+# Ignore JSON state and temporary files
+*_state.json
+*.json
+
+# Ignore text files related to state or generated data
+*_state.txt
+*.txt
+
+# Ignore specific directories
+sagan_smologents/ingest_data/
+sagan_smologents/sagan_workflow/spaider_agent_temp/
+sagan_smologents/sagan_workflow/output_pdf/
