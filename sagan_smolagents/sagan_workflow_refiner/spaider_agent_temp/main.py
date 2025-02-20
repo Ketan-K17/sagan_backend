@@ -40,6 +40,8 @@ with open(project_root / "cookie.json", "r") as f:
     cookie_data = json.load(f)
     project_id = cookie_data.get("project_id")
 
+print(f"incumbent project: {project_id}")
+
 # Update UserInput model to include human input fields
 class UserInput(BaseModel):
     message: str
