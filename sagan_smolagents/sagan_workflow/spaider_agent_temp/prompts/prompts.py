@@ -160,11 +160,13 @@ Your task is to generate a detailed plan where each section contains concrete, a
 - Avoid generic content like "Introduction", "Main Content", "Conclusion"
 - Reflect the specific subject matter from the project information
 
-Return ONLY a JSON dictionary in this exact format:
+Return ONLY a JSON object in this exact format:
 {
     "Section Title": ["Specific Step 1", "Specific Step 2", "Specific Step 3"],
     ...
 }
+
+NOTE: ENSURE that the llm response is only the JSON object, and no other decorative text like ```json or ```.
 
 Example Output:
 {

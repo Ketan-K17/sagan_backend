@@ -151,7 +151,7 @@ async def process_input(user_input: UserInput):
 
         state = outputs[-1]
         CURRENT_FILE = Path(__file__).resolve()
-        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
+        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent
         CONFIG_PATH = SAGAN_ROOT / "config.py"
     
         spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)

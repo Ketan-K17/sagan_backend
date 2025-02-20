@@ -519,8 +519,12 @@ def plan_node(state: State) -> State:
         response = agent.provide_final_answer(combined_prompt, images=None)
         print(f"Here's the response: {response}")
 
-        # Extract JSON from markdown code block and parse
-        json_str = response.replace('```json\n', '').replace('\n```', '').strip()
+        # Clean up response and parse JSON, handling both raw JSON and markdown-wrapped JSON
+        json_str = response.strip()
+        if json_str.startswith('```'):
+            # Remove markdown code block decorators if present
+            json_str = json_str.replace('```json\n', '').replace('```', '').strip()
+        
         plan_dict = json.loads(json_str)
         
         state["plan"] = plan_dict
