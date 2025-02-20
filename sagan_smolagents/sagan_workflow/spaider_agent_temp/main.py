@@ -503,14 +503,47 @@ def download_document():
     file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
     return FileResponse(file_path, media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document', filename="document.docx")
   
+# @app.get("/download-base64")
+# def download_document_base64():
+#     file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
+    
+#     with open(file_path, "rb") as file:
+#         encoded_string = base64.b64encode(file.read()).decode('utf-8')
+    
+#     return {"file": encoded_string}
+
+
+
 @app.get("/download-base64")
 def download_document_base64():
-    file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
+    try:
+        # Get current project ID
+        project_id = config.get_current_project_id()
+        if not project_id:
+            raise HTTPException(
+                status_code=404,
+                detail="No active project found"
+            )
+        
+        # Update project paths based on current project
+        config.update_project_paths(project_id)
+        
+        # Get state.json path for current project
+        # project_state_path = config.PROJECTS_BASE / project_id / "state.json"
+        
+        
+        # Read state.json
+        with open(config.OUTPUT_DOCX_PATH, "rb") as file:
+            encoded_string = base64.b64encode(file.read()).decode('utf-8')
     
-    with open(file_path, "rb") as file:
-        encoded_string = base64.b64encode(file.read()).decode('utf-8')
-    
-    return {"file": encoded_string}
+        return {"file": encoded_string}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting base64 document: {str(e)}"
+        )
+
+
 
 
 # class DocxContent(BaseModel):
@@ -546,33 +579,95 @@ class DocxContent(BaseModel):
 class DocumentContent(BaseModel):
     content: str  # Quill's HTML content
 
+# @app.post("/upload-docx")
+# async def upload_docx(data: DocumentContent = Body(...)):
+#     # file_path = os.path.join('./', "document.docx")
+
+#     try:
+#         docx_content = html2docx(data.content, title="Document")
+#         with open("./output_pdf/output.docx", "wb") as f:
+#             f.write(docx_content.getvalue())
+#         print("Document created successfully")
+#     except Exception as e:
+#         print("Error creating document:", e)
+#         return {"error": str(e)}
+
+#     return {"message": "Document saved successfully!", "filename": "output.docx"}
+
+
 @app.post("/upload-docx")
 async def upload_docx(data: DocumentContent = Body(...)):
-    # file_path = os.path.join('./', "document.docx")
-
+    # Get current project ID
+    project_id = config.get_current_project_id()
+    if not project_id:
+        raise HTTPException(
+            status_code=404,
+            detail="No active project found"
+        )
+    
+    # Update project paths based on current project
+    config.update_project_paths(project_id)
+    
     try:
         docx_content = html2docx(data.content, title="Document")
-        with open("./output_pdf/output.docx", "wb") as f:
+        with open(config.OUTPUT_DOCX_PATH, "wb") as f:
             f.write(docx_content.getvalue())
         print("Document created successfully")
     except Exception as e:
         print("Error creating document:", e)
         return {"error": str(e)}
+    
 
-    return {"message": "Document saved successfully!", "filename": "output.docx"}
+    # take docx_content and convert it to base64 string 
+    with open(config.OUTPUT_DOCX_PATH, "rb") as file:
+        encoded_string = base64.b64encode(file.read()).decode('utf-8')
+
+        # save this encoded_string in the state.json of the current project 
+        state_path = config.PROJECTS_BASE / project_id / "state.json"
+        with open(state_path, "r") as f:
+            state_data = json.load(f)
+            state_data["output_docx_base64"] = encoded_string
+        with open(state_path, "w") as f:
+            json.dump(state_data, f, indent=4)
+
+    return {"message": "Document saved successfully!", "filename": str(config.OUTPUT_DOCX_PATH)}
+
+
+# @app.get("/convert-to-html/")
+# async def convert_to_html():
+#     file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
+#     if not os.path.exists(file_path):
+#         raise HTTPException(status_code=404, detail="File not found.")
+#     with open(file_path, "rb") as docx_file:
+#         contents = docx_file.read()
+#     result = mammoth.convert_to_html(BytesIO(contents))
+#     html_content = result.value
+#     return HTMLResponse(content=html_content)
 
 
 @app.get("/convert-to-html/")
 async def convert_to_html():
-    file_path = os.path.join(os.path.dirname(__file__), "./output_pdf/output.docx")
+    project_id = config.get_current_project_id()
+    if not project_id:
+        raise HTTPException(
+            status_code=404,
+            detail="No active project found"
+        )
+    
+    # Update project paths based on current project
+    config.update_project_paths(project_id)
+    
+    # Get output docx path for current project
+    file_path = config.OUTPUT_DOCX_PATH
     if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="File not found.")
+        raise HTTPException(status_code=404, detail="File not found in workflow1_output folder")
+        
+        
     with open(file_path, "rb") as docx_file:
         contents = docx_file.read()
     result = mammoth.convert_to_html(BytesIO(contents))
     html_content = result.value
     return HTMLResponse(content=html_content)
-
 
 
 @app.post("/upload-image/")

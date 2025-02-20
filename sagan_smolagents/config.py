@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import os
 import certifi 
@@ -121,8 +122,22 @@ def update_project_paths(project_id: str) -> dict:
         
     return paths
 
+# def get_current_project_id():
+#     """Returns the currently active project_id"""
+#     return current_project_id
+
+
+
 def get_current_project_id():
     """Returns the currently active project_id"""
+    # Read project_id from cookie.json
+    try:
+        cookie_path = SAGAN_ROOT / 'cookie.json'
+        with open(cookie_path, 'r') as f:
+            cookie_data = json.load(f)
+            current_project_id = cookie_data.get('project_id')
+    except:
+        pass
     return current_project_id
 
 def create_directories():
