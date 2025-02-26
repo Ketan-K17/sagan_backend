@@ -171,7 +171,6 @@ sagan_multimodal/ingest_data/extracted_images/*
 __pycache__/
 
 # Ignore document and output files
-*.docx
 *.pdf
 
 # Ignore certificate files
