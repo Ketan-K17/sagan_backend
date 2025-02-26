@@ -11,6 +11,7 @@ from pypdf import PdfReader
 from typing import Dict
 from colorama import Fore, Style, init
 import json
+import shutil
 # getting config file here: 
 
 
@@ -187,9 +188,9 @@ class LoadProjectRequest(BaseModel):
 
 @app.post("/create_project")
 async def create_project(
-    project_name: str = Form(...),  # Ensure project_name is received correctly
-    data_files: List[UploadFile] = File(default=[]),  # Fix default value
-    template_file: Optional[UploadFile] = File(None)  # Optional template file
+    project_name: str = Form(...),  
+    data_files: List[UploadFile] = File(default=[]),  # Changed to default=[] instead of just []
+    template_file: Optional[UploadFile] = File(default=None)  # Make sure to use default=None
 ):
     try:
         print(f"\nStarting project creation for: {project_name}")
@@ -234,6 +235,61 @@ async def create_project(
                     detail="Failed to create template vector database"
                 )
             print("Template vector database created successfully!")
+        
+        # If not, this means user has selected one of default templates.
+        else:
+            # Default template selection (will be determined by frontend later)
+            selected_template = 'afr'  # Can be 'afr' or 'core'
+            
+            print(f"\nUsing default template: {selected_template}")
+            
+            # Paths for the template source
+            templates_base_path = Path("/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates")
+            template_source_path = templates_base_path / selected_template
+            template_db_source = template_source_path / "template_db"
+            template_file_source = template_source_path / f"{selected_template}.docx"
+            
+            # Paths for the destination in the project
+            project_id = project_state["project_id"]
+            project_base = config.PROJECTS_BASE / project_id
+            template_db_dest = project_base / "vectordb" / "template_db"
+            workflow_output_dest = project_base / "workflow1_output"
+            template_file_dest = workflow_output_dest / f"{selected_template}.docx"
+            
+            # Ensure destination directories exist
+            template_db_dest.parent.mkdir(parents=True, exist_ok=True)
+            workflow_output_dest.mkdir(parents=True, exist_ok=True)
+            
+            # Copy template_db folder
+            if template_db_source.exists():
+                if template_db_dest.exists():
+                    shutil.rmtree(template_db_dest)
+                shutil.copytree(template_db_source, template_db_dest)
+                print(f"Copied template database from {template_db_source} to {template_db_dest}")
+            else:
+                print(f"Warning: Template database not found at {template_db_source}")
+            
+            # Copy template docx file
+            if template_file_source.exists():
+                shutil.copy2(template_file_source, template_file_dest)
+                print(f"Copied template file from {template_file_source} to {template_file_dest}")
+            else:
+                print(f"Warning: Template file not found at {template_file_source}")
+            
+            # Update state with template information
+            update_state_path = project_base / "state.json"
+            if update_state_path.exists():
+                with open(update_state_path, 'r') as f:
+                    state_data = json.load(f)
+                
+                state_data["vectordb"] = state_data.get("vectordb", {})
+                state_data["vectordb"]["template"] = str(template_db_dest)
+                state_data["vectordb"]["template_file"] = str(template_file_dest)
+                
+                with open(update_state_path, 'w') as f:
+                    json.dump(state_data, f, indent=4)
+                
+                print(f"Updated state with template information")
 
         return JSONResponse(content={
             "message": "Project created and loaded successfully",
