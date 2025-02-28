@@ -8,7 +8,7 @@ from pathlib import Path
 import uvicorn
 import subprocess
 import base64
-from typing import Optional,Dict
+from typing import Optional,Dict,List
 import os
 import asyncio
 import json
@@ -17,6 +17,9 @@ import importlib.util
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.text.paragraph import Paragraph
+
+from docling.document_converter import DocumentConverter
+
 
 from nodes_and_conditional_edges.nodes import ws_manager,research_query_generator
 from models.chatgroq import BuildChatGroq, BuildChatOpenAI
@@ -51,11 +54,6 @@ class UserInput(BaseModel):
 class PublishInput(BaseModel):
     modified_text: str
     section_number: Optional[int] = None
-
-
-class UpdateLatexInput(BaseModel):
-    """Input model for updating complete LaTeX document"""
-    latex_content: str
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -138,6 +136,69 @@ def get_section_info(section_number: int) -> tuple[str, str]:
     else:
         raise ValueError(f"Section number {section_number} is out of range. Available sections: {len(section_titles)}")
     
+
+def get_text_info_from_inputfile(inputfile: UploadFile, grand_prompt: str):
+    """
+    Get textual information from an uploaded file and append it to the grand_prompt.
+    
+    Args:
+        inputfile (UploadFile): The uploaded file to process
+        grand_prompt (str): The prompt to append the extracted text to
+        
+    Returns:
+        str: The updated prompt with the file's content appended
+    """
+    try:
+        # Check if a file with this name already exists in the temp directory
+        temp_dir = Path("temp_uploads")
+        file_path = temp_dir / inputfile.filename
+        
+        # If file doesn't exist, save it
+        if not file_path.exists():
+            temp_dir.mkdir(exist_ok=True)
+            content = inputfile.file.read()
+            with open(file_path, "wb") as f:
+                f.write(content)
+            # Reset the file pointer
+            inputfile.file.seek(0)
+        
+        # Use the extract_info function to process the document
+        extracted_text = extract_info(str(file_path))
+        
+        # Append the extracted text to the grand_prompt
+        # Format: original prompt + clear separator + document content
+        updated_prompt = f"{grand_prompt}\n\n--- Document Content ---\n{extracted_text}"
+        
+        print(f"Enhanced prompt created with document content from {inputfile.filename}")
+        return updated_prompt
+    
+    except Exception as e:
+        print(f"Error processing uploaded file: {str(e)}")
+        # Return the original prompt if there was an error
+        return grand_prompt
+
+def extract_info(input_doc: str) -> str:
+    """
+    Processes the input document using Docling.
+    For image files, it leverages OCR and visual understanding to extract any embedded text or contextual info.
+    For textual documents (PDF, DOCX, etc.), it extracts and converts all text.
+    Returns a unified markdown string representing the content.
+    """
+    converter = DocumentConverter()
+    
+    # Optional: Check file extension to allow for future customizations.
+    ext = os.path.splitext(input_doc)[1].lower()
+    if ext in [".jpg", ".jpeg", ".png", ".bmp"]:
+        # For images, you might want to set additional pipeline options if needed.
+        # Here, we simply let Docling auto-detect the image and process it.
+        result = converter.convert(input_doc)
+    else:
+        result = converter.convert(input_doc)
+    
+    # Export all extracted information as Markdown.
+    extracted_content = result.document.export_to_markdown()
+    return extracted_content
+
 # helper function to read the contents of a docx file.
 def read_docx_file(file_path: str) -> str:
     """
@@ -238,7 +299,22 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
 
 @app.post("/process-input")
-async def process_input(user_input: UserInput):
+async def process_input(
+    message: str = Form(...),
+    section_number: int = Form(...),  # Section number is now mandatory
+    document: Optional[UploadFile] = File(None)
+):
+    """
+    Process user input with AI assistance, targeting a specific section of the document.
+    
+    Args:
+        message: User's text prompt or question
+        section_number: Required section number to target (1-based indexing)
+        document: Optional file upload to provide additional context
+        
+    Returns:
+        JSONResponse with AI's response and section information
+    """
     try:
         # Step 1: Generate a session ID and connect WebSocket
         session_id = "1234"
@@ -256,22 +332,56 @@ async def process_input(user_input: UserInput):
         
         # Step 3: Default paths and configurations
         docx_file = updated_paths['output_docx']
+        
+        # Step 4: Process uploaded document if provided
+        document_content = None
+        document_text = None
+        if document:
+            print(f"\nProcessing uploaded document: {document.filename}")
+            
+            # First save the uploaded file for use in multiple processes
+            # Create a temp directory for uploads if it doesn't exist
+            temp_upload_dir = Path("temp_uploads")
+            temp_upload_dir.mkdir(exist_ok=True)
+            
+            # Save the uploaded file
+            file_path = temp_upload_dir / document.filename
+            document_content = await document.read()
+            
+            with open(file_path, "wb") as f:
+                f.write(document_content)
+            
+            # Reset the file pointer for the UploadFile object
+            await document.seek(0)
+            
+            # Process the document using the get_text_info_from_inputfile function
+            # Create a grand prompt with the user's message
+            grand_prompt = message
+            
+            # Extract text and append to the grand prompt
+            # This is the key step that enhances the user message with document content
+            enhanced_prompt = get_text_info_from_inputfile(document, grand_prompt)
+            
+            # Save the original message and set the enhanced one
+            # 'message' now contains both the original user prompt and the document content
+            message = enhanced_prompt
 
-        # Step 4: Extract section if section number and draft path are provided
-        if user_input.section_number:
-            draft_path = docx_file  # Using tex_file as draft 
-            s_title, s_text = get_section_info(user_input.section_number)
-            initial_input = {
-                "user_prompt": user_input.message,
-                "section_text": s_text,
-                "section_title": s_title,
-                "section_number": user_input.section_number,
-                "rough_draft_path": str(draft_path)
-            }
-        else:
-            initial_input = {"messages": [("user", user_input.message)]}
-
-        # Step 5: Process through graph and capture the final state
+        # Step 5: Extract section since section number is now mandatory
+        draft_path = docx_file
+        s_title, s_text = get_section_info(section_number)
+        
+        # Create initial input with section information
+        # Note: 'message' already contains the document content if a document was provided,
+        # because it was enhanced by get_text_info_from_inputfile
+        initial_input = {
+            "user_prompt": message,  # This now includes document content if a document was provided
+            "section_text": s_text,
+            "section_title": s_title,
+            "section_number": section_number,
+            "rough_draft_path": str(draft_path)
+        }
+    
+        # Step 6: Process through graph and capture the final state
         state = None
         try:
             async for output in graph.astream(
@@ -296,12 +406,16 @@ async def process_input(user_input: UserInput):
             print(f"AI Message in state: {state.get('ai_message')}")
             print(f"Modified text in state: {bool(state.get('modified_section_text'))}")
 
-            # Step 6: Build initial response data
+            # Step 7: Build initial response data
+            # Note: The AI's response and the modified section text may reflect 
+            # information from both the user's prompt and any document content
             response_data = {
                 "success": True,
                 "message": "Processing completed",
                 "ai_message": state.get("ai_message"),
-                "modified_section_text": state.get("modified_section_text")
+                "modified_section_text": state.get("modified_section_text"),
+                "section_number": section_number,  # Include section number in response
+                "section_title": s_title  # Include section title in response
             }
 
             # WebSocket: Send final state
@@ -311,7 +425,7 @@ async def process_input(user_input: UserInput):
             print(f"AI Message: {response_data['ai_message']}")
             print(f"Modified text present: {bool(response_data['modified_section_text'])}")
 
-            # Step 7: Handle file processing for successful state
+            # Step 8: Handle file processing for successful state
             if response_data.get("success"):
                 print("Save was successful. Writing to docx file...")
 
@@ -366,10 +480,6 @@ async def process_input(user_input: UserInput):
             status_code=500,
             detail=f"Error in process-input endpoint: {str(e)}"
         )
-
-    # finally:
-    #     # Ensure WebSocket disconnects
-    #     ws_manager.disconnect(session_id)
 
 
 @app.post("/publish")
@@ -452,160 +562,6 @@ async def publish(update_request: PublishInput):
 
 
 
-@app.post("/update-latex")
-async def update_latex(update_request: UpdateLatexInput):
-    """
-    API to update the complete LaTeX document and regenerate PDF and markdown files.
-    Accepts full LaTeX content from frontend and updates all related files.
-    """
-    try:
-        # Step 1: Extract input parameters
-        latex_content = update_request.latex_content
-
-        if not latex_content:
-            raise HTTPException(
-                status_code=400,
-                detail="LaTeX content is required"
-            )
-
-        # Step 2: Dynamically load config and get paths
-        CURRENT_FILE = Path(__file__).resolve()
-        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent
-        CONFIG_PATH = SAGAN_ROOT / "config.py"
-        
-        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-        config = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(config)
-        
-        # Step 3: File paths
-        output_dir = Path(config.OUTPUT_PDF_PATH)
-        
-        tex_file = output_dir / "output.tex"
-        pdf_file = output_dir / "output.pdf"
-        md_file = output_dir / "output.md"
-
-        # Write the new LaTeX content to file
-        try:
-            with open(tex_file, 'w', encoding='utf-8') as f:
-                f.write(latex_content)
-            print("Successfully updated LaTeX file with new content.")
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error writing to LaTeX file: {str(e)}"
-            )
-
-        # Convert to PDF and Markdown
-        try:
-            # Create Markdown
-            md_pipeline = create_markdown_pipeline()
-            md_result = md_pipeline.convert_latex_to_markdown(str(tex_file), str(output_dir))
-
-            # Create PDF
-            pipeline = LaTeXPipeline()
-            pdf_result = pipeline.latex_to_pdf(tex_file, output_dir)
-
-            print(pdf_result,"pdf_result")
-
-            if not pdf_file.exists():
-                raise HTTPException(
-                    status_code=500,
-                    detail="PDF generation failed"
-                )
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error in file conversion: {str(e)}"
-            )
-
-        # Prepare response with all file contents
-        try:
-            # Read PDF content
-            with open(pdf_file, 'rb') as f:
-                pdf_content = base64.b64encode(f.read()).decode('utf-8')
-
-            # Handle Markdown content
-            markdown_content = None
-            if md_result["success"]:
-                markdown_content = md_result["markdown_content"]
-                # Save the markdown content to file
-                with open(md_file, 'w', encoding='utf-8') as f:
-                    f.write(markdown_content)
-                print("Successfully created Markdown file.")
-
-            # Prepare the response
-            response_data = {
-                "success": True,
-                "message": "Documents updated successfully",
-                "tex_file": latex_content,
-                "pdf_file": pdf_content,
-                "md_file": markdown_content,
-                "file_paths": {
-                    "tex": str(tex_file),
-                    "pdf": str(pdf_file),
-                    "md": str(md_file) if markdown_content else None
-                }
-            }
-
-            # Clean up auxiliary files
-            aux_extensions = ['.aux', '.log', '.out', '.fls', '.fdb_latexmk', '.synctex.gz']
-            for ext in aux_extensions:
-                aux_file = output_dir / f"output{ext}"
-                if aux_file.exists():
-                    aux_file.unlink()
-            print("Cleaned up auxiliary files.")
-
-            return JSONResponse(response_data)
-
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error preparing response: {str(e)}"
-            )
-
-    except Exception as e:
-        print(f"Error in update-latex API: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error in update-latex endpoint: {str(e)}"
-        )
-
-
-
-@app.post('/upload-image-to-latex')
-async def uploadImageToLatex(image: UploadFile = File(...), latex: str = Form(...), cursor_position: int = Form(...)):
-  try:
-    print('code started',image)
-   
-    file_path = os.path.join(config.OUTPUT_PDF_PATH, image.filename)
-    # file_path = os.path.join('C://Users//Asus//Desktop//sagan-demo-be//sagan_workflow//spaider_agent_temp//output_pdf', image.filename)
-    with open(file_path, "wb") as buffer: 
-      buffer.write(await image.read())
-    
-    image_path = f"./{image.filename}"
-
-    print(image_path,"image path")
-      
-    # image_latex = f'\\includegraphics[width=0.25\\linewidth]{{{image_path}}}'
-    
-    # text_before_cursor = latex[:cursor_position]
-    # text_after_cursor = latex[cursor_position:]
-    # latex_content = text_before_cursor + image_latex + text_after_cursor
-    
-    # output_file_path = os.path.join('./', 'output.tex')
-    # with open(output_file_path, "w") as output_file:
-    #   output_file.write(latex_content)
-      
-    # print('new latex ready')
-    
-    return JSONResponse(content={"latex": "heyy"})
-  
-  except Exception as e:
-    raise HTTPException(status_code=500, detail=f"uploadImageToLatex Error: {str(e)}")        
-
-
-
-
 @app.post("/test-websocket")
 async def test_websocket():
     try:
@@ -618,22 +574,22 @@ async def test_websocket():
 
 
 # @app.post("/interact")
-# async def interact(user_input: UserInput):
+# async def interact(message: str = Form(...)):
 #     """
 #     Endpoint to interact with the graph using user input with streaming response.
 #     """
-#     if not user_input.message:
+#     if not message:
 #         raise HTTPException(status_code=400, detail="No input provided")
-
+# 
 #     try:
 #         # Stream the responses from the graph
 #         async def event_generator():
-#             initial_input = {"messages": [("user", user_input.message)]}
+#             initial_input = {"messages": [("user", message)]}
 #             for response in graph.stream(initial_input, stream_mode="values", config=runnable_config):
 #                 yield f"data: {response}\n\n"
-
+# 
 #         return StreamingResponse(event_generator(), media_type="text/event-stream")
-
+# 
 #     except Exception as e:
 #         raise HTTPException(status_code=500, detail=str(e))
 

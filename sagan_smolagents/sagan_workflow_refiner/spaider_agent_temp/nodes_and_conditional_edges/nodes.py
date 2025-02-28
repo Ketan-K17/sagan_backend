@@ -186,6 +186,8 @@ async def research_query_generator(state: State) -> State:
         tools=[], 
         prompt_templates={"system_prompt": empty_prompt}
     )
+
+    print(f"HERE'S THE USER_PROMPT: \n{state['user_prompt']}")
     
     user_prompt = f"""
     Section Title: {state['section_title']}
