@@ -626,9 +626,16 @@ def formatting_node(state: State) -> State:
     updated_paths = config.update_project_paths(project_id)
     
     base_output_path = updated_paths['workflow1_output']
+    output_docx_path = base_output_path / "output.docx"
     
-    # Create a new Document
-    doc = Document()
+    # Load the existing document if it exists, otherwise create a new one
+    if output_docx_path.exists():
+        print(f"Loading existing template document from {output_docx_path}")
+        doc = Document(output_docx_path)
+        # No need to remove content as the template is already stripped of content
+    else:
+        print(f"No existing document found at {output_docx_path}, creating a new document")
+        doc = Document()
 
     project_title = state["project_title"]
     abstract_text = state["abstract_text"]
@@ -648,10 +655,9 @@ def formatting_node(state: State) -> State:
             doc.add_heading(section_header, level=1)
             doc.add_paragraph(section_content)
 
-    # Save the document to the base_output_path
-    output_docx_path = base_output_path / "output.docx"
+    # Save the document to the same path
     doc.save(output_docx_path)
-    print(f"Word document written to: {output_docx_path}")
+    print(f"Word document updated at: {output_docx_path}")
 
     # Create base64 string of output.docx
     with open(output_docx_path, "rb") as file:

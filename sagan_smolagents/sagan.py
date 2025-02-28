@@ -247,14 +247,14 @@ async def create_project(
             templates_base_path = Path("/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates")
             template_source_path = templates_base_path / selected_template
             template_db_source = template_source_path / "template_db"
-            template_file_source = template_source_path / f"{selected_template}.docx"
+            template_file_source = template_source_path / f"{selected_template}_stripped.docx"
             
             # Paths for the destination in the project
             project_id = project_state["project_id"]
             project_base = config.PROJECTS_BASE / project_id
             template_db_dest = project_base / "vectordb" / "template_db"
             workflow_output_dest = project_base / "workflow1_output"
-            template_file_dest = workflow_output_dest / f"{selected_template}.docx"
+            template_file_dest = workflow_output_dest / f"output.docx"
             
             # Ensure destination directories exist
             template_db_dest.parent.mkdir(parents=True, exist_ok=True)
