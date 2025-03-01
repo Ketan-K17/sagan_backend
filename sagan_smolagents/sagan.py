@@ -248,6 +248,8 @@ async def create_project(
             template_source_path = templates_base_path / selected_template
             template_db_source = template_source_path / "template_db"
             template_file_source = template_source_path / f"{selected_template}_stripped.docx"
+            unedited_template_file_source = template_source_path / f"{selected_template}.docx"
+            
             
             # Paths for the destination in the project
             project_id = project_state["project_id"]
@@ -255,6 +257,7 @@ async def create_project(
             template_db_dest = project_base / "vectordb" / "template_db"
             workflow_output_dest = project_base / "workflow1_output"
             template_file_dest = workflow_output_dest / f"output.docx"
+            unedited_template_file_dest = project_base / "template" / f"{selected_template}.docx"
             
             # Ensure destination directories exist
             template_db_dest.parent.mkdir(parents=True, exist_ok=True)
@@ -275,6 +278,13 @@ async def create_project(
                 print(f"Copied template file from {template_file_source} to {template_file_dest}")
             else:
                 print(f"Warning: Template file not found at {template_file_source}")
+
+            # Copy unedited template docx file
+            if unedited_template_file_source.exists():
+                shutil.copy2(unedited_template_file_source, unedited_template_file_dest)
+                print(f"Copied unedited template file from {unedited_template_file_source} to {unedited_template_file_dest}")
+            else:
+                print(f"Warning: Unedited template file not found at {unedited_template_file_source}")
             
             # Update state with template information
             update_state_path = project_base / "state.json"
