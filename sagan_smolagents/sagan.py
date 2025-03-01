@@ -244,7 +244,8 @@ async def create_project(
             print(f"\nUsing default template: {selected_template}")
             
             # Paths for the template source
-            templates_base_path = Path("/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates")
+            # templates_base_path = Path("/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates")
+            templates_base_path = config.READY_MADE_TEMPLATES_PATH
             template_source_path = templates_base_path / selected_template
             template_db_source = template_source_path / "template_db"
             template_file_source = template_source_path / f"{selected_template}_stripped.docx"

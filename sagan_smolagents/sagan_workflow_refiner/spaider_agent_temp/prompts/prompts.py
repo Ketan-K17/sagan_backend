@@ -78,5 +78,7 @@ Example Output:
   "ai_message": "The section text has been modified based on the user's request to include more information about the University of Luxembourg."
 }}
 
+MAKE SURE THAT ALL SPECIAL CHARACTERS, AND NEWLINES AND PROPERLY ESCAPED.
+
 Following is the exact user's query for your reference, follow it carefully, keeping the given guidelines in mind:
 """

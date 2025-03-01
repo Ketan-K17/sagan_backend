@@ -16,6 +16,7 @@ current_project_id = None
 SAGAN_ROOT = Path(__file__).parent # i.e. sagan_smolagents
 FIRST_WORKFLOW_ROOT = SAGAN_ROOT / "sagan_workflow" / "spaider_agent_temp"
 SECOND_WORKFLOW_ROOT = SAGAN_ROOT / "sagan_workflow_refiner" / "spaider_agent_temp"
+READY_MADE_TEMPLATES_PATH = SAGAN_ROOT / "ingest_data" / "ready_made_templates"
 
 # template file path
 # TEMPLATE_FILE_PATH = SAGAN_ROOT / "fnr_template" / "template.docx"

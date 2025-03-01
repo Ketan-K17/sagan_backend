@@ -454,15 +454,21 @@ def formatter(state: State):
     print("-" * 50)
 
     try:
-        # First try to extract just the JSON part if present
-        if '{' in raw_response:
-            json_start = raw_response.find('{')
-            json_end = raw_response.rfind('}') + 1
-            json_str = raw_response[json_start:json_end]
+        # First check if the response contains the '</think>' marker
+        # Extract everything after the '</think>' marker
+        json_str = raw_response.split('</think>')[1].strip()
+        print("Extracted JSON using '</think>' marker:")
+        try:
+            print("this is the json str:\n", json_str)
             response_data = json.loads(json_str)
-        else:
-            # If no JSON found, try to parse the whole response
-            response_data = json.loads(raw_response)
+        except json.JSONDecodeError:
+            print("Failed to parse JSON after '</think>' marker, falling back to brace detection")
+            # If parsing fails, fall back to brace detection
+            if '{' in json_str:
+                json_start = json_str.find('{')
+                json_end = json_str.rfind('}') + 1
+                json_str = json_str[json_start:json_end]
+                response_data = json.loads(json_str)
             
     except json.JSONDecodeError as e:
         print(f"Error parsing JSON response: {e}")
@@ -470,7 +476,7 @@ def formatter(state: State):
         # Create a more informative fallback response
         response_data = {
             'modified_section_text': state.get('section_text', ''),
-            'ai_message': f'Error: Could not process the text modification. Raw response: {raw_response[:100]}...'
+            'ai_message': f'Error: Could not process the text modification.'
         }
     
     # Extract the fields with fallback values

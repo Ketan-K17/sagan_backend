@@ -1,5 +1,6 @@
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.runnables.config import RunnableConfig
+from langchain_groq import ChatGroq
 from fastapi import FastAPI, HTTPException, WebSocket,WebSocketDisconnect,File ,Form,UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -29,6 +30,10 @@ from models.chatgroq import BuildChatGroq, BuildChatOpenAI
 from graph import create_graph, compile_graph, print_stream
 from schemas import State
 from prompts.prompts import RESEARCH_QUERY_GENERATOR_PROMPT
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Dynamically resolve the path to config.py
 CURRENT_FILE = Path(__file__).resolve()
@@ -75,6 +80,8 @@ DATA_FOLDER.mkdir(exist_ok=True)
 
 DATA_RFP_FOLDER = Path("testfolder")
 DATA_RFP_FOLDER.mkdir(exist_ok=True)
+
+groq_llm = BuildChatGroq(model="llama-3.2-90b-vision-preview", temperature=0.0)
 
 # Initialize graph
 verbose = True
@@ -138,7 +145,6 @@ def get_section_info(section_number: int) -> tuple[str, str]:
     else:
         raise ValueError(f"Section number {section_number} is out of range. Available sections: {len(section_titles)}")
     
-
 def get_text_info_from_inputfile(inputfile: UploadFile, grand_prompt: str):
     """
     Get textual information from an uploaded file and append it to the grand_prompt.
@@ -275,6 +281,17 @@ def get_image_info_from_inputfile(inputfile: UploadFile, grand_prompt: str):
         #   1. Load the image
         #   2. Use ChatGroq to describe the image
         #   3. Add description to image_summary
+
+        # Call describe_image() for each image in picture_paths
+        if picture_counter > 0:
+            for i, img_path in enumerate(picture_paths):
+                try:
+                    img_description = describe_image(img_path)
+                    image_summary += f"\n\nDescription of image {i+1}:\n{img_description}"
+                    print(f"Generated description for image {i+1}")
+                except Exception as e:
+                    print(f"Error describing image {i+1}: {str(e)}")
+                    image_summary += f"\n\nDescription of image {i+1}: Error generating description"
         
         # Step 9: Append the image summary to the grand_prompt
         updated_prompt = f"{grand_prompt}{image_summary}"
@@ -310,6 +327,34 @@ def extract_info(input_doc: str) -> str:
     # Export all extracted information as Markdown.
     extracted_content = result.document.export_to_markdown()
     return extracted_content
+
+def describe_image(image_path: str) -> str:
+    # Read and encode the image in base64
+    with open(image_path, "rb") as image_file:
+        base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+    
+    # Prepare a message that includes a text prompt and the image (as a data URI)
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        "Please describe the content of the workflow present in this image. Do it in this format:\n"
+                        "<what the entire workflow represents>\n\n"
+                        "<Detailed description of the flow diagram, what node leads to what node, and what the node does.>\n\n"
+                        "Keep your description concise, and do not include any other descriptive/reflective text. Your response must be in one paragraph."
+                    )
+                },
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+            ]
+        }
+    ]
+    
+    # Send the message to the LLM and return its response
+    response = groq_llm.invoke(messages)
+    return response.content
 
 # helper function to read the contents of a docx file.
 def read_docx_file(file_path: str) -> str:
@@ -473,10 +518,13 @@ async def process_input(
             # Extract text and append to the grand prompt
             # This is the key step that enhances the user message with document content
             enhanced_prompt = get_text_info_from_inputfile(document, grand_prompt)
+
+            # Process images and append to the grand prompt
+            final_prompt = get_image_info_from_inputfile(document, enhanced_prompt)
             
             # Save the original message and set the enhanced one
             # 'message' now contains both the original user prompt and the document content
-            message = enhanced_prompt
+            message = final_prompt
 
         # Step 5: Extract section since section number is now mandatory
         draft_path = docx_file
