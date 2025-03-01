@@ -18,7 +18,9 @@ from docx import Document
 from docx.oxml import OxmlElement
 from docx.text.paragraph import Paragraph
 
-from docling.document_converter import DocumentConverter
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling_core.types.doc import PictureItem, TableItem
+from docling_core.types.doc import ImageRefMode
 
 
 from nodes_and_conditional_edges.nodes import ws_manager,research_query_generator
@@ -174,6 +176,116 @@ def get_text_info_from_inputfile(inputfile: UploadFile, grand_prompt: str):
     
     except Exception as e:
         print(f"Error processing uploaded file: {str(e)}")
+        # Return the original prompt if there was an error
+        return grand_prompt
+
+def get_image_info_from_inputfile(inputfile: UploadFile, grand_prompt: str):
+    """
+    Get textual information from an uploaded image file and append it to the grand_prompt.
+    
+    Args:
+        inputfile (UploadFile): The uploaded image file to process
+        grand_prompt (str): The prompt to append the extracted text to
+        
+    Returns:
+        str: The updated prompt with image information appended
+    """
+    try:
+        # Step 1: Dynamically load config and get paths
+        CURRENT_FILE = Path(__file__).resolve()
+        project_root = CURRENT_FILE.parent.parent.parent
+        CONFIG_PATH = project_root / "config.py"
+        
+        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+        config = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(config)
+
+        updated_paths = config.update_project_paths(project_id)
+        
+        # Step 2: Create output directory for extracted images
+        # Make it a subfolder of workflow2_output as requested
+        workflow2_output = updated_paths.get('workflow2_output', project_root / "workflow2_output")
+        output_dir = workflow2_output / "extracted_images"
+        output_dir.mkdir(exist_ok=True, parents=True)
+        
+        # Step 3: Save the uploaded file temporarily
+        temp_dir = Path("temp_uploads")
+        temp_dir.mkdir(exist_ok=True)
+        file_path = temp_dir / inputfile.filename
+        
+        content = inputfile.file.read()
+        with open(file_path, "wb") as f:
+            f.write(content)
+        
+        # Reset the file pointer
+        inputfile.file.seek(0)
+        
+        # Step 4: Set up docling pipeline options for extraction
+        from docling.datamodel.pipeline_options import PdfPipelineOptions
+        pipeline_options = PdfPipelineOptions()
+        pipeline_options.images_scale = 2.0  # Adjust resolution if needed
+        pipeline_options.generate_page_images = True
+        pipeline_options.generate_picture_images = True
+        
+        # Step 5: Convert the document using docling's DocumentConverter
+        doc_converter = DocumentConverter(
+            format_options={
+                'pdf': PdfFormatOption(pipeline_options=pipeline_options)
+            }
+        )
+        conv_res = doc_converter.convert(file_path)
+        
+        # Step 6: Extract and save images of figures and tables
+        picture_paths = []
+        table_paths = []
+        
+        picture_counter = 0
+        table_counter = 0
+        
+        for element, _level in conv_res.document.iterate_items():
+            if isinstance(element, PictureItem):
+                picture_counter += 1
+                img_path = output_dir / f"picture_{picture_counter}.png"
+                with open(img_path, "wb") as fp:
+                    element.get_image(conv_res.document).save(fp, "PNG")
+                picture_paths.append(str(img_path))
+                
+            elif isinstance(element, TableItem):
+                table_counter += 1
+                img_path = output_dir / f"table_{table_counter}.png"
+                with open(img_path, "wb") as fp:
+                    element.get_image(conv_res.document).save(fp, "PNG")
+                table_paths.append(str(img_path))
+        
+        # Step 7: Create a summary of extracted images to append to the prompt
+        image_summary = f"\n\n--- Document Visual Elements ---\n"
+        image_summary += f"Extracted {picture_counter} images and {table_counter} tables from document.\n"
+        
+        if picture_counter > 0:
+            image_summary += f"Pictures found: {picture_counter}\n"
+            
+        if table_counter > 0:
+            image_summary += f"Tables found: {table_counter}\n"
+            
+        # Step 8: Placeholder for future ChatGroq integration
+        # TODO: Future implementation of ChatGroq image description
+        # This will use BuildChatGroq to analyze each image and generate descriptions
+        # The code for implementing this feature will go here
+        # For each image in picture_paths and table_paths:
+        #   1. Load the image
+        #   2. Use ChatGroq to describe the image
+        #   3. Add description to image_summary
+        
+        # Step 9: Append the image summary to the grand_prompt
+        updated_prompt = f"{grand_prompt}{image_summary}"
+        
+        print(f"Enhanced prompt created with image information from {inputfile.filename}")
+        print(f"Images and tables saved to {output_dir}")
+        
+        return updated_prompt
+    
+    except Exception as e:
+        print(f"Error processing image file: {str(e)}")
         # Return the original prompt if there was an error
         return grand_prompt
 
