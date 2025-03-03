@@ -4,6 +4,9 @@ mgmt_template_db
 .env
 What_to_finish_on_9th_nov
 
+projects/
+projects/**
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -161,7 +164,6 @@ sagan_multimodal/ingest_data/extracted_images/*
 
 
 # Ignore binary files
-*.bin
 
 # Ignore Python bytecode and compiled files
 *.pyc
