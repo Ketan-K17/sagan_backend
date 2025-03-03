@@ -432,20 +432,12 @@ def formatter(state: State):
     Additional Context:
     {context}
     
-    Instructions:
-    1. Keep all existing subsections intact
-    2. Only modify the specific parts relevant to the user's request
-    3. Maintain the same formatting and structure as the original
-    4. Return the COMPLETE section with your modifications
-    5. Your response should be in JSON format with the following structure:
-    {{
-        "modified_section_text": "entire section text with modifications",
-        "ai_message": "brief description of changes made"
-    }}
     """
 
     combined_prompt = FORMATTER_PROMPT + "\n" + formatter_user_prompt
     raw_response = agent.provide_final_answer(combined_prompt, images=None)
+
+    # print("HERE'S THE COMBINED PROMPT:\n",combined_prompt)
 
     # Debug logging
     print("\nRaw response from agent:")
@@ -454,29 +446,35 @@ def formatter(state: State):
     print("-" * 50)
 
     try:
-        # First check if the response contains the '</think>' marker
-        # Extract everything after the '</think>' marker
-        json_str = raw_response.split('</think>')[1].strip()
-        print("Extracted JSON using '</think>' marker:")
-        try:
-            print("this is the json str:\n", json_str)
-            response_data = json.loads(json_str)
-        except json.JSONDecodeError:
-            print("Failed to parse JSON after '</think>' marker, falling back to brace detection")
-            # If parsing fails, fall back to brace detection
-            if '{' in json_str:
-                json_start = json_str.find('{')
-                json_end = json_str.rfind('}') + 1
-                json_str = json_str[json_start:json_end]
-                response_data = json.loads(json_str)
+        # Look for the <answer> and </answer> tags to extract the JSON
+        if '<answer>' in raw_response and '</answer>' in raw_response:
+            # Extract content between <answer> and </answer> tags
+            answer_content = raw_response.split('<answer>')[1].split('</answer>')[0].strip()
+            print("Extracted content from <answer> tags:")
+            print(answer_content)
             
-    except json.JSONDecodeError as e:
-        print(f"Error parsing JSON response: {e}")
+            # Find JSON object within the answer content (looking for curly braces)
+            if '{' in answer_content and '}' in answer_content:
+                json_start = answer_content.find('{')
+                json_end = answer_content.rfind('}') + 1
+                json_str = answer_content[json_start:json_end]
+                print("Extracted JSON object:")
+                print(json_str)
+                response_data = json.loads(json_str)
+            else:
+                # If no JSON object found in answer content, raise an error
+                raise ValueError("No JSON object found within <answer> tags")
+        else:
+            # If no answer tags found, raise an error
+            raise ValueError("No <answer> tags found in the response")
+            
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"Error parsing response: {e}")
         print("Raw response:", raw_response)
-        # Create a more informative fallback response
+        # Create an error response
         response_data = {
             'modified_section_text': state.get('section_text', ''),
-            'ai_message': f'Error: Could not process the text modification.'
+            'ai_message': f'Error: Could not process the text modification. {str(e)}'
         }
     
     # Extract the fields with fallback values
