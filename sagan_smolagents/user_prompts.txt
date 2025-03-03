@@ -21,3 +21,5 @@ You are giving some file which have the process / methodology for a similar tool
 
 
 Rewrite the content in a more academic style with citations and also emphasize more on the research questions being addressed in the project.
+
+poetry run python ingest_data.py '/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates/core' '/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates/core/template_db' 512 128
