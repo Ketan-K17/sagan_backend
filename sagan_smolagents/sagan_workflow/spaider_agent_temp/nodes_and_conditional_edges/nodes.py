@@ -54,9 +54,9 @@ config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
 
 # getting project_id from cookie.json   
-with open(project_root / "cookie.json", "r") as f:
-    cookie_data = json.load(f)
-    project_id = cookie_data.get("project_id")
+# with open(project_root / "cookie.json", "r") as f:
+#     cookie_data = json.load(f)
+#     project_id = cookie_data.get("project_id")
 
 load_dotenv(dotenv_path=config.ENV_PATH)
 init()
@@ -190,7 +190,10 @@ def abstract_answers_generator(state: State) -> State:
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
 
-    updated_paths = config.update_project_paths(project_id)
+    current_project_id = config.get_current_project_id()
+
+
+    updated_paths = config.update_project_paths(current_project_id)
     
     abstract_questions = state["abstract_questions"]
     sys_prompt = ABSTRACT_ANSWERS_GENERATOR_PROMPT
@@ -266,7 +269,10 @@ def section_topic_extractor(state: State) -> State:
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
 
-    updated_paths = config.update_project_paths(project_id)
+    current_project_id = config.get_current_project_id()
+
+
+    updated_paths = config.update_project_paths(current_project_id)
     
     empty_prompt = """"""
     agent = ToolCallingAgent(
@@ -415,7 +421,10 @@ def section_wise_answers_generator(state: State) -> State:
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
 
-    updated_paths = config.update_project_paths(project_id)
+    current_project_id = config.get_current_project_id()
+
+
+    updated_paths = config.update_project_paths(current_project_id)
     
     section_questions = state.get("section_questions")
     if not section_questions:
@@ -623,7 +632,10 @@ def formatting_node(state: State) -> State:
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
     
-    updated_paths = config.update_project_paths(project_id)
+    current_project_id = config.get_current_project_id()
+
+
+    updated_paths = config.update_project_paths(current_project_id)
     
     base_output_path = updated_paths['workflow1_output']
     output_docx_path = base_output_path / "output.docx"

@@ -38,9 +38,9 @@ config = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(config)
 
 # getting project_id from cookie.json
-with open(project_root / "cookie.json", "r") as f:
-    cookie_data = json.load(f)
-    project_id = cookie_data.get("project_id")
+# with open(project_root / "cookie.json", "r") as f:
+#     cookie_data = json.load(f)
+#     project_id = cookie_data.get("project_id")
 
 load_dotenv()
 init()
@@ -370,8 +370,10 @@ def research_query_answerer(state: State) -> State:
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
 
-    updated_paths = config.update_project_paths(project_id)
-    
+    current_project_id = config.get_current_project_id()
+
+
+    updated_paths = config.update_project_paths(current_project_id)    
     print(f"{Fore.BLUE}################ RESEARCH QUERY ANSWERER BEGIN #################")
 
     if not state.get("research_needed"):
@@ -402,6 +404,11 @@ def formatter(state: State):
     spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
+
+    current_project_id = config.get_current_project_id()
+
+
+    updated_paths = config.update_project_paths(current_project_id)
     
     print(f"{Fore.LIGHTGREEN_EX}################ FORMATTING NODE BEGIN #################")
     empty_prompt = """ """

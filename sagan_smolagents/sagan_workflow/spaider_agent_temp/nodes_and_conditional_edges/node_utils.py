@@ -29,9 +29,7 @@ spec.loader.exec_module(config)
 # getting project_id from cookie.json
 with open(project_root / "cookie.json", "r") as f:
     cookie_data = json.load(f)
-    project_id = cookie_data.get("project_id")
-
-
+    current_project_id = cookie_data.get("project_id")
 # print the state in the node_test scripts in a readable format.
 def print_state(state):
     """Print the state in a human-readable format."""
@@ -97,13 +95,14 @@ def save_state_for_testing(state: State, node_name: str):
     CURRENT_FILE = Path(__file__).resolve()
     SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
     CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
+
     # Load config.py dynamically
     spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
 
-    updated_paths = config.update_project_paths(project_id)
+    current_project_id = config.get_current_project_id()
+    updated_paths = config.update_project_paths(current_project_id)
     
     # Use the path from config
     output_dir = updated_paths['nodewise_output']
