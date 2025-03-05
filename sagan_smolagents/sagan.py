@@ -190,7 +190,8 @@ class LoadProjectRequest(BaseModel):
 async def create_project(
     project_name: str = Form(...),  
     data_files: List[UploadFile] = File(default=[]),  # Changed to default=[] instead of just []
-    template_file: Optional[UploadFile] = File(default=None)  # Make sure to use default=None
+    template_file: Optional[UploadFile] = File(default=None) , # Make sure to use default=None
+    selected_template:str = Form(...)
 ):
     try:
         print(f"\nStarting project creation for: {project_name}")
@@ -239,17 +240,17 @@ async def create_project(
         # If not, this means user has selected one of default templates.
         else:
             # Default template selection (will be determined by frontend later)
-            selected_template = 'afr'  # Can be 'afr' or 'core'
+            selected_temp = selected_template  # Can be 'afr' or 'core'
             
-            print(f"\nUsing default template: {selected_template}")
+            print(f"\nUsing default template: {selected_temp}")
             
             # Paths for the template source
             # templates_base_path = Path("/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates")
             templates_base_path = config.READY_MADE_TEMPLATES_PATH
-            template_source_path = templates_base_path / selected_template
+            template_source_path = templates_base_path / selected_temp
             template_db_source = template_source_path / "template_db"
-            template_file_source = template_source_path / f"{selected_template}_stripped.docx"
-            unedited_template_file_source = template_source_path / f"{selected_template}.docx"
+            template_file_source = template_source_path / f"{selected_temp}_stripped.docx"
+            unedited_template_file_source = template_source_path / f"{selected_temp}.docx"
             
             
             # Paths for the destination in the project
@@ -258,7 +259,7 @@ async def create_project(
             template_db_dest = project_base / "vectordb" / "template_db"
             workflow_output_dest = project_base / "workflow1_output"
             template_file_dest = workflow_output_dest / f"output.docx"
-            unedited_template_file_dest = project_base / "template" / f"{selected_template}.docx"
+            unedited_template_file_dest = project_base / "template" / f"{selected_temp}.docx"
             
             # Ensure destination directories exist
             template_db_dest.parent.mkdir(parents=True, exist_ok=True)
