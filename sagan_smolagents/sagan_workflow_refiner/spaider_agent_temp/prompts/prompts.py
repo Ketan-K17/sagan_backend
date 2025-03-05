@@ -17,7 +17,7 @@ Output Format:
 >>> Examples:
 1. User Prompt: "Research the latest advancements in space propulsion technology and include information about it in the section."
    - Output: 
-     {{
+     {
        "research_queries": [
          "What are the recent breakthroughs in space propulsion technology?",
          "List the latest technologies being developed for space propulsion.",
@@ -25,13 +25,13 @@ Output Format:
          "What are the potential benefits of the latest space propulsion technologies?",
          "Who are the leading researchers or organizations in space propulsion advancements?"
        ]
-     }}
+     }
 
 2. User Prompt: "Try to paraphrase the section text such that it is atleast 800 words long."
    - Output: 
-     {{
+     {
        "research_queries": []
-     }}
+     }
 
 Here is the section title, section text and user prompt for your reference:
 """
@@ -50,7 +50,7 @@ Output Format:
 - Your output must be a valid JSON object with 'context' as the key and a list of results corresponding to each query.
 
 Example Output:
-{{
+{
   "context": [
     "Recent breakthroughs include the development of nuclear thermal propulsion systems and advanced ion engines that achieve 30%\ higher thrust efficiency than previous models.",
     "Current space propulsion technologies in development include solar sails, plasma propulsion, fusion drives, and electromagnetic tethers for orbital maneuvering.",
@@ -58,7 +58,7 @@ Example Output:
     "Latest propulsion technologies enable faster interplanetary travel, reduced mission costs, extended spacecraft lifespans, and the ability to carry heavier payloads to deep space.",
     "Leading organizations include NASA's Glenn Research Center, SpaceX's Raptor team, Blue Origin's Advanced Concepts division, and the European Space Agency's Electric Propulsion Laboratory."
   ]
-}}
+}
 
 Here is the list of research queries for your reference:
 
@@ -70,6 +70,9 @@ You are the Formatter agent, a specialized text editing assistant designed to mo
 Here's what you'll do:
 Use the user prompt's instructions and the given context to modify the section text. MAKE SURE TO NOT INVENT YOUR OWN DETAILS.
 
+Your Output should contain 2 sections: 
+1. A 'think' section where you write all your thoughts and reasoning
+2. Answer section which contains the modified text and the message by the ai, describing the changes made to the text 
 
 OUTPUT FORMAT: Your answer must look like this: 
 <think>
@@ -84,7 +87,8 @@ OUTPUT FORMAT: Your answer must look like this:
 
 GUIDELINES ABOUT JSON OBJECT CREATION: 
 1. The JSON object must be without any decorative markers such as ''' and '''json
-2. Make sure to escape all special characters, and newlines and properly format the JSON object
+2. Make sure to escape all special characters, and newlines and properly format the JSON object.
+3. Make sure that the <answer> and <think> tags are present in your output. 
 
 EXAMPLE OUTPUT:
 <think>
@@ -92,13 +96,11 @@ EXAMPLE OUTPUT:
 </think>
 
 <answer>
-{{
+{
   "modified_section_text": "...",
   "ai_message": "The section text has been modified based on the user's request to include more information about the University of Luxembourg."
-}}
+}
 </answer>
-
-MAKE SURE THAT ALL SPECIAL CHARACTERS, AND NEWLINES AND PROPERLY ESCAPED.
 
 Following is the original section text, the user's prompt for modification and the context for your reference. Follow it carefully, keeping the given guidelines in mind:
 """
