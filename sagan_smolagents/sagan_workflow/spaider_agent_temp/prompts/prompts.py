@@ -210,6 +210,11 @@ Your job is to write the section you are given.
 Writing Guidelines:
 1. Maintain a technical tone, and use proper technical language.
 2. ENSURE that your content is left unformatted, do not use Markdown, or anything else to format your text. You may use subheadings within your section, but do not use Markdown to format it.
+3. Don't add the section title, just write the content of the section.
+4. Don't use markdown formatting and avoid using '###' or '**' characters or other combinations of these characters.
+5. IEEE style citation formatting wherever necessary.
+6. Add two newlines between paragraphs and at the end of the content.
+7. The fontsize for subheadings should be bigger than the content text for proper distinction. 
 
 Here is the Project Information :
 """

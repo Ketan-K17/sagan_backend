@@ -255,7 +255,21 @@ def get_generated_sections() -> list:
         FileNotFoundError: If the state JSON file doesn't exist
         ValueError: If JSON data is malformed or missing required fields
     """
-    final_state_path = config.NODEWISE_OUTPUT_PATH / "formatting_node_state.json"
+    CURRENT_FILE = Path(__file__).resolve()
+    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent
+    CONFIG_PATH = SAGAN_ROOT / "config.py"
+    
+    # Load config.py dynamically
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+    
+    current_project_id = config.get_current_project_id()
+    updated_paths = config.update_project_paths(current_project_id)
+
+    nodewise_output_dir = updated_paths['nodewise_output']
+
+    final_state_path = nodewise_output_dir / "formatting_node_state.json"
     
     try:
        with open(final_state_path, 'r', encoding='utf-8') as f:
