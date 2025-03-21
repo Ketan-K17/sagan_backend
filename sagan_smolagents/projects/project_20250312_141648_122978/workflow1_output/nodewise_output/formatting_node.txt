@@ -1,4 +1,4 @@
-GENERATION OUTPUT:
+FORMATTING_NODE OUTPUT:
 ================================================================================
 
 STATE FIELDS:

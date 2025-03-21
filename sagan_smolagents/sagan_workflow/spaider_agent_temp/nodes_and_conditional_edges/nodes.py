@@ -125,7 +125,6 @@ def prompt_parser(state: State) -> State:
         print(f"Error in prompt_parser: {e}")
         raise
 
-
 def abstract_questions_generator(state: State) -> State:
     """
     Given the project title and description, this node creates a list of questions that may help it understand the project better. The answers to these questions will then be used to create a project abstract.
@@ -173,7 +172,6 @@ def abstract_questions_generator(state: State) -> State:
         state["messages"].append(SystemMessage(content=f"Error: {e}"))
         state["abstract_questions"] = None
         return state
-
 
 def abstract_answers_generator(state: State) -> State:
     """
@@ -253,7 +251,6 @@ def abstract_answers_generator(state: State) -> State:
         #state["abstract_text"] = None
         return state
 
-
 def section_topic_extractor(state: State) -> State:
     """
     This node extracts the topics for each section of the project from the template pdf given by the user.
@@ -323,6 +320,45 @@ def section_topic_extractor(state: State) -> State:
         state["section_topics"] = None
         return state
 
+def plan_node(state: State) -> State:
+    print(f"{Fore.LIGHTYELLOW_EX}################ PLAN NODE BEGIN #################")
+    
+    empty_prompt = """ """
+    agent = ToolCallingAgent(
+        model=model, 
+        tools=[], 
+        prompt_templates={"system_prompt": empty_prompt}
+    )
+    try:
+        # Construct prompt with project info
+        user_prompt = f"""
+        Project Title: {state["project_title"]}
+        Project Description: {state["project_description"]}
+        Abstract: {state["abstract_text"]}
+        List of Section Titles: {state["section_topics"]}
+        """
+        combined_prompt = PLAN_PROMPT + "\n" + user_prompt
+
+        # Get response from agent
+        response = agent.provide_final_answer(combined_prompt, images=None)
+        print(f"Here's the response: {response}")
+
+        # Clean up response and parse JSON, handling both raw JSON and markdown-wrapped JSON
+        json_str = response.strip()
+        if json_str.startswith('```'):
+            # Remove markdown code block decorators if present
+            json_str = json_str.replace('```json\n', '').replace('```', '').strip()
+        
+        plan_dict = json.loads(json_str)
+        
+        state["plan"] = plan_dict
+        save_state_for_testing(state, "plan")
+        return state
+            
+    except Exception as e:
+        print(f"Error in plan_node: {e}")
+        raise
+
 def section_wise_question_generator(state: State) -> State:
     """
     Given the list of sections, this node creates a list of questions for each section.
@@ -330,7 +366,7 @@ def section_wise_question_generator(state: State) -> State:
     print(f"{Fore.MAGENTA}################ SECTION WISE QUESTION GENERATOR BEGIN #################")
     
     # Validate required state fields
-    required_fields = ["section_topics", "project_title", "project_description", "abstract_text"]
+    required_fields = ["plan", "project_title", "project_description", "abstract_text"]
     for field in required_fields:
         if field not in state or not state[field]:
             error_msg = f"Missing required field: {field}"
@@ -339,22 +375,16 @@ def section_wise_question_generator(state: State) -> State:
             state["section_questions"] = None
             return state
 
-    # Format the input data
-    formatted_topics = "\n".join(f"- {topic}" for topic in state["section_topics"])
+   
     combined_prompt = f"""{SECTION_WISE_QUESTION_GENERATOR_PROMPT}
-
-Project Information:
-- Title: {state["project_title"]}
-- Description: {state["project_description"]}
-- Abstract: {state["abstract_text"]}
-
-Sections to generate questions for:
-{formatted_topics}
-
-Please generate questions in valid JSON format."""
+        Project Information:
+        - Title: {state["project_title"]}
+        - Description: {state["project_description"]}
+        - Abstract: {state["abstract_text"]}
+        - Plan for entire research paper: {state["plan"]}
+    """
 
     empty_prompt = """  """
-    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
     agent = ToolCallingAgent(
         model=model, 
         tools=[], 
@@ -491,8 +521,6 @@ def section_wise_answers_generator(state: State) -> State:
                 file.write(f"Completed answers for section: {section}\n")
                 file.write(f"Number of answers: {len(section_answers[section])}\n")
 
-            # Update state with the collected answers
-            state["messages"].append(SystemMessage(content="Section-wise answers generated successfully"))
             state["section_answers"] = section_answers
 
             # Debug output
@@ -517,46 +545,7 @@ def section_wise_answers_generator(state: State) -> State:
         state["section_answers"] = None
         return state
 
-def plan_node(state: State) -> State:
-    print(f"{Fore.LIGHTYELLOW_EX}################ PLAN NODE BEGIN #################")
-    
-    empty_prompt = """ """
-    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
-    try:
-        # Construct prompt with project info
-        user_prompt = f"""
-        Project Title: {state["project_title"]}
-        Project Description: {state["project_description"]}
-        Abstract: {state["abstract_text"]}
-        Section Topics = {state["section_topics"]}
-        Section Content: {state["section_answers"]}
-        """
-        combined_prompt = PLAN_PROMPT + "\n" + user_prompt
 
-        # Get response from agent
-        response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"Here's the response: {response}")
-
-        # Clean up response and parse JSON, handling both raw JSON and markdown-wrapped JSON
-        json_str = response.strip()
-        if json_str.startswith('```'):
-            # Remove markdown code block decorators if present
-            json_str = json_str.replace('```json\n', '').replace('```', '').strip()
-        
-        plan_dict = json.loads(json_str)
-        
-        state["plan"] = plan_dict
-        save_state_for_testing(state, "plan")
-        return state
-            
-    except Exception as e:
-        print(f"Error in plan_node: {e}")
-        raise
 
 def generation_node(state: State) -> State:
     print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE BEGIN #################")

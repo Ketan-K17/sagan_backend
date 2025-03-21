@@ -89,7 +89,7 @@ PLAN_PROMPT = """You are a research expert tasked with creating a detailed struc
 You will be given - 
 1. Project Title
 2. Project Description
-3. Research PaperAbstract
+3. Research Paper Abstract
 4. List of section titles that is to appear in the research paper.
 
 Your task is to generate a detailed plan for the entire research paper, that discusses the topics that must be tackled in each section, and the approach to be taken for the same.
@@ -123,7 +123,7 @@ Example Output:
 
 For each section, provide 3-5 detailed steps that directly relate to the project's specific content and goals.
 
-Here is the Project Information for your reference:
+Here is the Project Information for your reference, start with your task.
 """
 
 SECTION_WISE_QUESTION_GENERATOR_PROMPT = """
