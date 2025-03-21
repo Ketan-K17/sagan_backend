@@ -84,14 +84,57 @@ Example:
 Here is the corpus of text:
 """
 
+PLAN_PROMPT = """You are a research expert tasked with creating a detailed structural plan for a research proposal.
+
+You will be given - 
+1. Project Title
+2. Project Description
+3. Research PaperAbstract
+4. List of section titles that is to appear in the research paper.
+
+Your task is to generate a detailed plan for the entire research paper, that discusses the topics that must be tackled in each section, and the approach to be taken for the same.
+
+Your output MUST be in JSON format, with section names as keys and lists of steps as values. Make sure there is no additional text or other formatting like ''' and '''json accompanying the JSON object.
+
+Sample output format:
+{
+    "Section Title": ["Specific Step 1", "Specific Step 2", "Specific Step 3"],
+    ...
+}
+
+Example Output:
+{
+    "Background and Motivation": [
+        "Analyze current challenges in the field",
+        "Identify specific gaps this research addresses",
+        "Demonstrate the potential impact of proposed solution"
+    ],
+    "Research Objectives": [
+        "Define primary research question",
+        "List specific technical objectives",
+        "Outline expected contributions to the field"
+    ],
+    "Methodology": [
+        "Detail proposed technical approach",
+        "Specify methods for data collection and analysis",
+        "Describe validation strategies"
+    ]
+}
+
+For each section, provide 3-5 detailed steps that directly relate to the project's specific content and goals.
+
+Here is the Project Information for your reference:
+"""
+
 SECTION_WISE_QUESTION_GENERATOR_PROMPT = """
-You will be presented with a list of sections/topics. Your job is to generate a comprehensive list of questions for each section that will help gather detailed information for writing that section.
+You will be presented with the plan for a research paper, which is a list of sections with steps to be taken in each section. 
+
+Your job is to generate a comprehensive list of questions for each section that are in line with the plan. Ask questions, whose answers will help fulfill the objectives of the section, according to the plan.
 
 Guidelines to ask questions:
 1. Please ensure that your questions are open-ended and encourage detailed responses.
 2. Focus on aspects specific to each section's topic and scope.
-3. Include both high-level conceptual questions and specific technical details.
-4. Generate at least 5 questions per section.
+4. Generate at least 2 questions per step of the plan.
 
 Your output MUST be in JSON format, with section names as keys and lists of questions as values. Make sure there is NO additional text or other formatting like ''' and '''json accompanying the JSON object.
 
@@ -116,9 +159,7 @@ Section Topics: ["Introduction", "Methodology"]
     ]
 }
 
-You MUST provide at least 5 questions per section. The upper limit is 10 questions per section.
-
-Here are the sections to generate questions for, and the project title, description, and abstract for your reference:
+Here is the Project Title, Project Description, project abstract and the plan for the research paper:
 """
 
 SECTION_WISE_ANSWERS_GENERATOR_PROMPT = """
@@ -148,50 +189,6 @@ Example Output Format:
 
 Ensure that each answer is structured as per the example above.
 """
-
-
-
-PLAN_PROMPT = """You are a research expert tasked with creating a detailed structural plan for a research proposal. Based on the provided project information, create specific, logical steps for each section.
-
-Your task is to generate a detailed plan where each section contains concrete, actionable steps that:
-- Progress logically from start to finish
-- Cover all essential aspects of the topic
-- Maintain appropriate depth and detail
-- Avoid generic content like "Introduction", "Main Content", "Conclusion"
-- Reflect the specific subject matter from the project information
-
-Return ONLY a JSON object in this exact format:
-{
-    "Section Title": ["Specific Step 1", "Specific Step 2", "Specific Step 3"],
-    ...
-}
-
-NOTE: ENSURE that the llm response is only the JSON object, and no other decorative text like ```json or ```.
-
-Example Output:
-{
-    "Background and Motivation": [
-        "Analyze current challenges in the field",
-        "Identify specific gaps this research addresses",
-        "Demonstrate the potential impact of proposed solution"
-    ],
-    "Research Objectives": [
-        "Define primary research question",
-        "List specific technical objectives",
-        "Outline expected contributions to the field"
-    ],
-    "Methodology": [
-        "Detail proposed technical approach",
-        "Specify methods for data collection and analysis",
-        "Describe validation strategies"
-    ]
-}
-
-For each section, provide 3-5 detailed steps that directly relate to the project's specific content and goals.
-
-Here is the Project Information for your reference:
-"""
-
 
 WRITER_PROMPT = """You are an expert research document writer tasked with generating a self-contained section of a technical document. 
 
