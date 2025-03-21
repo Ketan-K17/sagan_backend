@@ -23,3 +23,8 @@ You are giving some file which have the process / methodology for a similar tool
 Rewrite the content in a more academic style with citations and also emphasize more on the research questions being addressed in the project.
 
 poetry run python ingest_data.py '/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates/core' '/Users/ketankunkalikar/Desktop/SS/sagan_smolagents/sagan_smolagents/ingest_data/ready_made_templates/core/template_db' 512 128
+
+
+Problem Statement
+Space programs, such as NASA’s Artemis and other international initiatives, are critical drivers of technological progress, economic development, and national security. Despite their importance, these programs are often designed using fragmented, mission-centric approaches that lack systematic integration. Traditional methods rely on paper-based documentation and static roadmaps, which fail to capture the dynamic interplay of strategic objectives, mission sequencing, technology readiness, and stakeholder roles. Currently, there are no comprehensive tools that enable a holistic, model-based design process to support adaptive and collaborative decision-making. This gap undermines the efficient allocation of resources and limits the ability of decision-makers to respond effectively to evolving political, economic, and technological challenges.
+Luxembourg’s rapidly growing space ecosystem, with over 60 startups and international players, lacks a systematic high-level design. No comprehensive space program architecture exists that details mission sequencing, available technologies, and stakeholder roles. This gap hinders strategic alignment and efficient resource allocation within the ecosystem.

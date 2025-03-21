@@ -1,0 +1,30 @@
+{
+    "project_id": "project_20250312_160549_313411",
+    "name": "test_09",
+    "created_at": "20250312_160549_313411",
+    "last_modified": "20250312_160626_619390",
+    "paths": {
+        "root": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411",
+        "data": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\data",
+        "vectordb": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\vectordb",
+        "template": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\template",
+        "workflow1_output": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\workflow1_output",
+        "workflow2_output": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\workflow2_output",
+        "state": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\state.json",
+        "nodewise_output": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\workflow1_output\\nodewise_output",
+        "retrieved_images": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\workflow1_output\\retrieved_images",
+        "output_docx": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\workflow1_output\\output.docx"
+    },
+    "workflows_completed": [],
+    "vectordb": {
+        "data": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\vectordb\\data_db",
+        "files": [
+            "## EXAMINE_Langley_Framework_for_the_Parametric_System_Modeling_of_Sp.pdf",
+            "European_Architecture_for_Lunar_Exploration.pdf",
+            "FinalEconomicAssessmentandSystemsAnalysisofanEvolvableLunarArchitectureELA.pdf",
+            "MissionPlanning_Sequencing.pdf"
+        ],
+        "template": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\vectordb\\template_db",
+        "template_file": "C:\\UniLu\\Spaider\\sagan\\sagan_smolagents\\sagan_smolagents\\projects\\project_20250312_160549_313411\\workflow1_output\\output.docx"
+    }
+}
