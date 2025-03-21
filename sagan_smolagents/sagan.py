@@ -327,12 +327,17 @@ async def load_project(
             if state["name"].lower() == project_name.lower():
                 project_id = pid
                 project_state = state
+                local_project_name = state["name"].lower()
                 break
         
         if project_id is None:
             raise HTTPException(status_code=404, detail="Project not found")
         
         # Update config paths
+        print("-" * 30)
+        print("Incumbent project name: ", local_project_name)
+        print("Incumbent project id: ", project_id)
+        print("-" * 30)
         config.update_project_paths(project_id)
         config.print_project_paths()
 
