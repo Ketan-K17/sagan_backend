@@ -418,6 +418,8 @@ async def upload_files(files: list[UploadFile] = File(...), folder: str = Form(.
 @app.post("/process-input-first-workflow")
 async def process_input(user_input: UserInput):
     try:   
+        print(graph.get_graph().draw_mermaid())
+
         print(f"Processing input: {user_input.message}")
         
         outputs = list(graph.stream(

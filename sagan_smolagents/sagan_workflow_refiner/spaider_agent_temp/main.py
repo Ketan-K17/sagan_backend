@@ -544,6 +544,8 @@ async def process_input(
         # Step 6: Process through graph and capture the final state
         state = None
         try:
+            print(graph.get_graph().draw_mermaid())
+
             async for output in graph.astream(
                 initial_input,
                 stream_mode="values",
