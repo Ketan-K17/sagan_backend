@@ -1,24 +1,24 @@
+import os
 import json
 import logging
-from typing import List
-from langchain_core.messages import SystemMessage, HumanMessage
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
 from colorama import init, Fore, Style
 import base64
+from pathlib import Path
+import importlib.util
+from types import ModuleType
+
+# llm/langchain/agent related imports
+from langchain_core.messages import SystemMessage
+from smolagents import ToolCallingAgent, HfApiModel
 
 # Python-docx imports.
 from docx import Document
-from docx.oxml import OxmlElement
-from docx.shared import Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-
-
 
 '''LOCAL IMPORTS'''
 from schemas import State
 from prompts.prompts import PROMPT_PARSER_PROMPT, ABSTRACT_QUESTIONS_GENERATOR_PROMPT, ABSTRACT_ANSWERS_GENERATOR_PROMPT, SECTION_TOPIC_EXTRACTOR_PROMPT, SECTION_WISE_QUESTION_GENERATOR_PROMPT, SECTION_WISE_ANSWERS_GENERATOR_PROMPT, PLAN_PROMPT, WRITER_PROMPT
-from models.chatgroq import BuildChatGroq, BuildChatOpenAI
 from .node_utils import save_state_for_testing, copy_figures
 
 '''IMPORT ALL TOOLS HERE AND CREATE LIST OF TOOLS TO BE PASSED TO THE AGENT.'''
@@ -26,80 +26,54 @@ from tools.script_executor import run_script
 from tools.file_tree import get_file_tree
 from tools.query_chromadb import query_chromadb
 from tools.multimodal_query import NomicVisionQuerier
-#from utils.latextopdf import latex_to_pdf
-
-import logging
-from langchain_core.messages import SystemMessage, HumanMessage
-from colorama import Fore, Style
-#from utils.latextopdf import latex_to_pdf
-
-import logging
-from typing import Dict, Any
-from colorama import Fore, Style
-from langchain_core.messages import SystemMessage, HumanMessage
-import os
 from schemas import State
 
-from pathlib import Path
-import importlib.util
+# helper function to load the config.py file dynamically
+def load_config_file() -> ModuleType:
+    # Dynamically resolve the path to config.py
+    CURRENT_FILE = Path(__file__).resolve()
+    project_root = CURRENT_FILE.parent.parent.parent.parent
+    CONFIG_PATH = project_root / "config.py"
+    # Load config.py dynamically
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+    return config
 
-# Dynamically resolve the path to config.py
-CURRENT_FILE = Path(__file__).resolve()
-project_root = CURRENT_FILE.parent.parent.parent.parent
-CONFIG_PATH = project_root / "config.py"
+# helper function to clean the JSON response from the LLM to ensure it's valid.
+def clean_json_response(response: str) -> str:
+    """
+    Cleans the JSON response from the LLM to ensure it's valid.
+    """
+    json_str = response.strip()
+    if json_str.startswith('```'):
+        json_str = json_str.replace('```json\n', '').replace('```', '').strip()
+    return json_str
 
-# Load config.py dynamically
-spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-config = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(config)
-
-# getting project_id from cookie.json   
-# with open(project_root / "cookie.json", "r") as f:
-#     cookie_data = json.load(f)
-#     project_id = cookie_data.get("project_id")
-
-load_dotenv(dotenv_path=config.ENV_PATH)
+configfile = load_config_file()
+load_dotenv(dotenv_path=configfile.ENV_PATH)
 init()
 
-logger = logging.getLogger(__name__)
-
-# Define tools for terminal and research nodes
-terminal_tools = [run_script, get_file_tree]
-research_tools = [query_chromadb]
-
 '''LLM TO USE'''
-from smolagents import ToolCallingAgent, HfApiModel
-# select model
 # model_id = "meta-llama/Llama-3.3-70B-Instruct"
 model_id = "Qwen/Qwen2.5-72B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-# model_id = "NousResearch/Hermes-3-Llama-3.1-8B"
-model = HfApiModel(model_id=model_id)   
+model = HfApiModel(model_id=model_id)
 
-# MODEL = "gpt-4o"
-# llm = BuildChatOpenAI(model=MODEL, temperature=0)
+empty_prompt = """ """
+
+agent = ToolCallingAgent(
+    model=model, 
+    tools=[], 
+    prompt_templates={"system_prompt": empty_prompt}
+)
 
 def prompt_parser(state: State) -> State:
     """
     Given a user prompt, this node parses the prompt to extract the project title and description based on the project title.
     """
     print(f"{Fore.YELLOW}################ PROMPT PARSER BEGIN #################")
-    # NOTE: the custom_agent_prompt will likely not be used for any of the agents, and will be set to an empty string, with the bare minimum of placeholder text. This will be the case for all nodes, unless the node has access to actual tools.
-    empty_prompt = """ """
-
-    # create the agent; this is equivalent of the llm object we previously used.
-    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
-
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
-
-    # logging the system prompt to ensure it's empty. text will be yellow.
-    print(f"HERE'S THE SYSTEM PROMPT: {agent.system_prompt}")
     user_prompt = state["user_prompt"]
-    print(user_prompt,"user prompt")
     
     try:
         combined_user_prompt = PROMPT_PARSER_PROMPT + "\n" + user_prompt
@@ -109,13 +83,10 @@ def prompt_parser(state: State) -> State:
         print(f"HERE'S THE PROMPT PARSER RESPONSE: {response}")
         response_json = json.loads(response)
         
-        print(f"HERE'S THE RESPONSE: {response}")
-        
         # updating state before end-of-node logging
         state["project_title"] = response_json["project_title"]
         state["project_description"] = response_json["project_description"]
 
-        # saving state in human readable format and machine readable format under outputpdf/nodewise_output
         save_state_for_testing(state, "prompt_parser")
 
         print(f"################ PROMPT PARSER END #################{Style.RESET_ALL}")
@@ -123,6 +94,7 @@ def prompt_parser(state: State) -> State:
 
     except Exception as e:
         print(f"Error in prompt_parser: {e}")
+        print(f"################ PROMPT PARSER END #################{Style.RESET_ALL}")
         raise
 
 def abstract_questions_generator(state: State) -> State:
@@ -132,35 +104,20 @@ def abstract_questions_generator(state: State) -> State:
     print(f"{Fore.RED}################ ABSTRACT QUESTIONS GENERATOR BEGIN #################")
     project_title = state.get("project_title", "")
     project_description = state.get("project_description", "")
-    
-    empty_prompt = """   """
-    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
 
-
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
     user_prompt = f"""
     Project Title: {project_title}
     Project Description: {project_description}
     """
     combined_prompt = ABSTRACT_QUESTIONS_GENERATOR_PROMPT + user_prompt
-    print(f"HERE'S THE COMBINED PROMPT: {combined_prompt}")
 
     try:
         response = agent.provide_final_answer(combined_prompt, images=None)
-        
-        # if not response or not hasattr(response, 'content'):
-        #     raise ValueError("Invalid response from LLM.")
-
         response_json = json.loads(response)
         
         # Update state before end-of-node logging
         state["abstract_questions"] = response_json["abstract_questions"]
 
-        # saving state in human readable format and machine readable format under outputpdf/nodewise_output
         save_state_for_testing(state, "abstract_questions_generator")
 
         print(f"################ ABSTRACT QUESTIONS GENERATOR END #################{Style.RESET_ALL}")
@@ -169,9 +126,7 @@ def abstract_questions_generator(state: State) -> State:
     except Exception as e:
         print(f"Error in abstract_questions_generator: {e}")
         print(f"################ ABSTRACT QUESTIONS GENERATOR END #################{Style.RESET_ALL}")
-        state["messages"].append(SystemMessage(content=f"Error: {e}"))
-        state["abstract_questions"] = None
-        return state
+        raise
 
 def abstract_answers_generator(state: State) -> State:
     """
@@ -179,32 +134,13 @@ def abstract_answers_generator(state: State) -> State:
     """
     print(f"{Fore.BLUE}################ ABSTRACT ANSWERS GENERATOR BEGIN #################")
     
-    # Dynamically load config
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-
-    current_project_id = config.get_current_project_id()
-
-
-    updated_paths = config.update_project_paths(current_project_id)
+    configfile = load_config_file()
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)
     
     abstract_questions = state["abstract_questions"]
-    sys_prompt = ABSTRACT_ANSWERS_GENERATOR_PROMPT
-    empty_prompt = """  """
 
     try:
-        # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
-
-        agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
         # Use the research tools to actually query the database
         qa_pairs = {}
         for question in abstract_questions:
@@ -217,10 +153,8 @@ def abstract_answers_generator(state: State) -> State:
             answer = agent.provide_final_answer(f"Frame the following texts into one cohesive answer: {result}. The question was: {question}", images=None)
             answer_text = answer.to_string() if hasattr(answer, 'to_string') else str(answer)
             qa_pairs[question] = answer_text
-            print(f"Question: {question}\nAnswer: {answer_text}\n\n\n\n")
 
         # Now use the LLM to generate an abstract based on the retrieved answers
-        state["abstract_qa_pairs"] = qa_pairs
         user_prompt = f"""
         Project Title: {state["project_title"]}
         Project Description: {state["project_description"]}
@@ -228,16 +162,15 @@ def abstract_answers_generator(state: State) -> State:
         Here's the list of question-answer pairs:
         {qa_pairs}
         """
-        combined_prompt = sys_prompt + "\n" + user_prompt
-        print(f"HERE'S THE COMBINED PROMPT: {combined_prompt}")
+        combined_prompt = str(ABSTRACT_ANSWERS_GENERATOR_PROMPT) + "\n" + str(user_prompt)
         response = agent.provide_final_answer(combined_prompt, images=None)
         response_json = json.loads(response)
         abstract_text = response_json["abstract_text"]
-        print(f"Abstract Text: {abstract_text}")
+
         # Updating state before end-of-node logging
         state["abstract_text"] = abstract_text
+        state["abstract_qa_pairs"] = qa_pairs
 
-        # saving state in human readable format and machine readable format under outputpdf/nodewise_output
         save_state_for_testing(state, "abstract_answers_generator")
 
         print(f"################ ABSTRACT ANSWERS GENERATOR END #################{Style.RESET_ALL}")
@@ -247,9 +180,7 @@ def abstract_answers_generator(state: State) -> State:
     except Exception as e:
         print(f"Error occurred: {e}")
         print(f"################ ABSTRACT ANSWERS GENERATOR END #################{Style.RESET_ALL}")
-        #state["messages"] = [str(e)]
-        #state["abstract_text"] = None
-        return state
+        raise
 
 def section_topic_extractor(state: State) -> State:
     """
@@ -257,78 +188,43 @@ def section_topic_extractor(state: State) -> State:
     """
     print(f"{Fore.CYAN}################ SECTION TOPIC EXTRACTOR BEGIN #################")
     
-    # Dynamically load config
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-
-    current_project_id = config.get_current_project_id()
-
-
-    updated_paths = config.update_project_paths(current_project_id)
-    
-    empty_prompt = """"""
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
+    configfile = load_config_file()
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)
 
     try:
-        # using the chromadb tool on the response template doc to fetch corpus of text
-        print(f"HERE'S THE VECTOR DB PATH: {updated_paths['vector_db_paths']['template_db']}")
-        print(f"HERE'S THE SENTENCE TRANSFORMER: {updated_paths['model_settings']['SENTENCE_TRANSFORMER']}")
         result = query_chromadb(
             str(updated_paths['vector_db_paths']['template_db']),  # Use path from config
             updated_paths['model_settings']['SENTENCE_TRANSFORMER'],  # Use model setting from config
-            "What are the sections/topics present in this template document?"
+            "Document section titles or topics or headings."
         )
-        state["section_topics_corpus"] = result
         # Format the result list into a single string
         formatted_result = "\n".join(result) if isinstance(result, list) else str(result)
         # Combine the prompt and formatted result
         combined_prompt = f"{SECTION_TOPIC_EXTRACTOR_PROMPT}\n\nContext:\n{formatted_result}"
 
-        print(f"HERE'S THE COMBINED PROMPT: {combined_prompt}")
         
         response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"HERE'S THE SECTION TOPIC EXTRACTOR RESPONSE: {response}")
         response_json = json.loads(response)
         section_topics_list = response_json["section_topics"]
 
-        #if not response or not hasattr(response, 'content'):
-        #    raise ValueError("Invalid response from LLM.")
-
         # Updating state before end-of-node logging
+        state["section_topics_corpus"] = result
         state["section_topics"] = section_topics_list
 
-        # saving state in human readable format and machine readable format under outputpdf/nodewise_output
         save_state_for_testing(state, "section_topic_extractor")
 
         print(f"################ SECTION TOPIC EXTRACTOR END #################{Style.RESET_ALL}")
-
-
         return state
 
     except Exception as e:
         print(f"Error occurred: {e}")
         print(f"################ SECTION TOPIC EXTRACTOR END #################{Style.RESET_ALL}")
-        state["section_topics"] = None
-        return state
+        raise
 
 def plan_node(state: State) -> State:
     print(f"{Fore.LIGHTYELLOW_EX}################ PLAN NODE BEGIN #################")
     
-    empty_prompt = """ """
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
     try:
         # Construct prompt with project info
         user_prompt = f"""
@@ -342,12 +238,7 @@ def plan_node(state: State) -> State:
         # Get response from agent
         response = agent.provide_final_answer(combined_prompt, images=None)
         print(f"Here's the response: {response}")
-
-        # Clean up response and parse JSON, handling both raw JSON and markdown-wrapped JSON
-        json_str = response.strip()
-        if json_str.startswith('```'):
-            # Remove markdown code block decorators if present
-            json_str = json_str.replace('```json\n', '').replace('```', '').strip()
+        json_str = clean_json_response(response)
         
         plan_dict = json.loads(json_str)
         
@@ -364,18 +255,7 @@ def section_wise_question_generator(state: State) -> State:
     Given the list of sections, this node creates a list of questions for each section.
     """
     print(f"{Fore.MAGENTA}################ SECTION WISE QUESTION GENERATOR BEGIN #################")
-    
-    # Validate required state fields
-    required_fields = ["plan", "project_title", "project_description", "abstract_text"]
-    for field in required_fields:
-        if field not in state or not state[field]:
-            error_msg = f"Missing required field: {field}"
-            print(f"Error: {error_msg}")
-            state["messages"].append(SystemMessage(content=error_msg))
-            state["section_questions"] = None
-            return state
 
-   
     combined_prompt = f"""{SECTION_WISE_QUESTION_GENERATOR_PROMPT}
         Project Information:
         - Title: {state["project_title"]}
@@ -383,44 +263,31 @@ def section_wise_question_generator(state: State) -> State:
         - Abstract: {state["abstract_text"]}
         - Plan for entire research paper: {state["plan"]}
     """
-
-    empty_prompt = """  """
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
     
     try:
         # Get response from agent
         response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"Raw response: {response}")
-        
-        # Clean up response to ensure it's valid JSON
-        # Remove any markdown code block markers and whitespace
-        json_str = response.replace('```json', '').replace('```', '').strip()
+        json_str = clean_json_response(response)
         
         # Parse and validate JSON response
         try:
-            section_questions_list = json.loads(json_str)
+            section_wise_questions = json.loads(json_str)
             
             # Validate the structure: should be dict[str, list[str]]
-            if not isinstance(section_questions_list, dict):
+            if not isinstance(section_wise_questions, dict):
                 raise ValueError("Response must be a dictionary")
             
-            for section, questions in section_questions_list.items():
+            for section, questions in section_wise_questions.items():
                 if not isinstance(questions, list):
                     raise ValueError(f"Questions must be a list for section {section}")
                 if not all(isinstance(q, str) for q in questions):
                     raise ValueError(f"All questions must be strings in section {section}")
 
             # Update state
-            state["section_questions"] = section_questions_list
-            print(f"Successfully parsed questions for {len(section_questions_list)} sections")
+            state["section_questions"] = section_wise_questions
             
         except json.JSONDecodeError as je:
             print(f"JSON parsing error: {je}")
-            print(f"Attempted to parse: {json_str}")
             raise
             
         # Save state and return
@@ -431,9 +298,7 @@ def section_wise_question_generator(state: State) -> State:
     except Exception as e:
         print(f"Error occurred: {e}")
         print(f"################ SECTION WISE QUESTION GENERATOR END #################{Style.RESET_ALL}")
-        state["section_questions"] = None
-        state["messages"].append(SystemMessage(content=f"Error generating section questions: {str(e)}"))
-        return state
+        raise
 
 def section_wise_answers_generator(state: State) -> State:
     """
@@ -443,30 +308,16 @@ def section_wise_answers_generator(state: State) -> State:
     print(f"{Fore.GREEN}################ SECTION WISE ANSWERS GENERATOR BEGIN #################")
     
     # Dynamically load config
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-
-    current_project_id = config.get_current_project_id()
-
-
-    updated_paths = config.update_project_paths(current_project_id)
+    configfile = load_config_file()
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)
     
     section_questions = state.get("section_questions")
     if not section_questions:
         error_msg = "No section questions found in state. Previous node may have failed."
         print(f"Error: {error_msg}")
-        state["messages"].append(SystemMessage(content=error_msg))
-        state["section_answers"] = None
-        return state
 
     try:
-        # Initialize the multimodal query tool
-        multimodal_tool = NomicVisionQuerier()
         section_answers = {}
 
         # Define the output file path
@@ -479,60 +330,31 @@ def section_wise_answers_generator(state: State) -> State:
                 section_answers[section] = []
                 
                 for question in questions:
+                    answer_list = []
                     file.write(f"\nQuerying for question: \n{question}\n")
                     
-                    try:
-                        # Use the multimodal_vectordb_query tool with correct parameters
-                        results = multimodal_tool.multimodal_vectordb_query(
-                            persist_dir=str(updated_paths['vector_db_paths']['data_db']),
-                            query=question,
-                            k=5
-                        )
-                        
-                        file.write(f"Query results: {results}\n")
-                        
-                        if results and "Results" in results:
-                            # Process each result and format according to schema
-                            for result in results["Results"]:
-                                answer_entry = {
-                                    "content": result.get("content", ""),
-                                    "images": result.get("images", [])
-                                }
-                                
-                                # Only add non-empty results
-                                if answer_entry["content"] or answer_entry["images"]:
-                                    section_answers[section].append(answer_entry)
-                                    file.write(f"Added answer entry with content length: {len(answer_entry['content'])}\n")
-                                    file.write(f"Number of images: {len(answer_entry['images'])}\n")
-                        else:
-                            file.write("No results found for query\n")
-                            
-                    except Exception as query_error:
-                        file.write(f"Error processing query: {query_error}\n")
-                        continue
+                    # Use the multimodal_vectordb_query tool with correct parameters
+                    results = query_chromadb(
+                        str(updated_paths['vector_db_paths']['data_db']),
+                        updated_paths['model_settings']['SENTENCE_TRANSFORMER'],
+                        question
+                    )
+                    
+                    file.write(f"Query results: {results}\n")
+                    
+                    # refactoring answer documents into one cohesive answer
+                    answer = agent.provide_final_answer(f"Frame the following texts into one cohesive answer: {results}. The question was: {question}", images=None)
+                    answer_text = answer.to_string() if hasattr(answer, 'to_string') else str(answer)
+                    answer_list.append(answer_text)
 
-                # If no answers were found for the section, add a placeholder
-                if not section_answers[section]:
-                    section_answers[section] = [{
-                        "content": "No relevant information found.",
-                        "images": []
-                    }]
-
+                section_answers[section] = answer_list
+                
                 file.write(f"Completed answers for section: {section}\n")
                 file.write(f"Number of answers: {len(section_answers[section])}\n")
 
+            # end of node logging
             state["section_answers"] = section_answers
 
-            # Debug output
-            file.write("\nFinal section answers structure:\n")
-            for section, answers in section_answers.items():
-                file.write(f"\nSection: {section}\n")
-                file.write(f"Number of answers: {len(answers)}\n")
-                for idx, answer in enumerate(answers):
-                    file.write(f"Answer {idx + 1} - Content length: {len(answer['content'])}\n")
-                    file.write(f"Number of images: {len(answer['images'])}\n")
-
-        # saving state in human readable format and machine readable format under outputpdf/nodewise_output
         save_state_for_testing(state, "section_wise_answers_generator")
 
         print(f"################ SECTION WISE ANSWERS GENERATOR END #################{Style.RESET_ALL}")
@@ -541,22 +363,12 @@ def section_wise_answers_generator(state: State) -> State:
     except Exception as e:
         print(f"Error occurred: {str(e)}")
         print(f"################ SECTION WISE ANSWERS GENERATOR END #################{Style.RESET_ALL}")
-        state["messages"].append(str(e))
-        state["section_answers"] = None
-        return state
+        raise
 
 
 
 def generation_node(state: State) -> State:
     print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE BEGIN #################")
-    
-    empty_prompt = """ """
-    # agent = ToolCallingAgent(model=model, tools=[], system_prompt=empty_prompt)
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
     
     try:
         plan = state.get("plan")
@@ -603,28 +415,17 @@ def generation_node(state: State) -> State:
             
     except Exception as e:
         print(f"Error in generation_node: {e}")
-        state["messages"].append(str(e))
-        state["generated_sections"] = None
-        return state
+        print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE END #################{Style.RESET_ALL}")
+        raise
 
 
 def formatting_node(state: State) -> State:
     print(f"{Fore.LIGHTYELLOW_EX}################ FORMATTING NODE BEGIN #################")
     
     # Dynamically load config and get paths
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-    # Load config.py dynamically
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-    
-    current_project_id = config.get_current_project_id()
-
-
-    updated_paths = config.update_project_paths(current_project_id)
+    configfile = load_config_file()
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)
     
     base_output_path = updated_paths['workflow1_output']
     output_docx_path = base_output_path / "output.docx"
@@ -678,7 +479,6 @@ def formatting_node(state: State) -> State:
         with open(state_json_path, 'w') as f:
             json.dump(project_state, f, indent=4)
 
-    # Use updated_paths instead of config.NODEWISE_OUTPUT_PATH
     save_state_for_testing(state, "formatting_node")
 
     print(f"################ FORMATTING NODE END #################{Style.RESET_ALL}")

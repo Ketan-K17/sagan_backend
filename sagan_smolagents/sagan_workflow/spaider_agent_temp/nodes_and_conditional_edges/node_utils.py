@@ -7,30 +7,40 @@ import os
 import sys
 import shutil
 import importlib.util
+from types import ModuleType
+
+# Local imports
+from schemas import State
+
+# helper function to load the config.py file dynamically
+def load_config_file() -> ModuleType:
+    # Dynamically resolve the path to config.py
+    CURRENT_FILE = Path(__file__).resolve()
+    project_root = CURRENT_FILE.parent.parent.parent.parent
+    CONFIG_PATH = project_root / "config.py"
+    # Load config.py dynamically
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+    return config
 
 # Get the path to the spaider_agent_temp directory
 CURRENT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 SPAIDER_AGENT_TEMP_DIR = CURRENT_DIR.parent
-
-# Import using relative imports
 sys.path.append(str(SPAIDER_AGENT_TEMP_DIR))
-from schemas import State
 
-# Dynamically resolve the path to config.py
+configfile = load_config_file()
+
+# getting project_id from cookie.json
 CURRENT_FILE = Path(__file__).resolve()
 project_root = CURRENT_FILE.parent.parent.parent.parent
-CONFIG_PATH = project_root / "config.py"
-
-# Load config.py dynamically
-spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-config = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(config)
 
 # getting project_id from cookie.json
 with open(project_root / "cookie.json", "r") as f:
     cookie_data = json.load(f)
     current_project_id = cookie_data.get("project_id")
-# print the state in the node_test scripts in a readable format.
+
+
 def print_state(state):
     """Print the state in a human-readable format."""
     print("STATE:")
@@ -84,25 +94,15 @@ def serialize_state(state: State, node_name: str) -> Dict[str, Any]:
     
     return serialized
 
-# saves the state in outputpdf/nodewise_output in .txt format (to be read by human) and .json format (to be read by machine to reconstruct state)
+
 def save_state_for_testing(state: State, node_name: str):
     """
-    Save the state in a format suitable for testing.
-    Creates both a human-readable and a machine-readable version.
+    Save the state in .json format so it can be reused.
     """
+    configfile = load_config_file()
 
-    # Dynamically load config and get NODEWISE_OUTPUT_PATH
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-
-    # Load config.py dynamically
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-
-    current_project_id = config.get_current_project_id()
-    updated_paths = config.update_project_paths(current_project_id)
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)
     
     # Use the path from config
     output_dir = updated_paths['nodewise_output']
@@ -114,28 +114,6 @@ def save_state_for_testing(state: State, node_name: str):
     serialized_state = serialize_state(state, node_name)
     with json_path.open('w', encoding='utf-8') as f:
         json.dump(serialized_state, f, indent=2, ensure_ascii=False)
-    
-    # Save human-readable text version
-    txt_path = output_dir / f"{node_name}.txt"
-    with txt_path.open('w', encoding='utf-8') as f:
-        f.write(f"{node_name.upper()} OUTPUT:\n")
-        f.write("=" * 80 + "\n\n")
-        
-        # Write state fields excluding messages
-        f.write("STATE FIELDS:\n")
-        f.write("-" * 40 + "\n")
-        for field_name, field_value in state.items():
-            if field_name != "messages":
-                f.write(f"{field_name.upper()}: {field_value}\n")
-        
-        # Write messages separately for better readability
-        f.write("\nMESSAGE HISTORY:\n")
-        f.write("-" * 40 + "\n")
-        for msg in state.get("messages", []):
-            f.write(f"{(msg.type).upper()}: {msg.content}\n")
-            if msg.additional_kwargs:
-                f.write(f"Additional kwargs: {msg.additional_kwargs}\n")
-            f.write("-" * 20 + "\n")
 
 
 # reconstructs the state for a given node, given its .json file in outputpdf/nodewise_output
@@ -144,20 +122,6 @@ def load_state_for_testing(node_name: str, output_dir: Path = None) -> State:
     Load a previously saved state for testing purposes.
     Reconstructs the full State object with proper message types and metadata.
     """
-    if output_dir is None:
-        # Dynamically load config and get NODEWISE_OUTPUT_PATH
-        CURRENT_FILE = Path(__file__).resolve()
-        SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-        CONFIG_PATH = SAGAN_ROOT / "config.py"
-        
-        # Load config.py dynamically
-        spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-        config = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(config)
-        
-        # Use the path from config
-        updated_paths = config.update_project_paths(project_id)
-        output_dir = updated_paths['nodewise_output']
     
     json_path = output_dir / f"{node_name}_state.json"
     if not json_path.exists():
