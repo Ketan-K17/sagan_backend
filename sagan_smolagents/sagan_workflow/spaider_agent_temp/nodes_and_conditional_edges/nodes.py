@@ -30,11 +30,9 @@ from schemas import State
 
 # helper function to load the config.py file dynamically
 def load_config_file() -> ModuleType:
-    # Dynamically resolve the path to config.py
     CURRENT_FILE = Path(__file__).resolve()
     project_root = CURRENT_FILE.parent.parent.parent.parent
     CONFIG_PATH = project_root / "config.py"
-    # Load config.py dynamically
     spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
@@ -364,8 +362,6 @@ def section_wise_answers_generator(state: State) -> State:
         print(f"Error occurred: {str(e)}")
         print(f"################ SECTION WISE ANSWERS GENERATOR END #################{Style.RESET_ALL}")
         raise
-
-
 
 def generation_node(state: State) -> State:
     print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE BEGIN #################")
