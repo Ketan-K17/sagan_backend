@@ -414,6 +414,13 @@ def generation_node(state: State) -> State:
         print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE END #################{Style.RESET_ALL}")
         raise
 
+def project_plan_node(state: State) -> State:
+    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN NODE BEGIN #################")
+    
+    
+
+    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN NODE END #################{Style.RESET_ALL}")
+    return state
 
 def formatting_node(state: State) -> State:
     print(f"{Fore.LIGHTYELLOW_EX}################ FORMATTING NODE BEGIN #################")
