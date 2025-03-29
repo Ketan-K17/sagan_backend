@@ -402,8 +402,47 @@ def generation_node(state: State) -> State:
 
             document_so_far += response
             generated_sections[section_title] = response
+        
+        # logic to decide where to add the Project Plan heading.
+        project_plan_heading_prompt = f"""
+        You are an expert research proposal writer. You have this list of project sections: {generated_sections.keys()}, the content for which already has been written on the document.
+
+        This document also needs a Project Plan that will delve into how to approach a solution to the problem statement the document has described so far. You need to decide WHERE it would be most appropriate to add a 'Project Plan' section.
+
+        If the list of sections I have shared with you were a 0-indexed array, AFTER which section would you like to see the 'Project Plan' section appear? I need you return the section_name, and the section_index of that very section.
+
+        Your output must be a JSON object with the following keys:
+        - section_name: The name of the section to add the project plan heading at.
+        - section_index: The index of the section to add the project plan heading at.
+
+        example:
+        {{
+            "section_name": "Conclusion",
+            "section_index": 5
+        }}
+
+        Guidelines for deciding the position of the Project Plan section:
+        - The Project plan section must be added at the later stages of the document, when the problem statement has been described completely.
+        - The Project Plan must always appear before the Bibliography section.
+        - The Project Plan must be added at a position where it logically fits in the document.
+        
+       """
+        
+        response = agent.provide_final_answer(project_plan_heading_prompt, images=None)
+        response_json = json.loads(response)
+        project_plan_section_name = response_json["section_name"]
+        project_plan_section_index = response_json["section_index"]
+
+        # verifying that the project plan section name and index are valid.
+        if project_plan_section_name not in generated_sections.keys():
+            raise ValueError(f"Invalid project plan section name: {project_plan_section_name}")
+        if project_plan_section_index not in range(len(generated_sections.keys())):
+            raise ValueError(f"Invalid project plan section index: {project_plan_section_index}")
+        if generated_sections.keys().index(project_plan_section_name) != project_plan_section_index:
+            raise ValueError(f"The section name and index do not match for the project plan section: {project_plan_section_name} and {project_plan_section_index}")
 
         state["generated_sections"] = generated_sections
+        state["project_plan_section_index"] = project_plan_section_index
         save_state_for_testing(state, "generation")
         
         print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE END #################{Style.RESET_ALL}")
@@ -454,11 +493,16 @@ def formatting_node(state: State) -> State:
     doc.add_heading("Abstract", 1)
     doc.add_paragraph(abstract_text)
 
-    # Add generated sections to the document
+    # Add generated sections to the document, with the project plan section added at the appropriate position.
     if generated_sections:
-        for section_header, section_content in generated_sections.items():
-            doc.add_heading(section_header, level=1)
-            doc.add_paragraph(section_content)
+        section_order = list(generated_sections.keys())
+        section_order.insert(state["project_plan_section_index"] + 1, "Project Plan")
+        generated_sections["Project Plan"] = ""  # Add content later
+
+        for section_name in section_order:
+            content = generated_sections[section_name]
+            doc.add_heading(section_name, level=1)
+            doc.add_paragraph(content)
 
     # Save the document to the same path
     doc.save(output_docx_path)
