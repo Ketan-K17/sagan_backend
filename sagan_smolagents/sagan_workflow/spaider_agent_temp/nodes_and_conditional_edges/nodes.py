@@ -75,10 +75,10 @@ def prompt_parser(state: State) -> State:
     
     try:
         combined_user_prompt = PROMPT_PARSER_PROMPT + "\n" + user_prompt
-
+        print(f"PROMPT PARSER PROMPT\n: {combined_user_prompt}\n\n\n")
         # llm call.
         response = agent.provide_final_answer(combined_user_prompt, images=None)
-        print(f"HERE'S THE PROMPT PARSER RESPONSE: {response}")
+        print(f"PROMPT PARSER RESPONSE\n: {response}\n\n\n")
         response_json = json.loads(response)
         
         # updating state before end-of-node logging
@@ -108,9 +108,11 @@ def abstract_questions_generator(state: State) -> State:
     Project Description: {project_description}
     """
     combined_prompt = ABSTRACT_QUESTIONS_GENERATOR_PROMPT + user_prompt
+    print(f"ABSTRACT QUESTIONS GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
 
     try:
         response = agent.provide_final_answer(combined_prompt, images=None)
+        print(f"ABSTRACT QUESTIONS GENERATOR RESPONSE\n: {response}\n\n\n")
         response_json = json.loads(response)
         
         # Update state before end-of-node logging
@@ -161,7 +163,9 @@ def abstract_answers_generator(state: State) -> State:
         {qa_pairs}
         """
         combined_prompt = str(ABSTRACT_ANSWERS_GENERATOR_PROMPT) + "\n" + str(user_prompt)
+        print(f"ABSTRACT ANSWERS GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
         response = agent.provide_final_answer(combined_prompt, images=None)
+        print(f"ABSTRACT ANSWERS GENERATOR RESPONSE\n: {response}\n\n\n")
         response_json = json.loads(response)
         abstract_text = response_json["abstract_text"]
 
@@ -200,9 +204,10 @@ def section_topic_extractor(state: State) -> State:
         formatted_result = "\n".join(result) if isinstance(result, list) else str(result)
         # Combine the prompt and formatted result
         combined_prompt = f"{SECTION_TOPIC_EXTRACTOR_PROMPT}\n\nContext:\n{formatted_result}"
-
+        print(f"SECTION TOPIC EXTRACTOR PROMPT\n: {combined_prompt}\n\n\n")
         
         response = agent.provide_final_answer(combined_prompt, images=None)
+        print(f"SECTION TOPIC EXTRACTOR RESPONSE\n: {response}\n\n\n")
         response_json = json.loads(response)
         section_topics_list = response_json["section_topics"]
 
@@ -232,10 +237,11 @@ def plan_node(state: State) -> State:
         List of Section Titles: {state["section_topics"]}
         """
         combined_prompt = PLAN_PROMPT + "\n" + user_prompt
+        print(f"PLAN NODE PROMPT\n: {combined_prompt}\n\n\n")
 
         # Get response from agent
         response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"Here's the response: {response}")
+        print(f"PLAN NODE RESPONSE\n: {response}\n\n\n")
         json_str = clean_json_response(response)
         
         plan_dict = json.loads(json_str)
@@ -261,10 +267,11 @@ def section_wise_question_generator(state: State) -> State:
         - Abstract: {state["abstract_text"]}
         - Plan for entire research paper: {state["plan"]}
     """
-    
+    print(f"SECTION WISE QUESTION GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
     try:
         # Get response from agent
         response = agent.provide_final_answer(combined_prompt, images=None)
+        print(f"SECTION WISE QUESTION GENERATOR RESPONSE\n: {response}\n\n\n")
         json_str = clean_json_response(response)
         
         # Parse and validate JSON response
@@ -281,7 +288,7 @@ def section_wise_question_generator(state: State) -> State:
                 if not all(isinstance(q, str) for q in questions):
                     raise ValueError(f"All questions must be strings in section {section}")
 
-            # Update state
+            # Update state      
             state["section_questions"] = section_wise_questions
             
         except json.JSONDecodeError as je:
@@ -395,10 +402,11 @@ def generation_node(state: State) -> State:
             """
             
             combined_prompt = WRITER_PROMPT + "\n" + project_information
-            
+            # print(f"GENERATION NODE PROMPT\n: {combined_prompt}\n\n\n")
             # Get response from agent
             response = agent.provide_final_answer(combined_prompt, images=None)
             print(f"Successfully generated content for {section_title}")
+            # print(f"GENERATION NODE RESPONSE\n: {response}\n\n\n")
 
             document_so_far += response
             generated_sections[section_title] = response
@@ -458,8 +466,9 @@ def project_plan_body_generator(state: State) -> State:
     
     # Construct prompt
     combined_prompt = str(PROJECT_PLAN_BODY_GENERATOR_PROMPT) + "\n" + str(state["generated_sections"])
-
+    print(f"PROJECT PLAN BODY GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
     response = agent.provide_final_answer(combined_prompt, images=None)
+    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {response}\n\n\n")
     response_json = json.loads(response)
     project_plan_section = response_json["project_plan_section"]
 
