@@ -217,11 +217,11 @@ Here is the Project Information :
 """
 
 
-PROJECT_PLAN_PROMPT = """
-You are an expert work plan generator for research proposals. Your task is to analyze a project description and generate a comprehensive, structured work plan that divides the project into logical work packages with appropriate tasks, timelines, deliverables, milestones, and effort allocation.
+PROJECT_PLAN_BODY_GENERATOR_PROMPT = """
+You are an expert work plan generator for research proposals. Your task is to analyze the project description and generate a comprehensive, structured work plan that divides the project into logical work packages with appropriate tasks, timelines, deliverables, milestones, and effort allocation.
 
 ## Input
-- A project description section from a research proposal that outlines the project's objectives, methodology, and expected outcomes
+- A corpus of text that is an in-depth discussion of the problem statement of the project and the various topics in it.
 
 ## Output
 1. A comprehensive work plan section that includes:
@@ -245,6 +245,26 @@ You are an expert work plan generator for research proposals. Your task is to an
 - Establish realistic timelines for each WP, considering dependencies
 - Define clear milestones and deliverables for each WP
 
+### Effort Contribution Table
+- It is a table showing effort allocation (in person-months) across:
+  - Work packages (rows)
+  - Team members (columns)
+  - Use generic role identifiers (PI, Co-PI, Researcher A, PhD Student B, etc.)
+  - Include total effort per WP and per team member
+  - Ensure allocations are realistic (e.g., no individual contributing more than 100 percent effort)
+
+### About the Work Packages and Effort contribution table
+- You are not directly responsible for creating the work packages and the effort contribution table. Instead, while generating the body of the project plan, you will need to put markers for where you think it would be appropriate to keep the work packages and the effort contribution table. Note that every marker must appear on a NEW LINE.
+- There will be multiple work packages in the project plan, therefore you must index your markers. i.e. your markers will be like:
+  - <WP1>
+  - <WP2>
+  - <WP3>
+  - <WP4>
+  - <WP5>
+  - <WP6>
+- There will be a SINGLE effort contribution table, hence you must use the marker just once. It should look like this:
+  - <EFFORT_CONTRIBUTION_TABLE>
+
 ### Narrative Structure
 - Begin with an overview paragraph explaining the work plan approach
 - For each work package, provide:
@@ -254,26 +274,6 @@ You are an expert work plan generator for research proposals. Your task is to an
   - Expected outputs and how they contribute to project goals
 - Include a section on project management and coordination mechanisms
 - Add a brief risk assessment and mitigation strategy section
-
-### Effort Contribution Table
-- Create a table showing effort allocation (in person-months) across:
-  - Work packages (rows)
-  - Team members (columns)
-  - Use generic role identifiers (PI, Co-PI, Researcher A, PhD Student B, etc.)
-  - Include total effort per WP and per team member
-  - Ensure allocations are realistic (e.g., no individual contributing more than 100 percent effort)
-
-## Tools
-
-You have access to two specialized tools:
-
-1. `create_work_package(context)`: 
-   - Input: Dictionary containing WP details (title, leader, duration, tasks, deliverables, etc.)
-   - Output: Formatted work package schema that matches the proposal template
-
-2. `create_effort_contribution_table(context)`:
-   - Input: Dictionary with team composition and effort allocation per WP
-   - Output: Formatted effort contribution table
 
 ## Guidelines
 - Align the work plan with the research objectives and methodology described in the project
