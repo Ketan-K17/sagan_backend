@@ -1,9 +1,45 @@
 from langgraph.graph import MessagesState
 from dotenv import load_dotenv
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 from pydantic import BaseModel, Field
 
 load_dotenv()
+
+class Task(BaseModel):
+    title: str
+    description: str
+
+class Deliverable(BaseModel):
+    title: str
+    month: str
+
+class Milestone(BaseModel):
+    title: str
+    month: str
+
+class Researcher(BaseModel):
+    name: str
+    partner: str
+    qualification: str
+    months: str
+
+class WorkPackageContext(BaseModel):
+    wp_leader: str
+    start_date: str
+    end_date: str
+    objective: str
+    tasks: List[Task]
+    interdependence: str
+    deliverables: List[Deliverable]
+    milestones: List[Milestone]
+    researchers: List[Researcher]
+
+class Contributor(BaseModel):
+    name: str
+    efforts: List[int]
+
+class ContributorsTable(BaseModel):
+    contributors: List[Contributor]
 
 class State(MessagesState):
     user_prompt: str
@@ -22,3 +58,5 @@ class State(MessagesState):
         default_factory=dict,
         description="Dictionary of written content for each section. Keys are section titles, and values are self-contained written content."
     )
+    work_packages_contexts: List[WorkPackageContext]
+    contributors_table: ContributorsTable
