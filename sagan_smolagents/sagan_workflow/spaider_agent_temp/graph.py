@@ -28,6 +28,7 @@ def create_graph():
     builder.add_node("generation_node", generation_node)
     builder.add_node("plan_node", plan_node)
     builder.add_node("formatting_node", formatting_node)
+    builder.add_node("project_plan_body_generator", project_plan_body_generator)
 
 
     # ADD EDGES/CONDITIONAL EDGES FOR THE GRAPH
@@ -39,7 +40,8 @@ def create_graph():
     builder.add_edge("plan_node", "section_wise_question_generator")
     builder.add_edge("section_wise_question_generator", "section_wise_answers_generator")
     builder.add_edge("section_wise_answers_generator", "generation_node")
-    builder.add_edge("generation_node", 'formatting_node')
+    builder.add_edge("generation_node", 'project_plan_body_generator')
+    builder.add_edge("project_plan_body_generator", 'formatting_node')
     builder.add_edge("formatting_node", END)    
     # builder.add_edge("aag_toolnode", "abstract_answers_generator")
     

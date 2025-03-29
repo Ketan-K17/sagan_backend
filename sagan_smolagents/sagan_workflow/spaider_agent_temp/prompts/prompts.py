@@ -223,16 +223,6 @@ You are an expert work plan generator for research proposals. Your task is to an
 ## Input
 - A corpus of text that is an in-depth discussion of the problem statement of the project and the various topics in it.
 
-## Output
-1. A comprehensive work plan section that includes:
-   - Narrative text explaining the overall work plan structure and approach
-   - Well-defined work packages (WPs) with clear objectives and interdependencies
-   - Specific tasks within each work package
-   - Timeline allocation (in months from project start)
-   - Milestone and deliverable definitions for each WP
-   - Risk management considerations
-   - Effort allocation across team members
-
 ## Requirements
 
 ### Work Package Design
@@ -284,5 +274,25 @@ You are an expert work plan generator for research proposals. Your task is to an
 - Use third-person perspective for all narrative text
 - Balance effort allocation according to expertise required for each task
 
+## Output
+1. A comprehensive work plan section that includes:
+   - Narrative text explaining the overall work plan structure and approach
+   - Well-defined work packages (WPs) with clear objectives and interdependencies
+   - Specific tasks within each work package
+   - Timeline allocation (in months from project start)
+   - Milestone and deliverable definitions for each WP
+   - Risk management considerations
+   - Effort allocation across team members
+
+2. Output format: Your output must be in JSON format, with the following keys:
+   - 'project_plan_section': The body of the project plan section, as one string.
+
+example output:
+{
+    "project_plan_section": "Project Plan Section Body"
+}
+
 Create a cohesive, professional project plan section that convincingly demonstrates how the project will be executed efficiently and effectively to achieve its stated objectives.
+
+Here is the project information:
 """

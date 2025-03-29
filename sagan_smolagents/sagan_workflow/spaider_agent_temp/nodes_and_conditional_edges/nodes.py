@@ -18,7 +18,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 '''LOCAL IMPORTS'''
 from schemas import State
-from prompts.prompts import PROMPT_PARSER_PROMPT, ABSTRACT_QUESTIONS_GENERATOR_PROMPT, ABSTRACT_ANSWERS_GENERATOR_PROMPT, SECTION_TOPIC_EXTRACTOR_PROMPT, SECTION_WISE_QUESTION_GENERATOR_PROMPT, SECTION_WISE_ANSWERS_GENERATOR_PROMPT, PLAN_PROMPT, WRITER_PROMPT
+from prompts.prompts import PROMPT_PARSER_PROMPT, ABSTRACT_QUESTIONS_GENERATOR_PROMPT, ABSTRACT_ANSWERS_GENERATOR_PROMPT, SECTION_TOPIC_EXTRACTOR_PROMPT, SECTION_WISE_QUESTION_GENERATOR_PROMPT, PLAN_PROMPT, WRITER_PROMPT, PROJECT_PLAN_BODY_GENERATOR_PROMPT
 from .node_utils import save_state_for_testing, copy_figures
 
 '''IMPORT ALL TOOLS HERE AND CREATE LIST OF TOOLS TO BE PASSED TO THE AGENT.'''
@@ -453,12 +453,22 @@ def generation_node(state: State) -> State:
         print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE END #################{Style.RESET_ALL}")
         raise
 
-def project_plan_node(state: State) -> State:
-    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN NODE BEGIN #################")
+def project_plan_body_generator(state: State) -> State:
+    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN BODY GENERATOR NODE BEGIN #################")
     
-    
+    # Construct prompt
+    combined_prompt = str(PROJECT_PLAN_BODY_GENERATOR_PROMPT) + "\n" + str(state["generated_sections"])
 
-    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN NODE END #################{Style.RESET_ALL}")
+    response = agent.provide_final_answer(combined_prompt, images=None)
+    response_json = json.loads(response)
+    project_plan_section = response_json["project_plan_section"]
+
+    # updating state before end-of-node logging
+    state["project_plan_section"] = project_plan_section
+
+    save_state_for_testing(state, "project_plan_body_generator")
+
+    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN BODY GENERATOR NODE END #################{Style.RESET_ALL}")
     return state
 
 def formatting_node(state: State) -> State:
@@ -497,7 +507,7 @@ def formatting_node(state: State) -> State:
     if generated_sections:
         section_order = list(generated_sections.keys())
         section_order.insert(state["project_plan_section_index"] + 1, "Project Plan")
-        generated_sections["Project Plan"] = ""  # Add content later
+        generated_sections["Project Plan"] = state["project_plan_section"]
 
         for section_name in section_order:
             content = generated_sections[section_name]
