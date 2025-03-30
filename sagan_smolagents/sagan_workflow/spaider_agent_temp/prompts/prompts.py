@@ -292,6 +292,8 @@ example output:
     "project_plan_section": "Project Plan Section Body"
 }
 
+3. Ensure that output JSON is formatted correctly without any additional text or formatting like ```json or ```.
+
 Create a cohesive, professional project plan section that convincingly demonstrates how the project will be executed efficiently and effectively to achieve its stated objectives.
 
 Here is the project information:

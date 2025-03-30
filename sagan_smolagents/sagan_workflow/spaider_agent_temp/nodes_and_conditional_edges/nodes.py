@@ -42,11 +42,44 @@ def load_config_file() -> ModuleType:
 def clean_json_response(response: str) -> str:
     """
     Cleans the JSON response from the LLM to ensure it's valid.
+    Handles complex JSON structures with proper error handling.
     """
+    # First, strip whitespace
     json_str = response.strip()
+    
+    # Remove markdown code block formatting if present
     if json_str.startswith('```'):
-        json_str = json_str.replace('```json\n', '').replace('```', '').strip()
-    return json_str
+        # Handle multiple variants of code block identifiers
+        json_str = json_str.split('\n', 1)[-1]  # Remove first line with ```json or similar
+        json_str = json_str.rstrip('`').strip()  # Remove trailing backticks
+        
+        # In case there are trailing backticks on their own line
+        if json_str.endswith('```'):
+            json_str = json_str[:-3].strip()
+    
+    # Try to validate JSON structure
+    try:
+        # Parse and re-stringify to normalize the JSON format
+        parsed_json = json.loads(json_str)
+        return json.dumps(parsed_json)
+    except json.JSONDecodeError as e:
+        # If we can't parse it, do some additional cleaning
+        print(f"Warning: JSON parsing failed: {e}")
+        
+        # Try to fix common issues with LLM-generated JSON
+        # 1. Unescaped quotes within string values
+        # 2. Trailing commas in arrays or objects
+        # 3. Comments in JSON
+        
+        # Remove potential comments
+        json_str = '\n'.join([line for line in json_str.split('\n') 
+                             if not line.strip().startswith('//')])
+        
+        # Fix trailing commas in arrays and objects
+        json_str = json_str.replace(',]', ']').replace(',}', '}')
+        
+        # Return the best-effort cleaned string
+        return json_str
 
 configfile = load_config_file()
 load_dotenv(dotenv_path=configfile.ENV_PATH)
@@ -462,7 +495,7 @@ def project_plan_heading_node(state: State) -> State:
         raise ValueError(f"Invalid project plan section name: {project_plan_section_name}")
     if project_plan_section_index not in range(len(generated_sections.keys())):
         raise ValueError(f"Invalid project plan section index: {project_plan_section_index}")
-    if generated_sections.keys().index(project_plan_section_name) != project_plan_section_index:
+    if list(generated_sections.keys()).index(project_plan_section_name) != project_plan_section_index:
         raise ValueError(f"The section name and index do not match for the project plan section: {project_plan_section_name} and {project_plan_section_index}")
     
     state["project_plan_section_index"] = project_plan_section_index
@@ -478,8 +511,9 @@ def project_plan_body_generator(state: State) -> State:
     combined_prompt = str(PROJECT_PLAN_BODY_GENERATOR_PROMPT) + "\n" + str(state["generated_sections"])
     print(f"PROJECT PLAN BODY GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
     response = agent.provide_final_answer(combined_prompt, images=None)
-    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {response}\n\n\n")
-    response_json = json.loads(response)
+    json_str = clean_json_response(response)
+    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {json_str}\n\n\n")
+    response_json = json.loads(json_str)
     project_plan_section = response_json["project_plan_section"]
 
     # updating state before end-of-node logging
