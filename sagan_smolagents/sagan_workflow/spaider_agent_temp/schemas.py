@@ -61,3 +61,4 @@ class State(MessagesState):
     work_packages_contexts: List[WorkPackageContext]
     contributors_table: ContributorsTable
     project_plan_section_index: int # the index of the section after which the project plan section should be added.
+    project_plan_section: str # the project plan section to be added.

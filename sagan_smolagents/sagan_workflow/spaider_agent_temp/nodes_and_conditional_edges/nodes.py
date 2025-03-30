@@ -57,6 +57,13 @@ def clean_json_response(response: str) -> str:
         if json_str.endswith('```'):
             json_str = json_str[:-3].strip()
     
+    # Remove invalid control characters (ASCII < 32 except tabs, newlines, carriage returns)
+    clean_str = ''
+    for ch in json_str:
+        if ord(ch) >= 32 or ch in '\n\r\t':
+            clean_str += ch
+    json_str = clean_str
+    
     # Try to validate JSON structure
     try:
         # Parse and re-stringify to normalize the JSON format
@@ -476,6 +483,8 @@ def project_plan_heading_node(state: State) -> State:
         "section_index": 5
     }}
 
+    Your output must be ONLY a JSON object, and nothing else. Ensure that output JSON is formatted correctly without any additional text or formatting like ```json or ```.
+
     Guidelines for deciding the position of the Project Plan section:
     - The Project plan section must be added at the later stages of the document, when the problem statement has been described completely.
     - The Project Plan must always appear before the Bibliography section.
@@ -505,23 +514,19 @@ def project_plan_heading_node(state: State) -> State:
     return state
 
 def project_plan_body_generator(state: State) -> State:
-    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN BODY GENERATOR NODE BEGIN #################")
+    print(f"{Fore.LIGHTRED_EX}################ PROJECT PLAN BODY GENERATOR NODE BEGIN #################")
     
     # Construct prompt
     combined_prompt = str(PROJECT_PLAN_BODY_GENERATOR_PROMPT) + "\n" + str(state["generated_sections"])
     print(f"PROJECT PLAN BODY GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
     response = agent.provide_final_answer(combined_prompt, images=None)
-    json_str = clean_json_response(response)
-    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {json_str}\n\n\n")
-    response_json = json.loads(json_str)
-    project_plan_section = response_json["project_plan_section"]
-
-    # updating state before end-of-node logging
+    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {response}\n\n\n")
+    project_plan_section = response
     state["project_plan_section"] = project_plan_section
 
     save_state_for_testing(state, "project_plan_body_generator")
 
-    print(f"{Fore.LIGHTYELLOW_EX}################ PROJECT PLAN BODY GENERATOR NODE END #################{Style.RESET_ALL}")
+    print(f"{Fore.LIGHTRED_EX}################ PROJECT PLAN BODY GENERATOR NODE END #################{Style.RESET_ALL}")
     return state
 
 def formatting_node(state: State) -> State:

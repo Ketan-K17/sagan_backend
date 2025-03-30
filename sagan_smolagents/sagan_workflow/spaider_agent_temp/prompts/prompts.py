@@ -25,7 +25,7 @@ Guidelines to ask questions:
 2. Focus on aspects such as the project's goals, target audience, potential challenges, and any specific features or functionalities that are important to consider.
 3. Make sure that the questions are related to the project domain, try to ask atleast 2 technical questions.
 
-Your output MUST be in JSON format, with exactly one key: 'abstract_questions', with the list of abstract questions as the value. Make sure there is no additional text accompanying the JSON object.
+Your output MUST be in JSON format, with exactly one key: 'abstract_questions', with the list of abstract questions as the value. Make sure there is no additional text accompanying the JSON object. Your JSON object must also not be wrapped in ```json```.
 
 >>> Examples:
 Project Title: "Recipe Sharing Website"
@@ -218,83 +218,49 @@ Here is the Project Information :
 
 
 PROJECT_PLAN_BODY_GENERATOR_PROMPT = """
-You are an expert work plan generator for research proposals. Your task is to analyze the project description and generate a comprehensive, structured work plan that divides the project into logical work packages with appropriate tasks, timelines, deliverables, milestones, and effort allocation.
+You are an expert research project planner. Your task is to generate the main body text for a Project Plan section of a research proposal based on the provided project description.
 
-## Input
-- A corpus of text that is an in-depth discussion of the problem statement of the project and the various topics in it.
+Input: A comprehensive project description detailing research objectives, approach, and expected outcomes.
 
-## Requirements
+Output: The complete body text for the Project Plan section that follows the structure and style of academic research proposals, with appropriate markers for work packages and the effort contribution table. NOTE that you must not create any of the tables.
 
-### Work Package Design
-- Divide the project into 4-8 logical work packages that follow a natural progression
-- Ensure the first WP is dedicated to project management and dissemination activities
-- The final WP should focus on validation, evaluation, or case studies
-- Ensure intermediate WPs follow a logical sequence with clear dependencies
-- Each WP should have 3-5 specific tasks that collectively fulfill the WP's objectives
-- Assign each WP a clear leader (use generic identifiers like "PI", "Co-PI", "Researcher A", etc.)
-- Establish realistic timelines for each WP, considering dependencies
-- Define clear milestones and deliverables for each WP
+Instructions:
+1. Analyze the project description and create a logical project plan structure with 4-8 work packages.
+2. Write the complete Project Plan narrative text in a formal academic style.
+3. Include clear markers for where work package details and the effort contribution table should be inserted.
+4. Create a cohesive narrative that explains the project's execution approach, timeline, and dependencies between work packages.
 
-### Effort Contribution Table
-- It is a table showing effort allocation (in person-months) across:
-  - Work packages (rows)
-  - Team members (columns)
-  - Use generic role identifiers (PI, Co-PI, Researcher A, PhD Student B, etc.)
-  - Include total effort per WP and per team member
-  - Ensure allocations are realistic (e.g., no individual contributing more than 100 percent effort)
+Requirements:
+- Insert the work package markers (<WP1>, <WP2>, etc.) on separate lines at appropriate locations.
+- Insert the effort contribution table marker (<ECT>) on a separate line where appropriate.
+- Organize content into logical subsections with appropriate headings.
+- Use plain text only with no markdown formatting.
+- Ensure the plan covers the entire project duration and accounts for all major components described in the project description.
+- Include sections on project management, risk assessment, and quality assurance as appropriate.
+- Describe the interdependencies between work packages and overall project flow.
+- Make realistic estimates for work package durations and sequencing.
+- Describe the role of each work package in achieving the project's objectives.
 
-### About the Work Packages and Effort contribution table
-- You are not directly responsible for creating the work packages and the effort contribution table. Instead, while generating the body of the project plan, you will need to put markers for where you think it would be appropriate to keep the work packages and the effort contribution table. Note that every marker must appear on a NEW LINE.
-- There will be multiple work packages in the project plan, therefore you must index your markers. i.e. your markers will be like:
-  - <WP1>
-  - <WP2>
-  - <WP3>
-  - <WP4>
-  - <WP5>
-  - <WP6>
-- There will be a SINGLE effort contribution table, hence you must use the marker just once. It should look like this:
-  - <EFFORT_CONTRIBUTION_TABLE>
+Your output should be a complete, ready-to-use Project Plan section that requires no editing, with appropriate markers for work packages and the effort contribution table.
 
-### Narrative Structure
-- Begin with an overview paragraph explaining the work plan approach
-- For each work package, provide:
-  - A brief description of its purpose and objectives
-  - Its relationship to other work packages
-  - Its main tasks and methodologies
-  - Expected outputs and how they contribute to project goals
-- Include a section on project management and coordination mechanisms
-- Add a brief risk assessment and mitigation strategy section
-
-## Guidelines
-- Align the work plan with the research objectives and methodology described in the project
-- Make realistic timeline estimates considering the project's overall duration
-- Ensure tasks are specific, measurable, and clearly contribute to project objectives
-- Use month numbers (M1, M2, etc.) rather than calendar dates for all timelines
-- Maintain consistency in terminology and formatting throughout
-- Use third-person perspective for all narrative text
-- Balance effort allocation according to expertise required for each task
-
-## Output
-1. A comprehensive work plan section that includes:
-   - Narrative text explaining the overall work plan structure and approach
-   - Well-defined work packages (WPs) with clear objectives and interdependencies
-   - Specific tasks within each work package
-   - Timeline allocation (in months from project start)
-   - Milestone and deliverable definitions for each WP
-   - Risk management considerations
-   - Effort allocation across team members
-
-2. Output format: Your output must be in JSON format, with the following keys:
-   - 'project_plan_section': The body of the project plan section, as one string.
-
-example output:
-{
-    "project_plan_section": "Project Plan Section Body"
-}
-
-3. Ensure that output JSON is formatted correctly without any additional text or formatting like ```json or ```.
-
-Create a cohesive, professional project plan section that convincingly demonstrates how the project will be executed efficiently and effectively to achieve its stated objectives.
-
-Here is the project information:
+Here is the project description:
 """
+
+# Here's what you need to do: 
+# 1. Devise Work Packages for the project following these guidelines:
+# - Divide the project into 4-8 logical work packages that follow a natural progression
+# - Ensure the first WP is dedicated to project management and dissemination activities
+# - The final WP should focus on validation, evaluation, or case studies
+# - Ensure intermediate WPs follow a logical sequence with clear dependencies
+# - Each WP should have 3-5 specific tasks that collectively fulfill the WP's objectives
+# - Assign each WP a clear leader (use generic identifiers like "PI", "Co-PI", "Researcher A", etc.)
+# - Establish realistic timelines for each WP, considering dependencies
+# - Define clear milestones and deliverables for each WP
+
+# 2. Create an Effort Contribution Table, following these guidelines:
+# - It is a table showing effort allocation (in person-months) across:
+#   - Work packages (rows)
+#   - Team members (columns)
+#   - Use generic role identifiers (PI, Co-PI, Researcher A, PhD Student B, etc.)
+#   - Include total effort per WP and per team member
+#   - Ensure allocations are realistic (e.g., no individual contributing more than 100 percent effort)
