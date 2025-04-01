@@ -94,7 +94,8 @@ init()
 
 '''LLM TO USE'''
 # model_id = "meta-llama/Llama-3.3-70B-Instruct"
-model_id = "Qwen/Qwen2.5-72B-Instruct"
+# model_id = "Qwen/Qwen2.5-72B-Instruct"
+model_id = "Qwen/QwQ-32B"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 model = HfApiModel(model_id=model_id)
 
@@ -504,8 +505,8 @@ def project_plan_heading_node(state: State) -> State:
         raise ValueError(f"Invalid project plan section name: {project_plan_section_name}")
     if project_plan_section_index not in range(len(generated_sections.keys())):
         raise ValueError(f"Invalid project plan section index: {project_plan_section_index}")
-    if list(generated_sections.keys()).index(project_plan_section_name) != project_plan_section_index:
-        raise ValueError(f"The section name and index do not match for the project plan section: {project_plan_section_name} and {project_plan_section_index}")
+    # if list(generated_sections.keys()).index(project_plan_section_name) != project_plan_section_index:
+    #     raise ValueError(f"The section name and index do not match for the project plan section: {project_plan_section_name} and {project_plan_section_index}")
     
     state["project_plan_section_index"] = project_plan_section_index
     save_state_for_testing(state, "project_plan_heading_node")
@@ -527,6 +528,12 @@ def project_plan_body_generator(state: State) -> State:
     save_state_for_testing(state, "project_plan_body_generator")
 
     print(f"{Fore.LIGHTRED_EX}################ PROJECT PLAN BODY GENERATOR NODE END #################{Style.RESET_ALL}")
+    return state
+
+def project_plan_schema_generator(state: State) -> State:
+    print(f"{Fore.LIGHTMAGENTA_EX}################ PROJECT PLAN SCHEMA GENERATOR NODE BEGIN #################")
+
+    print(f"{Fore.LIGHTMAGENTA_EX}################ PROJECT PLAN SCHEMA GENERATOR NODE END #################{Style.RESET_ALL}")
     return state
 
 def formatting_node(state: State) -> State:
