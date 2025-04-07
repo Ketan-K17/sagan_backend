@@ -472,7 +472,7 @@ def project_plan_heading_node(state: State) -> State:
 
     This document also needs a Project Plan that will delve into how to approach a solution to the problem statement the document has described so far. You need to decide which of the existing sections would be most appropriate to add the Project Plan content into.
 
-    If the list of sections I have shared with you were a 0-indexed array, then in which section would you like to see the 'Project Plan' content appear? I need you return the section_name, and the section_index of that very section.
+    Given the list of sections, return the section_name where you think the 'Project Plan' content should appear.
 
     Your output must be a JSON object with the following key:
     - section_name: The name of the section to add the project plan heading at.
