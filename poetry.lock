@@ -2911,13 +2911,13 @@ testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
 
 [[package]]
 name = "markdownify"
-version = "0.14.1"
+version = "1.1.0"
 description = "Convert HTML to markdown."
 optional = false
 python-versions = "*"
 files = [
-    {file = "markdownify-0.14.1-py3-none-any.whl", hash = "sha256:4c46a6c0c12c6005ddcd49b45a5a890398b002ef51380cd319db62df5e09bc2a"},
-    {file = "markdownify-0.14.1.tar.gz", hash = "sha256:a62a7a216947ed0b8dafb95b99b2ef4a0edd1e18d5653c656f68f03db2bfb2f1"},
+    {file = "markdownify-1.1.0-py3-none-any.whl", hash = "sha256:32a5a08e9af02c8a6528942224c91b933b4bd2c7d078f9012943776fc313eeef"},
+    {file = "markdownify-1.1.0.tar.gz", hash = "sha256:449c0bbbf1401c5112379619524f33b63490a8fa479456d41de9dc9e37560ebd"},
 ]
 
 [package.dependencies]
@@ -7784,4 +7784,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "ec8fee8666c2b0a6c06032fa15dba4211123ecf61a25a126a4423b1eec763c9c"
+content-hash = "4020fc88ea4141c9e8ae79d67b0569f273fcdedfb191d8cdba9beaa27933cf50"
