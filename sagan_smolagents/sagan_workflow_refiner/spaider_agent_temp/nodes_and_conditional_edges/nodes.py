@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from colorama import init, Fore, Back, Style
 from fastapi import WebSocket,WebSocketDisconnect,HTTPException
 import asyncio
+from types import ModuleType
 
 # docx related imports
 from docx import Document
@@ -16,7 +17,7 @@ from docx.text.paragraph import Paragraph
 
 '''LOCAL IMPORTS'''
 from schemas import State
-from prompts.prompts import *
+from prompts.prompts import RESEARCH_QUERY_GENERATOR_PROMPT, FORMATTER_PROMPT
 
 '''IMPORT ALL TOOLS HERE AND CREATE LIST OF TOOLS TO BE PASSED TO THE AGENT.'''
 from tools.query_chromadb import query_chromadb
@@ -25,25 +26,51 @@ import importlib.util
 import certifi
 import os
 
-# Dynamically resolve the path to config.py
-CURRENT_FILE = Path(__file__).resolve()
-project_root = CURRENT_FILE.parent.parent.parent.parent
-CONFIG_PATH = project_root / "config.py"
+def load_config_file() -> ModuleType:
+    CURRENT_FILE = Path(__file__).resolve()
+    project_root = CURRENT_FILE.parent.parent.parent.parent
+    CONFIG_PATH = project_root / "config.py"
+    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+    return config
 
-os.environ['SSL_CERT_FILE'] = certifi.where()
-
-# Load config.py dynamically
-spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-config = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(config)
-
-# getting project_id from cookie.json
-# with open(project_root / "cookie.json", "r") as f:
-#     cookie_data = json.load(f)
-#     project_id = cookie_data.get("project_id")
-
+def parse_agent_response(response: str) -> tuple:
+    """
+    Parses the agent's response to separate thinking trace from JSON output.
+    
+    Args:
+        response: String containing both thinking trace and JSON output
+        
+    Returns:
+        tuple: (thinking_trace, json_object)
+    """
+    if '</think>' in response:
+        # Split by the </think> tag
+        parts = response.split('</think>', 1)
+        thinking_trace = parts[0] + '</think>'
+        json_str = parts[1].strip()
+        
+        # Parse the JSON object
+        try:
+            json_object = json.loads(json_str)
+            return thinking_trace, json_object
+        except json.JSONDecodeError:
+            # If JSON parsing fails, return the raw string
+            return thinking_trace, json_str
+    else:
+        # No thinking trace found, try to parse the whole thing as JSON
+        try:
+            json_object = json.loads(response)
+            return "", json_object
+        except json.JSONDecodeError:
+            # If JSON parsing fails, return empty trace and the raw string
+            return "", response
+        
+load_config_file()
 load_dotenv()
 init()
+
 
 research_tools = [query_chromadb]
 
@@ -52,12 +79,19 @@ from smolagents import ToolCallingAgent, HfApiModel, CodeAgent
 # select model
 # model_id = "Qwen/Qwen2.5-Coder-32B-Instruct"
 # model_id = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
-# model_id = "Qwen/QwQ-32B"
-model_id = "meta-llama/Llama-3.3-70B-Instruct"
+model_id = "Qwen/QwQ-32B"
+# model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 # model_id = "NousResearch/Hermes-3-Llama-3.1-8B"
 model = HfApiModel(model_id=model_id)  
+
+empty_prompt = """ """
+agent = ToolCallingAgent(
+    model=model, 
+    tools=[], 
+    prompt_templates={"system_prompt": empty_prompt}
+)
 
 message_queues = {}
 
@@ -169,24 +203,9 @@ async def research_query_generator(state: State) -> State:
     """
     Node to generate research queries and allow user modification via WebSocket.
     """
-    # Dynamically load config
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-    
-    session_id = "1234"
     print(f"{Fore.YELLOW}################ RESEARCH QUERY GENERATOR BEGIN #################")
-    empty_prompt = """ """
-    
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
+    configfile = load_config_file()
+    session_id = "1234"
 
     print(f"HERE'S THE USER_PROMPT: \n{state['user_prompt']}")
     
@@ -195,7 +214,6 @@ async def research_query_generator(state: State) -> State:
     Section Text: {state['section_text']}
     User Prompt: {state['user_prompt']}
     """
-
     combined_prompt = RESEARCH_QUERY_GENERATOR_PROMPT + "\n" + user_prompt
 
     try:
@@ -208,18 +226,10 @@ async def research_query_generator(state: State) -> State:
         print(response)
         print("-" * 50)
         
-        # Try to clean the response if it contains extra text
-        try:
-            if '{' in response:
-                json_start = response.find('{')
-                json_end = response.rfind('}') + 1
-                response = response[json_start:json_end]
-            
-            response_content = json.loads(response)
-        except json.JSONDecodeError as e:
-            print(f"JSON parsing error: {e}")
-            print("Falling back to empty research queries")
-            response_content = {"research_queries": []}
+        thinking_trace, response_content = parse_agent_response(response)
+
+        print("THINKING TRACE:\n", thinking_trace)
+        print("RESPONSE CONTENT:\n", response_content)
         
         # Extract research queries with fallback
         research_queries = response_content.get('research_queries', [])
@@ -243,14 +253,8 @@ async def research_query_generator(state: State) -> State:
                     "data": research_queries
                 })
 
-            # await ws_manager.send_message("1234", {
-            #     "type": "queries",
-            #     "data": research_queries
-            # })
-            
             if bool(research_queries) is False:
                 return state
-
 
             await ws_manager.send_message("1234", {
                 "type": "question1",
@@ -282,14 +286,8 @@ async def research_query_generator(state: State) -> State:
                         "data":"Would you like to add a new query? (yes/no)"
                     })
                     add_more= await ws_manager.get_message(session_id, 'question2')
-                    # add_more = await ws_manager.wait_for_response(
-                    #     "1234"
-                    # )
 
                     print("351",add_more)
-                    # add_more = await ws_manager.query_user(
-                    #     session_id, "Would you like to add a new query? (yes/no)"
-                    # )
                     if add_more and add_more.lower() != 'yes':
                         break
                     await ws_manager.send_message(session_id,{
@@ -299,15 +297,11 @@ async def research_query_generator(state: State) -> State:
 
                     new_query = await ws_manager.get_message(session_id,"question3")
                     print(new_query,"new_query")
-                    # new_query = await ws_manager.query_user(
-                    #     session_id, f"Enter new query {len(modified_queries) + 1}:"
-                    # )
 
                     if new_query:
                         modified_queries.append(new_query)
 
                 research_queries = modified_queries
-            # ------------------------------------------------
 
             # Update state
             state["research_needed"] = bool(research_queries)
@@ -330,52 +324,15 @@ async def research_query_generator(state: State) -> State:
         state["research_queries"] = []
         return state
 
-# new code below be aware llm code ahead
-
-# def research_query_generator(state: dict, research_queries: List[str]) -> dict:
-#     """
-#     Process the state and research queries synchronously.
-#     This function assumes that all necessary inputs have been provided beforehand.
-#     """
-#     try:
-#         # Update the state with the finalized research queries
-#         state["research_needed"] = len(research_queries) > 0
-#         state["research_queries"] = research_queries
-
-#         # Log the updated state
-#         print("\nFinal research queries:")
-#         for i, query in enumerate(research_queries, start=1):
-#             print(f"{i}. {query}")
-
-#         return state
-
-#     except Exception as e:
-#         print(f"Error in research_query_generator: {str(e)}")
-#         state["messages"] = [str(e)]
-#         state["research_needed"] = False
-#         state["research_queries"] = []
-#         return state
-
-# my code ahead
 def research_query_answerer(state: State) -> State:
     """
     Takes the generated queries and executes them against the vector database.
     Only runs if research_needed is True.
     """
-    # Dynamically load config
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-
-    current_project_id = config.get_current_project_id()
-
-
-    updated_paths = config.update_project_paths(current_project_id)    
     print(f"{Fore.BLUE}################ RESEARCH QUERY ANSWERER BEGIN #################")
+    configfile = load_config_file()
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)    
 
     if not state.get("research_needed"):
         state["context"] = []
@@ -397,27 +354,11 @@ def research_query_answerer(state: State) -> State:
 
 
 def formatter(state: State):
-    # Dynamically load config
-    CURRENT_FILE = Path(__file__).resolve()
-    SAGAN_ROOT = CURRENT_FILE.parent.parent.parent.parent
-    CONFIG_PATH = SAGAN_ROOT / "config.py"
-    
-    spec = importlib.util.spec_from_file_location("config", CONFIG_PATH)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-
-    current_project_id = config.get_current_project_id()
-
-
-    updated_paths = config.update_project_paths(current_project_id)
     
     print(f"{Fore.LIGHTGREEN_EX}################ FORMATTING NODE BEGIN #################")
-    empty_prompt = """ """
-    agent = ToolCallingAgent(
-        model=model, 
-        tools=[], 
-        prompt_templates={"system_prompt": empty_prompt}
-    )
+    configfile = load_config_file()
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)
 
     # Ensure state values are not None and convert to string if needed
     section_title = str(state.get("section_title", ""))
@@ -453,39 +394,8 @@ def formatter(state: State):
     print(raw_response)
     print("-" * 50)
 
-    # try:
-    #     # Look for the <answer> and </answer> tags to extract the JSON
-    #     if '<answer>' in raw_response and '</answer>' in raw_response:
-    #         # Extract content between <answer> and </answer> tags
-    #         answer_content = raw_response.split('<answer>')[1].split('</answer>')[0].strip()
-    #         print("Extracted content from <answer> tags:")
-    #         print(answer_content)
-            
-    #         # Find JSON object within the answer content (looking for curly braces)
-    #         if '{' in answer_content and '}' in answer_content:
-    #             json_start = answer_content.find('{')
-    #             json_end = answer_content.rfind('}') + 1
-    #             json_str = answer_content[json_start:json_end]
-    #             print("Extracted JSON object:")
-    #             print(json_str)
-    #             response_data = json.loads(json_str)
-    #         else:
-    #             # If no JSON object found in answer content, raise an error
-    #             raise ValueError("No JSON object found within <answer> tags")
-    #     else:
-    #         # If no answer tags found, raise an error
-    #         raise ValueError("No <answer> tags found in the response")
-            
-    # except (json.JSONDecodeError, ValueError) as e:
-    #     print(f"Error parsing response: {e}")
-    #     print("Raw response:", raw_response)
-    #     # Create an error response
-    #     response_data = {
-    #         'modified_section_text': state.get('section_text', ''),
-    #         'ai_message': f'Error: Could not process the text modification. {str(e)}'
-    #     }
+    thought_trace, response_data = parse_agent_response(raw_response)
 
-    response_data = json.loads(raw_response)
     # Extract the fields with fallback values
     modified_section_text = response_data.get('modified_section_text', section_text)
     ai_message = response_data.get('ai_message', 'No message provided')
@@ -496,18 +406,6 @@ def formatter(state: State):
 
     print(f"################ FORMATTING NODE END #################{Style.RESET_ALL}")
     return state
-
-
-# original code below 
-# def human_input_node(state: State):
-#     print(f"{Fore.LIGHTMAGENTA_EX}################ HUMAN INPUT NODE BEGIN #################")
-
-#     response = input("Saves Changes to the section text? (yes/no): ")
-#     state["user_approval"] = response
-#     print(f"################ HUMAN INPUT NODE END #################{Style.RESET_ALL}")
-#     return state
-
-# gpt code belwo 
 
 async def human_input_node(state: State):
     print(f"{Fore.LIGHTMAGENTA_EX}################ HUMAN INPUT NODE BEGIN #################")
