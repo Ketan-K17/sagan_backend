@@ -247,103 +247,29 @@ Here is the project description:
 """
 
 PROJECT_PLAN_SCHEMA_GENERATOR_PROMPT = """
-You are an expert research project planner. You have been provided with an existing project plan, embedded in which is a list of markers for work packages and the effort contribution table.
+You are an expert research project planner. You will be provided with an existing project plan's body of text. However, note that there are {wp_count} markers that look like <WP1>, <WP2>, etc. that are placeholders of work packages in the project plan.
 
-Here's how to identify the markers: 
-1. Work Package markers: <WP1>, <WP2>, etc.
-2. Effort Contribution Table marker: <ECT>
+By reading the project plan's text, you must write the row parameters for each of the {wp_count} work packages.
 
-Your task is to first read the existing project plan, and then generate content for each of the work packages and the effort contribution table.
-Note that there's exactly one marker for the Effort Contribution Table, and multiple markers for the work packages. You must read the project plan carefully to identify how many work packages there are.
+This is what a single Work Package's row parameters looks like:
 
-Structure of Work Package Content:
-{
-    "wp_leader": "Dr. Jane Smith",
-    "start_date": "January 2023",
-    "end_date": "June 2023",
-    "objective": "Analyze and document all system requirements from stakeholders",
-    "tasks": [
-        {"title": "Stakeholder interviews", "description": "Conduct interviews with key stakeholders"},
-        {"title": "Requirements gathering", "description": "Document functional and non-functional requirements"},
-        {"title": "Requirements validation", "description": "Validate requirements with stakeholders"},
-        {"title": "Requirements document", "description": "Create final requirements document"}
-    ],
-    "interdependence": "This package depends on WP1 and feeds into WP4 and WP5",
-    "deliverables": [
-        {"title": "Initial requirements draft", "month": "2"},
-        {"title": "Final requirements document", "month": "5"}
-    ],
-    "milestones": [
-        {"title": "Requirements gathering complete", "month": "3"},
-        {"title": "Requirements validation complete", "month": "4"},
-        {"title": "Requirements document approved", "month": "6"}
-    ],
-    "researchers": [
-        {"name": "John Doe", "partner": "University A", "qualification": "PhD", "months": "3"},
-        {"name": "Jane Smith", "partner": "Company B", "qualification": "MSc", "months": "2"},
-        {"name": "Robert Johnson", "partner": "Research Lab C", "qualification": "PhD", "months": "4"},
-        {"name": "Sarah Williams", "partner": "University A", "qualification": "MSc", "months": "2"}
-    ]
-}
+row_params = {{
+    'number': 1, 
+    'title': 'Research Foundations',
+    'num_tasks': 2,
+    'num_deliverables': 2,
+    'num_milestones': 1,
+    'num_researchers': 2
+}}
 
-Structure of Effort Contribution Table:
-[
-    {
-        'name': 'Prof. Dr. Andreas Hein',
-        'efforts': [2, 2, 1, 0, 0, 1]
-    },
-    {
-        'name': 'Dr. Maxime Cordy',
-        'efforts': [2, 1, 0, 1, 1, 1]
-    },
-    {
-        'name': 'Dr. Loveneesh Rana',
-        'efforts': [2, 6, 12, 2, 2, 10]
-    },
-    {
-        'name': 'Dr. Sami Lazreg',
-        'efforts': [2, 1, 1, 2, 4, 2]
-    },
-    {
-        'name': 'NN PhD Student SpaSys',
-        'efforts': [4, 12, 12, 6, 4, 10]
-    },
-    {
-        'name': 'NN PhD Student SerVal',
-        'efforts': [4, 4, 6, 12, 12, 10]
-    }
-]
+You need to return me a list of {wp_count} such dictionaries, one for each work package.
 
-Your output should be a JSON object with the following keys:
-1. work_packages: A list of work packages, each of which follows the structure given above.
-2. effort_contribution_table: A list of dictionaries, like the one I have presented before you.
+Your output needs to be a JSON object, with the following keys, and devoid of any other text or formatting like ```json or ```.
 
-Note that your JSON output should not be wrapped in ```json```.
+{{
+    "row_params_list": <list of row_params>
+}}
 
-Sample JSON Output: 
-{
-    "work_packages": <List of Work package structures>,
-    "effort_contribution_table": <Effort Contribution Table>
-}
-
-Here is the project description:
+Here is the project plan's body of text:
 """
 
-# Here's what you need to do: 
-# 1. Devise Work Packages for the project following these guidelines:
-# - Divide the project into 4-8 logical work packages that follow a natural progression
-# - Ensure the first WP is dedicated to project management and dissemination activities
-# - The final WP should focus on validation, evaluation, or case studies
-# - Ensure intermediate WPs follow a logical sequence with clear dependencies
-# - Each WP should have 3-5 specific tasks that collectively fulfill the WP's objectives
-# - Assign each WP a clear leader (use generic identifiers like "PI", "Co-PI", "Researcher A", etc.)
-# - Establish realistic timelines for each WP, considering dependencies
-# - Define clear milestones and deliverables for each WP
-
-# 2. Create an Effort Contribution Table, following these guidelines:
-# - It is a table showing effort allocation (in person-months) across:
-#   - Work packages (rows)
-#   - Team members (columns)
-#   - Use generic role identifiers (PI, Co-PI, Researcher A, PhD Student B, etc.)
-#   - Include total effort per WP and per team member
-#   - Ensure allocations are realistic (e.g., no individual contributing more than 100 percent effort)

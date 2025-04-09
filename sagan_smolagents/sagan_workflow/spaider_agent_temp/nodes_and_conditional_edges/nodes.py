@@ -18,8 +18,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 '''LOCAL IMPORTS'''
 from schemas import State
-from prompts.prompts import PROMPT_PARSER_PROMPT, ABSTRACT_QUESTIONS_GENERATOR_PROMPT, ABSTRACT_ANSWERS_GENERATOR_PROMPT, SECTION_TOPIC_EXTRACTOR_PROMPT, SECTION_WISE_QUESTION_GENERATOR_PROMPT, PLAN_PROMPT, WRITER_PROMPT, PROJECT_PLAN_BODY_GENERATOR_PROMPT
-from .node_utils import save_state_for_testing, copy_figures
+from prompts.prompts import PROMPT_PARSER_PROMPT, ABSTRACT_QUESTIONS_GENERATOR_PROMPT, ABSTRACT_ANSWERS_GENERATOR_PROMPT, SECTION_TOPIC_EXTRACTOR_PROMPT, SECTION_WISE_QUESTION_GENERATOR_PROMPT, PLAN_PROMPT, WRITER_PROMPT, PROJECT_PLAN_BODY_GENERATOR_PROMPT, PROJECT_PLAN_SCHEMA_GENERATOR_PROMPT
+from .node_utils import save_state_for_testing, copy_figures, replace_wp_markers_preserving_format
 
 '''IMPORT ALL TOOLS HERE AND CREATE LIST OF TOOLS TO BE PASSED TO THE AGENT.'''
 from tools.script_executor import run_script
@@ -530,8 +530,29 @@ def project_plan_body_generator(state: State) -> State:
 
 def project_plan_schema_generator(state: State) -> State:
     print(f"{Fore.LIGHTMAGENTA_EX}################ PROJECT PLAN SCHEMA GENERATOR NODE BEGIN #################")
+    # count the number of work package markers in the project plan.
+    wp_count = state['generated_sections'][state['project_plan_section_name']].count('<WP')
 
+    # create the wp_list list of input dicts to work packages.
+    # once that is done, create context for each of the work packages.
+    combined_prompt = str(PROJECT_PLAN_SCHEMA_GENERATOR_PROMPT.format(wp_count=wp_count)) + "\n\n" + state['generated_sections'][state['project_plan_section_name']]
 
+    print("PROJECT_PLAN_SCHEMA_GENERATOR_PROMPT\n: ", combined_prompt)
+    response = agent.provide_final_answer(combined_prompt, images=None)
+    print("PROJECT_PLAN_SCHEMA_GENERATOR RESPONSE\n: ", response)
+    response_json = json.loads(response)
+    row_params_list = response_json['row_params_list']
+
+    configfile = load_config_file()
+    current_project_id = configfile.get_current_project_id()
+    updated_paths = configfile.update_project_paths(current_project_id)
+    
+    base_output_path = updated_paths['workflow1_output']
+    output_docx_path = base_output_path / "output.docx"
+    replace_wp_markers_preserving_format(output_docx_path, output_docx_path, row_params_list)
+    print(f"Saved rendered document to {output_docx_path}")
+
+    save_state_for_testing(state, "project_plan_schema_generator_node")
 
     print(f"{Fore.LIGHTMAGENTA_EX}################ PROJECT PLAN SCHEMA GENERATOR NODE END #################{Style.RESET_ALL}")
     return state

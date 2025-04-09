@@ -237,6 +237,20 @@ tests = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4
 tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
 [[package]]
+name = "babel"
+version = "2.17.0"
+description = "Internationalization utilities"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "babel-2.17.0-py3-none-any.whl", hash = "sha256:4d0b53093fdfb4b21c92b5213dba5a1b23885afa8383709427046b21c366e5f2"},
+    {file = "babel-2.17.0.tar.gz", hash = "sha256:0c54cffb19f690cdcc52a3b50bcbf71e07a808d1c80d549f2459b9d2cf0afb9d"},
+]
+
+[package.extras]
+dev = ["backports.zoneinfo", "freezegun (>=1.0,<2.0)", "jinja2 (>=3.0)", "pytest (>=6.0)", "pytest-cov", "pytz", "setuptools", "tzdata"]
+
+[[package]]
 name = "backoff"
 version = "2.2.1"
 description = "Function decoration for backoff and retry"
@@ -1082,6 +1096,47 @@ python-versions = "*"
 files = [
     {file = "docx2txt-0.8.tar.gz", hash = "sha256:2c06d98d7cfe2d3947e5760a57d924e3ff07745b379c8737723922e7009236e5"},
 ]
+
+[[package]]
+name = "docxcompose"
+version = "1.4.0"
+description = "Compose .docx documents"
+optional = false
+python-versions = "*"
+files = [
+    {file = "docxcompose-1.4.0.tar.gz", hash = "sha256:bcf2799a0b63c29eb77a3d799a2f28443ae0f69f8691ff3d753f706be515c3e9"},
+]
+
+[package.dependencies]
+babel = "*"
+lxml = "*"
+python-docx = ">=0.8.8"
+setuptools = "*"
+six = "*"
+
+[package.extras]
+test = ["pytest"]
+tests = ["pytest"]
+
+[[package]]
+name = "docxtpl"
+version = "0.19.1"
+description = "Python docx template engine"
+optional = false
+python-versions = "*"
+files = [
+    {file = "docxtpl-0.19.1-py2.py3-none-any.whl", hash = "sha256:12dbf93069d3d08897e3a44a4a043cb60d0320b88228ec2a6c6cf0e103c732dd"},
+    {file = "docxtpl-0.19.1.tar.gz", hash = "sha256:5836aab5583a82e2e81b086fae130ce94dc080f6b7fe0e43f83f4e3e3e5daecf"},
+]
+
+[package.dependencies]
+docxcompose = "*"
+jinja2 = "*"
+lxml = "*"
+python-docx = ">=1.1.1"
+
+[package.extras]
+docs = ["Sphinx", "sphinxcontrib-napoleon"]
 
 [[package]]
 name = "duckduckgo-search"
@@ -7784,4 +7839,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "4020fc88ea4141c9e8ae79d67b0569f273fcdedfb191d8cdba9beaa27933cf50"
+content-hash = "73f8fe48b3759c68c480d325c51d1574541633abc659f56d4f8d43f08fa6194f"
