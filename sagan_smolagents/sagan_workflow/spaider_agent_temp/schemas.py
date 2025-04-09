@@ -61,3 +61,4 @@ class State(MessagesState):
     work_packages_contexts: List[WorkPackageContext]
     contributors_table: ContributorsTable
     project_plan_section_name: str # the name of the section to add the project plan content into.
+    row_params_list: List[Dict[str, str]]

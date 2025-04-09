@@ -233,6 +233,7 @@ Instructions:
 Requirements:
 - Insert the work package markers (<WP1>, <WP2>, etc.) on separate lines at appropriate locations.
 - Insert the effort contribution table marker (<ECT>) on a separate line where appropriate.
+- ALL THE MARKERS MUST BE PUT ON NEW LINES IN THE OUTPUT. THEY SHOULD NOT BE PART OF A LIST, OR ANY OTHER TEXT.
 - Organize content into logical subsections with appropriate headings.
 - Use plain text only with no markdown formatting.
 - Ensure the plan covers the entire project duration and accounts for all major components described in the project description.

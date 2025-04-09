@@ -7,6 +7,7 @@ import base64
 from pathlib import Path
 import importlib.util
 from types import ModuleType
+import shutil
 
 # llm/langchain/agent related imports
 from langchain_core.messages import SystemMessage
@@ -542,15 +543,7 @@ def project_plan_schema_generator(state: State) -> State:
     print("PROJECT_PLAN_SCHEMA_GENERATOR RESPONSE\n: ", response)
     response_json = json.loads(response)
     row_params_list = response_json['row_params_list']
-
-    configfile = load_config_file()
-    current_project_id = configfile.get_current_project_id()
-    updated_paths = configfile.update_project_paths(current_project_id)
-    
-    base_output_path = updated_paths['workflow1_output']
-    output_docx_path = base_output_path / "output.docx"
-    replace_wp_markers_preserving_format(output_docx_path, output_docx_path, row_params_list)
-    print(f"Saved rendered document to {output_docx_path}")
+    state["row_params_list"] = row_params_list
 
     save_state_for_testing(state, "project_plan_schema_generator_node")
 
@@ -598,6 +591,16 @@ def formatting_node(state: State) -> State:
     # Save the document to the same path
     doc.save(output_docx_path)
     print(f"Word document updated at: {output_docx_path}")
+
+    # Create a temporary file path
+    temp_output_path = output_docx_path.parent / "temp_output.docx"
+
+    # Use the temporary file as output
+    replace_wp_markers_preserving_format(output_docx_path, temp_output_path, state["row_params_list"])
+
+    # Replace the original file with the temporary file
+    shutil.move(temp_output_path, output_docx_path)
+    print(f"Saved rendered document to {output_docx_path}")
 
     # Create base64 string of output.docx
     with open(output_docx_path, "rb") as file:
