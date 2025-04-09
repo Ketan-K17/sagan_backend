@@ -51,8 +51,9 @@ research_tools = [query_chromadb]
 from smolagents import ToolCallingAgent, HfApiModel, CodeAgent
 # select model
 # model_id = "Qwen/Qwen2.5-Coder-32B-Instruct"
-model_id = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
-# model_id = "meta-llama/Llama-3.3-70B-Instruct"
+# model_id = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+# model_id = "Qwen/QwQ-32B"
+model_id = "meta-llama/Llama-3.3-70B-Instruct"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 # model_id = "NousResearch/Hermes-3-Llama-3.1-8B"
@@ -452,38 +453,39 @@ def formatter(state: State):
     print(raw_response)
     print("-" * 50)
 
-    try:
-        # Look for the <answer> and </answer> tags to extract the JSON
-        if '<answer>' in raw_response and '</answer>' in raw_response:
-            # Extract content between <answer> and </answer> tags
-            answer_content = raw_response.split('<answer>')[1].split('</answer>')[0].strip()
-            print("Extracted content from <answer> tags:")
-            print(answer_content)
+    # try:
+    #     # Look for the <answer> and </answer> tags to extract the JSON
+    #     if '<answer>' in raw_response and '</answer>' in raw_response:
+    #         # Extract content between <answer> and </answer> tags
+    #         answer_content = raw_response.split('<answer>')[1].split('</answer>')[0].strip()
+    #         print("Extracted content from <answer> tags:")
+    #         print(answer_content)
             
-            # Find JSON object within the answer content (looking for curly braces)
-            if '{' in answer_content and '}' in answer_content:
-                json_start = answer_content.find('{')
-                json_end = answer_content.rfind('}') + 1
-                json_str = answer_content[json_start:json_end]
-                print("Extracted JSON object:")
-                print(json_str)
-                response_data = json.loads(json_str)
-            else:
-                # If no JSON object found in answer content, raise an error
-                raise ValueError("No JSON object found within <answer> tags")
-        else:
-            # If no answer tags found, raise an error
-            raise ValueError("No <answer> tags found in the response")
+    #         # Find JSON object within the answer content (looking for curly braces)
+    #         if '{' in answer_content and '}' in answer_content:
+    #             json_start = answer_content.find('{')
+    #             json_end = answer_content.rfind('}') + 1
+    #             json_str = answer_content[json_start:json_end]
+    #             print("Extracted JSON object:")
+    #             print(json_str)
+    #             response_data = json.loads(json_str)
+    #         else:
+    #             # If no JSON object found in answer content, raise an error
+    #             raise ValueError("No JSON object found within <answer> tags")
+    #     else:
+    #         # If no answer tags found, raise an error
+    #         raise ValueError("No <answer> tags found in the response")
             
-    except (json.JSONDecodeError, ValueError) as e:
-        print(f"Error parsing response: {e}")
-        print("Raw response:", raw_response)
-        # Create an error response
-        response_data = {
-            'modified_section_text': state.get('section_text', ''),
-            'ai_message': f'Error: Could not process the text modification. {str(e)}'
-        }
-    
+    # except (json.JSONDecodeError, ValueError) as e:
+    #     print(f"Error parsing response: {e}")
+    #     print("Raw response:", raw_response)
+    #     # Create an error response
+    #     response_data = {
+    #         'modified_section_text': state.get('section_text', ''),
+    #         'ai_message': f'Error: Could not process the text modification. {str(e)}'
+    #     }
+
+    response_data = json.loads(raw_response)
     # Extract the fields with fallback values
     modified_section_text = response_data.get('modified_section_text', section_text)
     ai_message = response_data.get('ai_message', 'No message provided')

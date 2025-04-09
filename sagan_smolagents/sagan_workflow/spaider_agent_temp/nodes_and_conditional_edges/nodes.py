@@ -414,6 +414,78 @@ def generation_node(state: State) -> State:
         print(f"{Fore.LIGHTYELLOW_EX}################ GENERATION NODE END #################{Style.RESET_ALL}")
         raise
 
+def project_plan_heading_node(state: State) -> State:
+    print(f"{Fore.LIGHTGREEN_EX}################ PROJECT PLAN HEADING NODE BEGIN #################")
+    generated_sections = state["generated_sections"]
+    # logic to decide where to add the Project Plan heading.
+    project_plan_heading_prompt = f"""
+    You are an expert research proposal writer. You have this list of project sections: {generated_sections.keys()}, the content for which already has been written on the document.
+
+    This document also needs a Project Plan that will delve into how to approach a solution to the problem statement the document has described so far. You need to decide which of the existing sections would be most appropriate to add the Project Plan content into.
+
+    Given the list of sections, return the section_name where you think the 'Project Plan' content should appear.
+
+    Your output must be a JSON object with the following key:
+    - section_name: The name of the section to add the project plan heading at.
+
+    example:
+    {{
+        "section_name": "Methodology"
+    }}
+
+    Your output must be ONLY a JSON object, and nothing else. Ensure that output JSON is formatted correctly without any additional text or formatting like ```json or ```.
+
+    Guidelines for deciding the position of the Project Plan content:
+    - The Project Plan content must be added at the later stages of the document, when the problem statement has been described completely.
+    - The Project Plan content CANNOT appear in the introduction, or the conclusion and bibliography sections.
+    - The Project Plan content must be added at a position where it logically fits in the document.
+    
+    """
+    
+    print(f"PROJECT PLAN HEADING NODE PROMPT\n: {project_plan_heading_prompt}\n\n\n")
+    response = agent.provide_final_answer(project_plan_heading_prompt, images=None)
+    print(f"PROJECT PLAN HEADING NODE RESPONSE\n: {response}\n\n\n")
+    response_json = json.loads(response)
+    project_plan_section_name = response_json["section_name"]
+    
+    state["project_plan_section_name"] = project_plan_section_name
+    save_state_for_testing(state, "project_plan_heading_node")
+
+    print(f"{Fore.LIGHTGREEN_EX}################ PROJECT PLAN HEADING NODE END #################{Style.RESET_ALL}")
+    return state
+
+def project_plan_body_generator(state: State) -> State:
+    print(f"{Fore.LIGHTRED_EX}################ PROJECT PLAN BODY GENERATOR NODE BEGIN #################")
+    
+    # Construct prompt
+    combined_prompt = str(PROJECT_PLAN_BODY_GENERATOR_PROMPT) + "\n" + str(state["generated_sections"])
+    print(f"PROJECT PLAN BODY GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
+    project_plan_section_content = agent.provide_final_answer(combined_prompt, images=None)
+    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {project_plan_section_content}\n\n\n")
+
+    # Find the appropriate section to add the project plan content
+    target_section_name = state["project_plan_section_name"]
+    generated_sections = state["generated_sections"]
+    target_section_lower = target_section_name.lower().strip()
+    for section_name in generated_sections.keys():
+        section_lower = section_name.lower().strip()
+        # Perfect match
+        if section_lower == target_section_lower:
+            generated_sections[section_name] = project_plan_section_content
+            break
+
+    save_state_for_testing(state, "project_plan_body_generator")
+
+    print(f"{Fore.LIGHTRED_EX}################ PROJECT PLAN BODY GENERATOR NODE END #################{Style.RESET_ALL}")
+    return state
+
+def project_plan_schema_generator(state: State) -> State:
+    print(f"{Fore.LIGHTMAGENTA_EX}################ PROJECT PLAN SCHEMA GENERATOR NODE BEGIN #################")
+
+
+
+    print(f"{Fore.LIGHTMAGENTA_EX}################ PROJECT PLAN SCHEMA GENERATOR NODE END #################{Style.RESET_ALL}")
+    return state
 
 def formatting_node(state: State) -> State:
     print(f"{Fore.LIGHTYELLOW_EX}################ FORMATTING NODE BEGIN #################")
