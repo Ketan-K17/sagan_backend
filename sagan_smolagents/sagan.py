@@ -31,6 +31,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {"message": "Sagan API is running", "endpoints": ["/list_projects", "/create_project", "/load_project"]}
+
 class ProjectDetails(BaseModel):
     project_name: str
 
