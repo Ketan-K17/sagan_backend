@@ -2,3 +2,5 @@
 projects/
 
 *.pyc
+
+__pycache__/
