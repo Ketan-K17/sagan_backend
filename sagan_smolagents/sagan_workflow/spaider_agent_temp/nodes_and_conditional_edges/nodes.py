@@ -39,6 +39,29 @@ def load_config_file() -> ModuleType:
     spec.loader.exec_module(config)
     return config
 
+# helper function to strip thinking section from LLM response
+def strip_thinking_section(response: str) -> str:
+    """
+    Strips the thinking section enclosed in <think> tags from the LLM response.
+    Returns the remainder of the response for JSON parsing.
+    """
+    response_str = str(response).strip()
+    
+    # Find and remove thinking section
+    think_start = response_str.find('<think>')
+    think_end = response_str.find('</think>')
+    
+    if think_start != -1 and think_end != -1:
+        # Remove the entire thinking section including tags
+        before_think = response_str[:think_start]
+        after_think = response_str[think_end + 8:]  # 8 is len('</think>')
+        cleaned_response = before_think + after_think
+    else:
+        # No thinking section found, return as is
+        cleaned_response = response_str
+    
+    return cleaned_response.strip()
+
 # helper function to clean the JSON response from the LLM to ensure it's valid.
 def clean_json_response(response: str) -> str:
     """
@@ -94,7 +117,7 @@ load_dotenv(dotenv_path=configfile.ENV_PATH)
 init()
 
 '''LLM TO USE'''
-model_id = "meta-llama/Llama-3.3-70B-Instruct"
+model_id = "HuggingFaceTB/SmolLM3-3B"
 # model_id = "Qwen/Qwen2.5-72B-Instruct"
 # model_id = "Qwen/QwQ-32B"
 # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
@@ -121,7 +144,11 @@ def prompt_parser(state: State) -> State:
         # llm call.
         response = agent.provide_final_answer(combined_user_prompt, images=None)
         print(f"PROMPT PARSER RESPONSE\n: {response}\n\n\n")
-        response_json = json.loads(response)
+        
+        # Strip thinking section and <think> tags
+        cleaned_response = strip_thinking_section(str(response))
+        json_response = clean_json_response(cleaned_response)
+        response_json = json.loads(json_response)
         
         # updating state before end-of-node logging
         state["project_title"] = response_json["project_title"]
@@ -155,7 +182,9 @@ def abstract_questions_generator(state: State) -> State:
     try:
         response = agent.provide_final_answer(combined_prompt, images=None)
         print(f"ABSTRACT QUESTIONS GENERATOR RESPONSE\n: {response}\n\n\n")
-        response_json = json.loads(response)
+        cleaned_response = strip_thinking_section(str(response))
+        json_response = clean_json_response(cleaned_response)
+        response_json = json.loads(json_response)
         
         # Update state before end-of-node logging
         state["abstract_questions"] = response_json["abstract_questions"]
@@ -208,7 +237,9 @@ def abstract_answers_generator(state: State) -> State:
         print(f"ABSTRACT ANSWERS GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
         response = agent.provide_final_answer(combined_prompt, images=None)
         print(f"ABSTRACT ANSWERS GENERATOR RESPONSE\n: {response}\n\n\n")
-        response_json = json.loads(response)
+        cleaned_response = strip_thinking_section(str(response))
+        json_response = clean_json_response(cleaned_response)
+        response_json = json.loads(json_response)
         abstract_text = response_json["abstract_text"]
 
         # Updating state before end-of-node logging
@@ -250,12 +281,14 @@ def section_topic_extractor(state: State) -> State:
         
         response = agent.provide_final_answer(combined_prompt, images=None)
         print(f"SECTION TOPIC EXTRACTOR RESPONSE\n: {response}\n\n\n")
-        response_json = json.loads(response)
+        cleaned_response = strip_thinking_section(str(response))
+        json_response = clean_json_response(cleaned_response)
+        response_json = json.loads(json_response)
         section_topics_list = response_json["section_topics"]
 
         # Updating state before end-of-node logging
         state["section_topics_corpus"] = result
-        state["section_topics"] = section_topics_list
+        state["section_topics"] = section_topics_list   
 
         save_state_for_testing(state, "section_topic_extractor")
 
@@ -284,9 +317,11 @@ def plan_node(state: State) -> State:
         # Get response from agent
         response = agent.provide_final_answer(combined_prompt, images=None)
         print(f"PLAN NODE RESPONSE\n: {response}\n\n\n")
-        json_str = clean_json_response(response)
+        cleaned_response = strip_thinking_section(str(response))
+        json_response = clean_json_response(cleaned_response)
+        response_json = json.loads(json_response)
         
-        plan_dict = json.loads(json_str)
+        plan_dict = response_json
         
         state["plan"] = plan_dict
         save_state_for_testing(state, "plan")
@@ -314,11 +349,12 @@ def section_wise_question_generator(state: State) -> State:
         # Get response from agent
         response = agent.provide_final_answer(combined_prompt, images=None)
         print(f"SECTION WISE QUESTION GENERATOR RESPONSE\n: {response}\n\n\n")
-        json_str = clean_json_response(response)
+        cleaned_response = strip_thinking_section(str(response))
+        json_str = clean_json_response(cleaned_response)
         
         # Parse and validate JSON response
         try:
-            section_wise_questions = json.loads(json_str)
+            section_wise_questions = json.loads(json_str)   
             
             # Validate the structure: should be dict[str, list[str]]
             if not isinstance(section_wise_questions, dict):
@@ -391,6 +427,8 @@ def section_wise_answers_generator(state: State) -> State:
                     
                     # refactoring answer documents into one cohesive answer
                     answer = agent.provide_final_answer(f"Frame the following texts into one cohesive answer: {results}. The question was: {question}", images=None)
+                    answer = strip_thinking_section(str(answer))
+                    answer = clean_json_response(answer)
                     answer_text = answer.to_string() if hasattr(answer, 'to_string') else str(answer)
                     answer_list.append(answer_text)
 
@@ -495,7 +533,9 @@ def project_plan_heading_node(state: State) -> State:
     print(f"PROJECT PLAN HEADING NODE PROMPT\n: {project_plan_heading_prompt}\n\n\n")
     response = agent.provide_final_answer(project_plan_heading_prompt, images=None)
     print(f"PROJECT PLAN HEADING NODE RESPONSE\n: {response}\n\n\n")
-    response_json = json.loads(response)
+    cleaned_response = strip_thinking_section(str(response))
+    json_response = clean_json_response(cleaned_response)
+    response_json = json.loads(json_response)
     project_plan_section_name = response_json["section_name"]
     
     state["project_plan_section_name"] = project_plan_section_name
@@ -541,7 +581,9 @@ def project_plan_schema_generator(state: State) -> State:
     print("PROJECT_PLAN_SCHEMA_GENERATOR_PROMPT\n: ", combined_prompt)
     response = agent.provide_final_answer(combined_prompt, images=None)
     print("PROJECT_PLAN_SCHEMA_GENERATOR RESPONSE\n: ", response)
-    response_json = json.loads(response)
+    cleaned_response = strip_thinking_section(str(response))
+    json_response = clean_json_response(cleaned_response)
+    response_json = json.loads(json_response)
     row_params_list = response_json['row_params_list']
     state["row_params_list"] = row_params_list
 

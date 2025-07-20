@@ -380,6 +380,11 @@ def get_generated_sections() -> list:
 #     })
 
 
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {"message": "Sagan API is running", "endpoints": ["/upload-files", "/process-input-first-workflow", "/interact", "/download", "/download-base64", "/upload-docx", "/convert-to-html", "/upload-image", "/convert-to-docx", "/upload_resume", "/store_project_info", "/store_company_info", "/store_author_info", "/store_pi_info", "/store_copi_info"]}
+
 
 
 @app.post("/upload-files")
