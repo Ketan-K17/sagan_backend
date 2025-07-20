@@ -11,7 +11,9 @@ import shutil
 
 # llm/langchain/agent related imports
 from langchain_core.messages import SystemMessage
-from smolagents import ToolCallingAgent, HfApiModel
+from langchain_ollama import ChatOllama
+from langchain_core.output_parsers import JsonOutputParser
+from pydantic import BaseModel, Field
 
 # Python-docx imports.
 from docx import Document
@@ -117,18 +119,10 @@ load_dotenv(dotenv_path=configfile.ENV_PATH)
 init()
 
 '''LLM TO USE'''
-model_id = "HuggingFaceTB/SmolLM3-3B"
-# model_id = "Qwen/Qwen2.5-72B-Instruct"
-# model_id = "Qwen/QwQ-32B"
-# model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-model = HfApiModel(model_id=model_id)
-
-empty_prompt = """ """
-
-agent = ToolCallingAgent(
-    model=model, 
-    tools=[], 
-    prompt_templates={"system_prompt": empty_prompt}
+model_id = "llama3.2:latest"
+llm = ChatOllama(
+    model = model_id,
+    temperature = 0
 )
 
 def prompt_parser(state: State) -> State:
@@ -137,22 +131,27 @@ def prompt_parser(state: State) -> State:
     """
     print(f"{Fore.YELLOW}################ PROMPT PARSER BEGIN #################")
     user_prompt = state["user_prompt"]
+
+    # Define the output schema for the prompt parser
+    class PromptParserOutput(BaseModel):
+        project_title: str = Field(description="The title of the project")
+        project_description: str = Field(description="The description of the project")
+
+    # Define the output parser for the prompt parser
+    output_parser = JsonOutputParser(pydantic_object=PromptParserOutput)
     
     try:
         combined_user_prompt = PROMPT_PARSER_PROMPT + "\n" + user_prompt
-        print(f"PROMPT PARSER PROMPT\n: {combined_user_prompt}\n\n\n")
+        # print(f"PROMPT PARSER PROMPT\n: {combined_user_prompt}\n\n\n")
         # llm call.
-        response = agent.provide_final_answer(combined_user_prompt, images=None)
-        print(f"PROMPT PARSER RESPONSE\n: {response}\n\n\n")
-        
-        # Strip thinking section and <think> tags
-        cleaned_response = strip_thinking_section(str(response))
-        json_response = clean_json_response(cleaned_response)
-        response_json = json.loads(json_response)
+        response = llm.invoke(combined_user_prompt)
+        parsed_response = output_parser.invoke(response)
+
+        print(f"PROMPT PARSER RESPONSE\n: {parsed_response}\n\n\n")
         
         # updating state before end-of-node logging
-        state["project_title"] = response_json["project_title"]
-        state["project_description"] = response_json["project_description"]
+        state["project_title"] = parsed_response["project_title"]
+        state["project_description"] = parsed_response["project_description"]
 
         save_state_for_testing(state, "prompt_parser")
 
@@ -163,6 +162,7 @@ def prompt_parser(state: State) -> State:
         print(f"Error in prompt_parser: {e}")
         print(f"################ PROMPT PARSER END #################{Style.RESET_ALL}")
         raise
+
 
 def abstract_questions_generator(state: State) -> State:
     """
@@ -177,17 +177,20 @@ def abstract_questions_generator(state: State) -> State:
     Project Description: {project_description}
     """
     combined_prompt = ABSTRACT_QUESTIONS_GENERATOR_PROMPT + user_prompt
-    print(f"ABSTRACT QUESTIONS GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
+
+    class AbstractQuestionsGeneratorOutput(BaseModel):
+        abstract_questions: list[str] = Field(description="A list of questions that may help it understand the project better. The answers to these questions will then be used to create a project abstract.")
+
+    output_parser = JsonOutputParser(pydantic_object=AbstractQuestionsGeneratorOutput)
 
     try:
-        response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"ABSTRACT QUESTIONS GENERATOR RESPONSE\n: {response}\n\n\n")
-        cleaned_response = strip_thinking_section(str(response))
-        json_response = clean_json_response(cleaned_response)
-        response_json = json.loads(json_response)
+        response = llm.invoke(combined_prompt)
+        parsed_response = output_parser.invoke(response)
         
+        print(f"ABSTRACT QUESTIONS GENERATOR RESPONSE\n: {parsed_response}\n\n\n")
+
         # Update state before end-of-node logging
-        state["abstract_questions"] = response_json["abstract_questions"]
+        state["abstract_questions"] = parsed_response["abstract_questions"]
 
         save_state_for_testing(state, "abstract_questions_generator")
 
@@ -213,6 +216,7 @@ def abstract_answers_generator(state: State) -> State:
 
     try:
         # Use the research tools to actually query the database
+        i = 1
         qa_pairs = {}
         for question in abstract_questions:
             result = query_chromadb(
@@ -221,9 +225,12 @@ def abstract_answers_generator(state: State) -> State:
                 question
             )
             # refactoring answer documents into one cohesive answer
-            answer = agent.provide_final_answer(f"Frame the following texts into one cohesive answer: {result}. The question was: {question}", images=None)
-            answer_text = answer.to_string() if hasattr(answer, 'to_string') else str(answer)
-            qa_pairs[question] = answer_text
+            answer = llm.invoke(f"Frame the following texts into one cohesive answer: {result}. The question was: {question}")
+            qa_pairs[question] = answer.content
+            # Print Q&A pairs
+            print(f"Q{i}: {question}")
+            print(f"A{i}: {answer.content}\n")
+            i += 1
 
         # Now use the LLM to generate an abstract based on the retrieved answers
         user_prompt = f"""
@@ -232,18 +239,30 @@ def abstract_answers_generator(state: State) -> State:
 
         Here's the list of question-answer pairs:
         {qa_pairs}
+
+        Return the abstract as a JSON object with the key 'abstract_text' and the value as the abstract text. MAKE sure there is no additional text accompanying the JSON object.
+
+        Sample Output Format:
+        {{
+            "abstract_text": "Abstract text here"
+        }}
+
+        Make sure the abstract is 250-300 words long.
         """
+
+        class AbstractAnswersGeneratorOutput(BaseModel):
+            abstract_text: str = Field(description="The abstract of the project")
+
+        output_parser = JsonOutputParser(pydantic_object=AbstractAnswersGeneratorOutput)
+
         combined_prompt = str(ABSTRACT_ANSWERS_GENERATOR_PROMPT) + "\n" + str(user_prompt)
-        print(f"ABSTRACT ANSWERS GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
-        response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"ABSTRACT ANSWERS GENERATOR RESPONSE\n: {response}\n\n\n")
-        cleaned_response = strip_thinking_section(str(response))
-        json_response = clean_json_response(cleaned_response)
-        response_json = json.loads(json_response)
-        abstract_text = response_json["abstract_text"]
+        response = llm.invoke(combined_prompt)
+        parsed_response = output_parser.invoke(response)
+        print(f"ABSTRACT ANSWERS GENERATOR RESPONSE\n: {parsed_response}\n\n\n")
+
 
         # Updating state before end-of-node logging
-        state["abstract_text"] = abstract_text
+        state["abstract_text"] = parsed_response["abstract_text"]
         state["abstract_qa_pairs"] = qa_pairs
 
         save_state_for_testing(state, "abstract_answers_generator")
@@ -277,18 +296,19 @@ def section_topic_extractor(state: State) -> State:
         formatted_result = "\n".join(result) if isinstance(result, list) else str(result)
         # Combine the prompt and formatted result
         combined_prompt = f"{SECTION_TOPIC_EXTRACTOR_PROMPT}\n\nContext:\n{formatted_result}"
-        print(f"SECTION TOPIC EXTRACTOR PROMPT\n: {combined_prompt}\n\n\n")
+
+        class SectionTopicExtractorOutput(BaseModel):
+            section_topics: list[str] = Field(description="A list of section topics or headings or titles")
+
+        output_parser = JsonOutputParser(pydantic_object=SectionTopicExtractorOutput)
         
-        response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"SECTION TOPIC EXTRACTOR RESPONSE\n: {response}\n\n\n")
-        cleaned_response = strip_thinking_section(str(response))
-        json_response = clean_json_response(cleaned_response)
-        response_json = json.loads(json_response)
-        section_topics_list = response_json["section_topics"]
+        response = llm.invoke(combined_prompt)
+        parsed_response = output_parser.invoke(response)
+        print(f"SECTION TOPIC EXTRACTOR RESPONSE\n: {parsed_response}\n\n\n")
 
         # Updating state before end-of-node logging
         state["section_topics_corpus"] = result
-        state["section_topics"] = section_topics_list   
+        state["section_topics"] = parsed_response["section_topics"]   
 
         save_state_for_testing(state, "section_topic_extractor")
 
@@ -312,18 +332,17 @@ def plan_node(state: State) -> State:
         List of Section Titles: {state["section_topics"]}
         """
         combined_prompt = PLAN_PROMPT + "\n" + user_prompt
-        print(f"PLAN NODE PROMPT\n: {combined_prompt}\n\n\n")
+
+        class PlanNodeOutput(BaseModel):
+            plan: dict[str, list[str]] = Field(description="A dictionary of section titles and their corresponding plan")
+
+        output_parser = JsonOutputParser(pydantic_object=PlanNodeOutput)
 
         # Get response from agent
-        response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"PLAN NODE RESPONSE\n: {response}\n\n\n")
-        cleaned_response = strip_thinking_section(str(response))
-        json_response = clean_json_response(cleaned_response)
-        response_json = json.loads(json_response)
-        
-        plan_dict = response_json
-        
-        state["plan"] = plan_dict
+        response = llm.invoke(combined_prompt)
+        parsed_response = output_parser.invoke(response)
+        print(f"PLAN NODE RESPONSE\n: {parsed_response}\n\n\n")
+        state["plan"] = parsed_response
         save_state_for_testing(state, "plan")
         return state
             
@@ -344,34 +363,20 @@ def section_wise_question_generator(state: State) -> State:
         - Abstract: {state["abstract_text"]}
         - Plan for entire research paper: {state["plan"]}
     """
-    print(f"SECTION WISE QUESTION GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
+
+    class SectionWiseQuestionGeneratorOutput(BaseModel):
+        section_wise_questions: dict[str, list[str]] = Field(description="A dictionary of section titles and their corresponding questions")
+
+    output_parser = JsonOutputParser(pydantic_object=SectionWiseQuestionGeneratorOutput)
+
     try:
         # Get response from agent
-        response = agent.provide_final_answer(combined_prompt, images=None)
-        print(f"SECTION WISE QUESTION GENERATOR RESPONSE\n: {response}\n\n\n")
-        cleaned_response = strip_thinking_section(str(response))
-        json_str = clean_json_response(cleaned_response)
+        response = llm.invoke(combined_prompt)
+        parsed_response = output_parser.invoke(response)
+        print(f"SECTION WISE QUESTION GENERATOR RESPONSE\n: {parsed_response}\n\n\n")
         
-        # Parse and validate JSON response
-        try:
-            section_wise_questions = json.loads(json_str)   
-            
-            # Validate the structure: should be dict[str, list[str]]
-            if not isinstance(section_wise_questions, dict):
-                raise ValueError("Response must be a dictionary")
-            
-            for section, questions in section_wise_questions.items():
-                if not isinstance(questions, list):
-                    raise ValueError(f"Questions must be a list for section {section}")
-                if not all(isinstance(q, str) for q in questions):
-                    raise ValueError(f"All questions must be strings in section {section}")
-
-            # Update state      
-            state["section_questions"] = section_wise_questions
-            
-        except json.JSONDecodeError as je:
-            print(f"JSON parsing error: {je}")
-            raise
+        # Update state      
+        state["section_questions"] = parsed_response
             
         # Save state and return
         save_state_for_testing(state, "section_wise_question_generator")
@@ -395,6 +400,11 @@ def section_wise_answers_generator(state: State) -> State:
     current_project_id = configfile.get_current_project_id()
     updated_paths = configfile.update_project_paths(current_project_id)
     
+    class SectionWiseAnswersGeneratorOutput(BaseModel):
+        section_answers: dict[str, list[str]] = Field(description="A dictionary of section titles and their corresponding answers")
+
+    output_parser = JsonOutputParser(pydantic_object=SectionWiseAnswersGeneratorOutput)
+
     section_questions = state.get("section_questions")
     if not section_questions:
         error_msg = "No section questions found in state. Previous node may have failed."
@@ -426,11 +436,8 @@ def section_wise_answers_generator(state: State) -> State:
                     file.write(f"Query results: {results}\n")
                     
                     # refactoring answer documents into one cohesive answer
-                    answer = agent.provide_final_answer(f"Frame the following texts into one cohesive answer: {results}. The question was: {question}", images=None)
-                    answer = strip_thinking_section(str(answer))
-                    answer = clean_json_response(answer)
-                    answer_text = answer.to_string() if hasattr(answer, 'to_string') else str(answer)
-                    answer_list.append(answer_text)
+                    answer = llm.invoke(f"Frame the following texts into one cohesive answer: {results}. The question was: {question}")
+                    answer_list.append(answer.content)
 
                 section_answers[section] = answer_list
                 
@@ -482,14 +489,13 @@ def generation_node(state: State) -> State:
             """
             
             combined_prompt = WRITER_PROMPT + "\n" + project_information
-            print(f"GENERATION NODE PROMPT\n: {combined_prompt}\n\n\n")
             # Get response from agent
-            response = agent.provide_final_answer(combined_prompt, images=None)
+            response = llm.invoke(combined_prompt)
             print(f"Successfully generated content for {section_title}")
-            print(f"GENERATION NODE RESPONSE\n: {response}\n\n\n")
+            print(f"GENERATION NODE RESPONSE\n: {response.content}\n\n\n")
 
-            document_so_far += response
-            generated_sections[section_title] = response
+            document_so_far += response.content
+            generated_sections[section_title] = response.content
         
         state["generated_sections"] = generated_sections
         save_state_for_testing(state, "generation")
@@ -529,29 +535,37 @@ def project_plan_heading_node(state: State) -> State:
     - The Project Plan content must be added at a position where it logically fits in the document.
     
     """
-    
-    print(f"PROJECT PLAN HEADING NODE PROMPT\n: {project_plan_heading_prompt}\n\n\n")
-    response = agent.provide_final_answer(project_plan_heading_prompt, images=None)
-    print(f"PROJECT PLAN HEADING NODE RESPONSE\n: {response}\n\n\n")
-    cleaned_response = strip_thinking_section(str(response))
-    json_response = clean_json_response(cleaned_response)
-    response_json = json.loads(json_response)
-    project_plan_section_name = response_json["section_name"]
-    
-    state["project_plan_section_name"] = project_plan_section_name
+
+    class ProjectPlanHeadingNodeOutput(BaseModel):
+        section_name: str = Field(description="The name of the section to add the project plan heading at.")
+
+    output_parser = JsonOutputParser(pydantic_object=ProjectPlanHeadingNodeOutput)
+
+    response = llm.invoke(project_plan_heading_prompt)
+    parsed_response = output_parser.invoke(response)
+    print(f"PROJECT PLAN HEADING NODE RESPONSE\n: {parsed_response}\n\n\n")
+
+    state["project_plan_section_name"] = parsed_response["section_name"]
     save_state_for_testing(state, "project_plan_heading_node")
 
     print(f"{Fore.LIGHTGREEN_EX}################ PROJECT PLAN HEADING NODE END #################{Style.RESET_ALL}")
     return state
+
+
 
 def project_plan_body_generator(state: State) -> State:
     print(f"{Fore.LIGHTRED_EX}################ PROJECT PLAN BODY GENERATOR NODE BEGIN #################")
     
     # Construct prompt
     combined_prompt = str(PROJECT_PLAN_BODY_GENERATOR_PROMPT) + "\n" + str(state["generated_sections"])
-    print(f"PROJECT PLAN BODY GENERATOR PROMPT\n: {combined_prompt}\n\n\n")
-    project_plan_section_content = agent.provide_final_answer(combined_prompt, images=None)
-    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {project_plan_section_content}\n\n\n")
+
+    class ProjectPlanBodyGeneratorOutput(BaseModel):
+        project_plan_section_content: str = Field(description="The content of the project plan section")
+
+    output_parser = JsonOutputParser(pydantic_object=ProjectPlanBodyGeneratorOutput)
+
+    project_plan_section_content = llm.invoke(combined_prompt)
+    print(f"PROJECT PLAN BODY GENERATOR RESPONSE\n: {project_plan_section_content.content}\n\n\n")
 
     # Find the appropriate section to add the project plan content
     target_section_name = state["project_plan_section_name"]
@@ -561,7 +575,7 @@ def project_plan_body_generator(state: State) -> State:
         section_lower = section_name.lower().strip()
         # Perfect match
         if section_lower == target_section_lower:
-            generated_sections[section_name] = project_plan_section_content
+            generated_sections[section_name] = project_plan_section_content.content
             break
 
     save_state_for_testing(state, "project_plan_body_generator")
@@ -579,9 +593,15 @@ def project_plan_schema_generator(state: State) -> State:
     combined_prompt = str(PROJECT_PLAN_SCHEMA_GENERATOR_PROMPT.format(wp_count=wp_count)) + "\n\n" + state['generated_sections'][state['project_plan_section_name']]
 
     print("PROJECT_PLAN_SCHEMA_GENERATOR_PROMPT\n: ", combined_prompt)
-    response = agent.provide_final_answer(combined_prompt, images=None)
-    print("PROJECT_PLAN_SCHEMA_GENERATOR RESPONSE\n: ", response)
-    cleaned_response = strip_thinking_section(str(response))
+
+    class ProjectPlanSchemaGeneratorOutput(BaseModel):
+        row_params_list: list[dict] = Field(description="A list of dictionaries, each containing the parameters for a row in the project plan table")
+
+    output_parser = JsonOutputParser(pydantic_object=ProjectPlanSchemaGeneratorOutput)
+
+    response = llm.invoke(combined_prompt, response_format=output_parser)
+    print("PROJECT_PLAN_SCHEMA_GENERATOR RESPONSE\n: ", response.content)
+    cleaned_response = strip_thinking_section(str(response.content))
     json_response = clean_json_response(cleaned_response)
     response_json = json.loads(json_response)
     row_params_list = response_json['row_params_list']

@@ -63,6 +63,7 @@ html2docx = "^1.6.0"
 docling = "^2.25.0"
 smolagents = "1.8.0"
 docxtpl = "^0.19.1"
+langchain-ollama = "^0.3.5"
 
 [tool.poetry.group.dev.dependencies]
 python-certifi-win32 = "^1.6.1"

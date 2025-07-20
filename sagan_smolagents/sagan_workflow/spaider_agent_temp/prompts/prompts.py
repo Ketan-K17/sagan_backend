@@ -52,17 +52,7 @@ Here is the project title and description:
 ABSTRACT_ANSWERS_GENERATOR_PROMPT = """
 You are an intelligent assistant responsible for creating an abstract of a research project paper based on the project title and description, and a set of question-answer pairs. Your task is to read the question-answer pairs and create an abstract of the project based on the answers.
 
-Return the abstract as a JSON object with the key 'abstract_text' and the value as the abstract text. MAKE sure there is no additional text accompanying the JSON object.
-
-Sample Output Format:
-{
-    "abstract_text": "Abstract text here"
-}
-
-Make sure the abstract is 250-300 words long.
-
-Here's the project title and description:
-
+Here's the project title and description, and the question-answer pairs:
 """
 
 SECTION_TOPIC_EXTRACTOR_PROMPT = """
