@@ -552,7 +552,6 @@ def project_plan_heading_node(state: State) -> State:
     return state
 
 
-
 def project_plan_body_generator(state: State) -> State:
     print(f"{Fore.LIGHTRED_EX}################ PROJECT PLAN BODY GENERATOR NODE BEGIN #################")
     
